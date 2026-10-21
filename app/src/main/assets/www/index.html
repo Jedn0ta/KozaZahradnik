@@ -1,3 +1,4 @@
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="claude:viewport-fit-sides" content="cover">
 <title>Koza Zahradník</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Nunito+Sans:wght@400;600;700;800&display=swap">
@@ -896,7 +897,7 @@ const HNOJIVA = ['Kompost','Zralý hnůj','Cererit (NPK)','Rohová moučka','Kos
 
 /* ============ STAV ============ */
 let state = {
-  adresa: '', parcela: '',
+  adresa: '', parcela: '', psc: '',
   outline: [],        // [[x,y], ...] v metrech
   outlineDone: false,
   items: {},          // id -> { id, typ, x, y, w, h, nazev, cropId, datumVysadby, poznamka, fotky, hnojeni }
@@ -1577,6 +1578,9 @@ function hnojeniZanedbano(it) {
    selze. V aplikaci (WebView s nativnim mostem) to bezi. */
 const CUZK_WFS = 'https://services.cuzk.cz/wfs/inspire-cp-wfs.asp';
 const CRS84 = 'http://www.opengis.net/def/crs/EPSG/0/4326';
+/* Sluzba chce nazev vrstvy s predponou jmenneho prostoru, jinak dotaz odmitne. */
+const CP_NS = 'http://inspire.ec.europa.eu/schemas/cp/4.0';
+const CP_TYPE = 'cp:CadastralParcel';
 
 /* V aplikaci jde pozadavek pres nativni most, jinak pres fetch.
    Most obchazi CORS, ktery by ve WebView jinak dotazy na CUZK zablokoval. */
@@ -1608,6 +1612,27 @@ function naMetry(body, lat0, lon0) {
   return body.map(p => [ (p[1] - lon0) * mLon, -(p[0] - lat0) * mLat ]);
 }
 
+/* Chyba je jen tehdy, kdyz je ExceptionReport korenem dokumentu. Sluzba totiz
+   k platne odpovedi pripojuje <truncatedResponse> s ExceptionReport uvnitr,
+   kdyz vypis zkratila. To neni chyba, jen upozorneni. */
+function chybaSluzby(xml) {
+  if (!xml) return 'prázdná odpověď';
+  let doc;
+  try { doc = new DOMParser().parseFromString(xml, 'application/xml'); }
+  catch (q) { return 'odpověď nejde přečíst'; }
+  const root = doc.documentElement;
+  if (!root || doc.querySelector('parsererror')) return 'odpověď nejde přečíst';
+  if (root.localName !== 'ExceptionReport') return null;
+  const t = root.getElementsByTagNameNS('*', 'ExceptionText');
+  if (t.length) return (t[0].textContent || '').trim().slice(0, 220);
+  const e = root.getElementsByTagNameNS('*', 'Exception');
+  if (e.length) return (e[0].getAttribute('exceptionCode') || 'neznámá chyba');
+  return 'služba vrátila chybové hlášení';
+}
+/* Sluzba zkratila vypis: parcely jsou platne, jen jich je v okoli vic */
+function zkraceno(xml) {
+  return !!xml && xml.indexOf('truncatedResponse') >= 0;
+}
 /* Z GML vytahneme souradnicove seznamy. Poradi os overujeme podle rozsahu CR. */
 function parsujGml(xml) {
   const doc = new DOMParser().parseFromString(xml, 'application/xml');
@@ -1632,19 +1657,32 @@ async function nactiParcelu(adresa) {
   katStav = { stav:'geokoduji', text:'Hledám adresu…' };
   renderGarden();
   const m = await geokoduj(adresa);
-  if (!m) { katStav = { stav:'chyba', text:'Adresu „' + adresa + '" jsem nenašel. Zkus ji napsat i s obcí.' }; renderGarden(); return; }
+  if (!m) { katStav = { stav:'chyba', text:'Adresu „' + adresa + '" jsem nenašel. Zkus ji doplnit o PSČ nebo obec.' }; renderGarden(); return; }
+  const kde = (m.nazev || '').split(',').slice(0,3).join(',').trim();
 
   katStav = { stav:'parcela', text:'Mám souřadnice, stahuji parcelu z katastru…' };
   renderGarden();
   const d = 0.0012;  // asi 130 m na vysku
   const bbox = [ (m.lat-d), (m.lon-d*1.6), (m.lat+d), (m.lon+d*1.6) ].map(x=>x.toFixed(6)).join(',');
   const u = CUZK_WFS + '?service=WFS&version=2.0.0&request=GetFeature'
-    + '&typenames=CadastralParcel&count=60'
+    + '&typenames=' + encodeURIComponent(CP_TYPE)
+    + '&namespaces=' + encodeURIComponent('xmlns(cp,' + CP_NS + ')')
+    + '&count=60'
     + '&srsName=' + encodeURIComponent(CRS84)
     + '&BBOX=' + bbox + ',' + encodeURIComponent(CRS84);
   const xml = await httpGet(u, 'application/xml');
+
+  // sluzba hlasi chyby jako ExceptionReport, ne jako HTTP chybu
+  const vyjimka = chybaSluzby(xml);
+  if (vyjimka) {
+    katStav = { stav:'chyba', text:'Katastr odmítl dotaz: ' + vyjimka };
+    renderGarden(); return;
+  }
   const polygony = parsujGml(xml);
-  if (!polygony.length) { katStav = { stav:'chyba', text:'Katastr pro tohle místo nevrátil žádnou parcelu.' }; renderGarden(); return; }
+  if (!polygony.length) {
+    katStav = { stav:'chyba', text:'Katastr pro tohle místo nevrátil žádnou parcelu. Může jít o území bez digitální mapy, nebo je adresa mimo zastavěnou část.' };
+    renderGarden(); return;
+  }
 
   // parcela, ve ktere nalezeny bod lezi; jinak ta s nejblizsim stredem
   let vybrana = polygony.find(poly => pointInPoly(m.lon, m.lat, poly.map(q => [q[1], q[0]])));
@@ -1667,8 +1705,9 @@ async function nactiParcelu(adresa) {
   state.outline = metry;
   state.outlineDone = true;
   state.sel = null; state.selVert = null;
-  state.adresa = adresa;
-  katStav = { stav:'ok', text:'Parcela načtena z katastru · ' + fmtA(polyArea(metry)) + ' · ' + metry.length + ' lomových bodů' };
+  katStav = { stav:'ok', text:'Parcela z katastru · ' + fmtA(polyArea(metry)) + ' · ' + metry.length + ' lomových bodů'
+    + (zkraceno(xml) ? ' · v okolí je parcel víc, vybral jsem tu pod adresou' : '')
+    + (kde ? '\n' + kde : '') };
   save(); renderGarden(); fitView();
   toast('Parcela načtena, ' + fmtA(polyArea(metry)));
 }
@@ -1676,10 +1715,14 @@ async function nactiParcelu(adresa) {
 let katStav = { stav:'idle', text:'' };
 function nactiObrys() {
   const a = (el('addr-input').value || '').trim();
-  if (!a) { toast('Napiš adresu zahrady'); return; }
-  state.adresa = a; save();
-  nactiParcelu(a).catch(e => {
-    katStav = { stav:'blokovano', text: String((e && e.message) || e) };
+  const psc = ((el('psc-input') || {}).value || '').trim();
+  if (!a) { toast('Napiš ulici a číslo popisné'); return; }
+  state.adresa = a; state.psc = psc; save();
+  // PSC dotaz zpresni, bez nej je stejna ulice ve vice obcich
+  const dotaz = psc ? a + ', ' + psc : a;
+  nactiParcelu(dotaz).catch(e => {
+    const m = String((e && e.message) || e);
+    katStav = { stav:'blokovano', text: m };
     renderGarden();
   });
 }
@@ -1722,15 +1765,18 @@ function renderGarden() {
     </div>
     <div class="addr-card">
       <div class="addr-row">
-        <input id="addr-input" placeholder="Zdická 1351/15, Praha" value="${esc(state.adresa)}" aria-label="Adresa zahrady">
-        <button class="btn sm" id="addr-load">${katStav.stav==='geokoduji'||katStav.stav==='parcela' ? 'Hledám…' : 'Z katastru'}</button>
+        <input id="addr-input" placeholder="Zdická 1351/15" value="${esc(state.adresa)}" aria-label="Ulice a číslo popisné" style="flex:2">
+        <input id="psc-input" placeholder="PSČ" inputmode="numeric" maxlength="7" value="${esc(state.psc || '')}" aria-label="PSČ" style="flex:0 0 94px">
       </div>
+      <button class="btn" id="addr-load" style="width:100%;justify-content:center;margin-top:9px">
+        ${katStav.stav==='geokoduji'||katStav.stav==='parcela' ? 'Hledám…' : 'Načíst z katastru'}
+      </button>
       ${katStav.text ? `<div class="${katStav.stav==='ok'?'live-ok':(katStav.stav==='ukazka'?'live-ok':'live-bad')}" style="margin-top:8px">${katStav.stav==='ok'?'● ':''}${esc(katStav.text)}</div>` : ''}
-      ${katStav.stav==='blokovano' ? `<div class="live-bad" style="margin-top:8px">Tahle stránka nemá přístup k síti, takže z katastru stahovat nejde. V aplikaci to funguje. Zatím si obrys nakresli sám, nebo si načti ukázku.</div>` : ''}
+      ${katStav.stav==='blokovano' ? `<div class="live-bad" style="margin-top:8px">Stažení z katastru se nepovedlo: <strong>${esc(katStav.text)}</strong><br>Zatím si obrys nakresli sám, nebo načti ukázku.</div>` : ''}
       <div class="actrow" style="margin-top:9px">
         <button class="btn sm ghost" id="addr-demo">Ukázková parcela</button>
       </div>
-      <p class="addr-note">Obrys se stáhne z katastru podle adresy a pak ho upravíš.</p>
+      <p class="addr-note">PSČ zadej taky, jinak může být stejná ulice v jiné obci. Obrys pak můžeš upravit. Digitální mapa pokrývá 99,5 % území.</p>
     </div>
     <div class="toolrow">
       ${TOOLS.map(t=>`<button class="tool ${state.tool===t.id?'active':''}" data-tool="${t.id}">
@@ -1786,6 +1832,8 @@ function renderGarden() {
   `;
 
   el('addr-load').onclick = nactiObrys;
+  const pi = el('psc-input');
+  if (pi) pi.onchange = () => { state.psc = pi.value.trim(); save(); };
   el('addr-demo').onclick = () => confirmDialog('Načíst ukázkovou parcelu?','Přepíše to současný obrys zahrady.', ukazkovyObrys);
   const ai = el('addr-input');
   ai.onchange = () => { state.adresa = ai.value; save(); };
