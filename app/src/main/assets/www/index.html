@@ -426,6 +426,7 @@ h1,h2,h3,h4 { margin: 0; font-weight: 800; letter-spacing: -.02em; }
 .cal .cday .dots i.voda { background: var(--sky); }
 .cal .cday .dots i.hnuj { background: var(--earth); }
 .cal .cday .dots i.vysadba { background: var(--acc); }
+.cal .cday .dots i.sklizen { background: var(--sun); }
 .cal .cday.mam { background: var(--card); border-color: var(--line); }
 .callegend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 12px; font-size: 11.5px; font-weight: 700; color: var(--ink3); }
 .callegend span { display: flex; align-items: center; gap: 5px; }
@@ -603,6 +604,63 @@ body { font-size: 17px; }
 }
 .cfoto figure > button.x { left: auto; right: 4px; top: 4px; bottom: auto; font-size: 17px; font-weight: 700; padding: 0; }
 
+/* ---------- obrazovka Dnes ---------- */
+.dnes-hlava { display: flex; align-items: center; gap: 12px; margin-top: 18px; }
+.dh-t { flex: 1; min-width: 0; }
+.dh-t b { display: block; font-size: 23px; font-weight: 800; letter-spacing: -.03em; }
+.dh-t span { display: block; font-size: 14px; font-weight: 600; color: var(--ink3); margin-top: 2px; }
+.dh-w {
+  flex: none; display: flex; align-items: center; gap: 9px; padding: 9px 13px 9px 10px;
+  background: var(--acc-dark); color: #fff; border-radius: 16px; box-shadow: var(--sh);
+}
+.dh-w .wi { width: 30px; height: 30px; flex: none; }
+.dh-w .wt { display: block; text-align: left; }
+.dh-w .wt b { display: block; font-size: 17px; font-weight: 800; }
+.dh-w .wt span { display: block; font-size: 11px; font-weight: 600; opacity: .85; max-width: 92px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.ukol { display: flex; align-items: center; gap: 12px; padding: 13px; }
+.ukol .ui { width: 46px; height: 46px; flex: none; border-radius: 14px; display: grid; place-items: center; padding: 10px; background: var(--bg2); color: var(--ink2); }
+.ukol .ui.zalij { background: #dceaf4; color: #276692; }
+.ukol .ui.hnoj { background: var(--earth-soft); color: #8a5230; }
+.ukol .ui.sklid { background: var(--acc-soft); color: var(--acc-dark); }
+.ukol .um { display: block; flex: 1; min-width: 0; }
+.ukol .um b { display: block; font-size: 16px; font-weight: 800; letter-spacing: -.01em; }
+.ukol .um span { display: block; font-size: 14px; font-weight: 500; color: var(--ink2); line-height: 1.45; margin-top: 2px; }
+.ukol .ok {
+  width: 50px; height: 50px; flex: none; border-radius: 15px; padding: 11px;
+  background: var(--acc); color: var(--acc-ink); box-shadow: var(--sh);
+}
+.ukol .ok:active { background: var(--acc-dark); }
+.wdays-plain { margin-top: 0; }
+.wdays-plain .wday { background: var(--bg2); color: var(--ink); }
+.wdays-plain .wday .mn { color: var(--ink3); }
+
+/* ---------- karta záhonu ---------- */
+.krok { display: flex; gap: 11px; align-items: flex-start; margin: 0 13px 12px; padding: 12px; border-radius: 14px; background: var(--bg2); }
+.krok .ki { width: 34px; height: 34px; flex: none; color: var(--ink2); }
+.krok .km { display: block; flex: 1; min-width: 0; }
+.krok .km b { display: block; font-size: 16px; font-weight: 800; }
+.krok .km span { display: block; font-size: 14px; font-weight: 500; color: var(--ink2); line-height: 1.45; margin-top: 2px; }
+.krok.zalij { background: #dceaf4; } .krok.zalij .ki { color: #276692; }
+.krok.hnoj { background: var(--earth-soft); } .krok.hnoj .ki { color: #8a5230; }
+.krok.sklid { background: var(--acc-soft); } .krok.sklid .ki { color: var(--acc-dark); }
+
+.akce { display: flex; gap: 8px; padding: 0 13px 12px; }
+.akce button {
+  flex: 1; min-width: 0; height: 56px; border-radius: 15px; border: 1.5px solid var(--line);
+  background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px; font-size: 12.5px; font-weight: 700; color: var(--ink2);
+}
+.akce button .ik { width: 24px; height: 24px; }
+.akce button:active { background: var(--acc-soft); border-color: var(--acc); }
+.akce button.done { background: var(--acc-soft); border-color: var(--acc); color: var(--acc-dark); }
+.tag.silny { background: var(--acc-soft); color: var(--acc-dark); font-weight: 800; }
+.varovani {
+  display: flex; gap: 9px; align-items: flex-start; margin: 0; padding: 0 13px 13px;
+  font-size: 13.5px; font-weight: 600; color: var(--sun); line-height: 1.5;
+}
+.varovani .ik { width: 20px; height: 20px; flex: none; margin-top: 1px; }
+
 /* ---------- nástroje na plán: svislá lišta u kraje, jen ikony ---------- */
 .mrail {
   position: absolute; left: 12px; z-index: 6;
@@ -636,25 +694,27 @@ body { font-size: 17px; }
   </header>
 
   <div id="view">
-    <section class="scr on" id="s-map"></section>
+    <section class="scr on" id="s-dnes"></section>
+    <section class="scr" id="s-map"></section>
     <section class="scr" id="s-beds"></section>
     <section class="scr" id="s-crops"></section>
     <section class="scr" id="s-cal"></section>
     <section class="scr" id="s-weather"></section>
+
   </div>
 
   <nav id="nav">
-    <button data-tab="map" class="on"><span class="ni" data-pix="mapa"></span>Zahrada</button>
+    <button data-tab="dnes" class="on"><span class="ni" data-pix="dnes"></span>Dnes</button>
+    <button data-tab="map"><span class="ni" data-pix="mapa"></span>Zahrada</button>
     <button data-tab="beds"><span class="ni" data-pix="zahon"></span>Záhonky</button>
     <button data-tab="crops"><span class="ni" data-pix="listek"></span>Plodiny</button>
     <button data-tab="cal"><span class="ni" data-pix="kalendar"></span>Kalendář</button>
-    <button data-tab="weather"><span class="ni" data-pix="slunce"></span>Počasí</button>
   </nav>
 </div>
 
 <script>
 
-const VERZE = 'v1.6 · 22. 10. 2026';
+const VERZE = 'v2.0 · 22. 10. 2026';
 const LOGO_KOZEL = `<svg viewBox="0 0 32 32" aria-hidden="true">
   <path d="M11.2 9.4C9.6 6.6 7.4 4.6 4.6 3.9c-.5-.1-.9.3-.8.8.5 2.9 1.9 5.4 4.1 7.2.7.6 1.5 1 2.4 1.3z" fill="#fff" opacity=".95"/>
   <path d="M20.8 9.4c1.6-2.8 3.8-4.8 6.6-5.5.5-.1.9.3.8.8-.5 2.9-1.9 5.4-4.1 7.2-.7.6-1.5 1-2.4 1.3z" fill="#fff" opacity=".95"/>
@@ -733,6 +793,8 @@ function load() {
           if (!i.zalivka) i.zalivka = [];
           if (i.rostliny === undefined) i.rostliny = null;
           if (i.zamek === undefined) i.zamek = false;
+          if (!Array.isArray(i.sklizen)) i.sklizen = [];
+          if (!Array.isArray(i.historie)) i.historie = [];
           if (!PRVKY[i.typ]) i.typ = 'bed';
           if (i.thumb !== undefined) delete i.thumb;
           i.fotky = (i.fotky || []).map(f => typeof f === 'string' ? { data:f, datum:'' } : f);
@@ -824,7 +886,7 @@ function shrinkImage(dataUrl, maxW, cb) {
 /* ============ DATA: plodiny ============
    soil = priprava pudy, sow = vysev, plant = vysadba, care = pece, harvest = sklizen */
 const CROPS = [
-  { id:'rajce', nazev:'Rajče', lat:'Solanum lycopersicum', emoji:'🍅', kat:'Plodová',
+  { id:'rajce', nazev:'Rajče', lat:'Solanum lycopersicum', emoji:'🍅', kat:'Plodová', celed:'Lilkovité', jednotka:'kg',
     sow:[2,3], plant:[5], harvest:[7,8,9], hustota:2.9,
     rozestup:'50 × 70 cm', hloubka:'1 cm (výsev)', slunce:'Plné slunce, 6+ h',
     pozor:'Plíseň bramborová při vlhku na listech. Zalévat vždy ke korenům, nikdy na listy. Vysazovat až po zmrzlých, tedy po 15. květnu.',
@@ -836,7 +898,7 @@ const CROPS = [
             {m:6,t:'Vyvázat ke kůlu, vyštipovat zálistky',ic:'✂️',typ:'care'}, {m:7,t:'Sklizeň prvních plodů',ic:'🍅',typ:'harvest'},
             {m:8,t:'Hlavní sklizeň',ic:'🍅',typ:'harvest'}, {m:9,t:'Dosklizeň, odstranit rostliny',ic:'🍅',typ:'harvest'} ] },
 
-  { id:'mrkev', nazev:'Mrkev', lat:'Daucus carota', emoji:'🥕', kat:'Kořenová',
+  { id:'mrkev', nazev:'Mrkev', lat:'Daucus carota', emoji:'🥕', kat:'Kořenová', celed:'Miříkovité', jednotka:'kg',
     sow:[3,4,5], plant:[], harvest:[7,8,9,10], hustota:130,
     rozestup:'3 × 25 cm', hloubka:'1–2 cm', slunce:'Slunce až polostín',
     pozor:'Nesnáší svěží hnůj, kořeny se rozdvojují. Pozor na pochmurnici mrkvovou: chránit plachetkou nebo pěstovat vedle cibule.',
@@ -848,7 +910,7 @@ const CROPS = [
             {m:6,t:'Protrhat a okopat',ic:'✂️',typ:'care'}, {m:7,t:'Sklizeň mladé mrkve',ic:'🥕',typ:'harvest'},
             {m:9,t:'Hlavní sklizeň',ic:'🥕',typ:'harvest'}, {m:10,t:'Vyndat před mrazy, uložit do písku',ic:'🥕',typ:'harvest'} ] },
 
-  { id:'salat', nazev:'Salát hlávkový', lat:'Lactuca sativa', emoji:'🥬', kat:'Listová',
+  { id:'salat', nazev:'Salát hlávkový', lat:'Lactuca sativa', emoji:'🥬', kat:'Listová', celed:'Hvězdnicovité', jednotka:'ks',
     sow:[3,4,7,8], plant:[4,5,8], harvest:[5,6,7,9,10], hustota:16,
     rozestup:'25 × 25 cm', hloubka:'0,5 cm', slunce:'Slunce, v létě polostín',
     pozor:'V horku vybíhá do květu a zhořkne. Slimáci, nejvíc po dešti. Sbírat ráno.',
@@ -860,7 +922,7 @@ const CROPS = [
             {m:6,t:'Sklizeň hlávek',ic:'🥬',typ:'harvest'}, {m:7,t:'Výsev pro podzim',ic:'🌱',typ:'sow'},
             {m:8,t:'Vysadit podzimní sazenice',ic:'🌿',typ:'plant'}, {m:10,t:'Poslední sklizeň',ic:'🥬',typ:'harvest'} ] },
 
-  { id:'cesnek', nazev:'Česnek', lat:'Allium sativum', emoji:'🧄', kat:'Cibulová',
+  { id:'cesnek', nazev:'Česnek', lat:'Allium sativum', emoji:'🧄', kat:'Cibulová', celed:'Amarylkovité', jednotka:'ks',
     sow:[], plant:[10,11], harvest:[7], hustota:40,
     rozestup:'10 × 25 cm', hloubka:'5–7 cm, špičkou nahoru', slunce:'Plné slunce',
     pozor:'Nesnáší zamokřenou půdu, hnije. Nesázet po cibuli ani po česneku, nechat 4 roky pauzu.',
@@ -872,7 +934,7 @@ const CROPS = [
             {m:5,t:'Odlomit květní stvoly u paličáku',ic:'✂️',typ:'care'}, {m:6,t:'Přestat zalévat',ic:'💧',typ:'care'},
             {m:7,t:'Sklidit, když zaschne třetina listů',ic:'🧄',typ:'harvest'} ] },
 
-  { id:'cuketa', nazev:'Cuketa', lat:'Cucurbita pepo', emoji:'🥒', kat:'Plodová',
+  { id:'cuketa', nazev:'Cuketa', lat:'Cucurbita pepo', emoji:'🥒', kat:'Plodová', celed:'Tykvovité', jednotka:'ks',
     sow:[4,5], plant:[5,6], harvest:[7,8,9], hustota:1.2,
     rozestup:'80 × 100 cm', hloubka:'2–3 cm', slunce:'Plné slunce',
     pozor:'Padlí na listech v druhé polovině léta. Nezalévat na listy. Potřebuje hodně místa, jedna rostlina zabere skoro metr čtvereční.',
@@ -884,7 +946,7 @@ const CROPS = [
             {m:7,t:'Sklízet mladé plody průběžně',ic:'🥒',typ:'harvest'}, {m:8,t:'Sklizeň, kontrola padlí',ic:'🥒',typ:'harvest'},
             {m:9,t:'Dosklizeň před mrazy',ic:'🥒',typ:'harvest'} ] },
 
-  { id:'redkvicka', nazev:'Ředkvička', lat:'Raphanus sativus', emoji:'🫜', kat:'Kořenová',
+  { id:'redkvicka', nazev:'Ředkvička', lat:'Raphanus sativus', emoji:'🫜', kat:'Kořenová', celed:'Brukvovité', jednotka:'ks',
     sow:[3,4,5,8,9], plant:[], harvest:[4,5,6,9,10], hustota:110,
     rozestup:'5 × 15 cm', hloubka:'1 cm', slunce:'Slunce až polostín',
     pozor:'V suchu a horku zdřevnatí a je pálivá. Dřepčíci dírkují listy, chránit plachetkou.',
@@ -896,7 +958,7 @@ const CROPS = [
             {m:8,t:'Podzimní výsev',ic:'🌱',typ:'sow'}, {m:9,t:'Podzimní sklizeň',ic:'🫜',typ:'harvest'},
             {m:10,t:'Poslední sklizeň',ic:'🫜',typ:'harvest'} ] },
 
-  { id:'fazole', nazev:'Fazole tyčková', lat:'Phaseolus vulgaris', emoji:'🫛', kat:'Luskovina',
+  { id:'fazole', nazev:'Fazole tyčková', lat:'Phaseolus vulgaris', emoji:'🫛', kat:'Luskovina', celed:'Bobovité', jednotka:'kg',
     sow:[5,6], plant:[], harvest:[7,8,9], hustota:17,
     rozestup:'10 × 60 cm u opory', hloubka:'3–4 cm', slunce:'Plné slunce, závětří',
     pozor:'Citlivá na chlad. Sít až když je půda nad 12 °C, jinak zahnije. Potřebuje oporu vysokou dva metry.',
@@ -907,7 +969,7 @@ const CROPS = [
             {m:6,t:'Dosev, navést na oporu',ic:'🌱',typ:'sow'}, {m:7,t:'První sklizeň lusků',ic:'🫛',typ:'harvest'},
             {m:8,t:'Sklízet průběžně dvakrát týdně',ic:'🫛',typ:'harvest'}, {m:9,t:'Dosklizeň, kořeny nechat v půdě',ic:'🫛',typ:'harvest'} ] },
 
-  { id:'dyne', nazev:'Dýně Hokaido', lat:'Cucurbita maxima', emoji:'🎃', kat:'Plodová',
+  { id:'dyne', nazev:'Dýně Hokaido', lat:'Cucurbita maxima', emoji:'🎃', kat:'Plodová', celed:'Tykvovité', jednotka:'ks',
     sow:[4,5], plant:[5,6], harvest:[9,10], hustota:0.7,
     rozestup:'100 × 150 cm', hloubka:'3 cm', slunce:'Plné slunce',
     pozor:'Zabírá velký prostor, výhony přesahují záhon. Plody nesmí ležet na mokré zemi, podložit deskou.',
@@ -918,7 +980,7 @@ const CROPS = [
             {m:5,t:'Vysadit po zmrzlých',ic:'🌿',typ:'plant'}, {m:7,t:'Podložit plody, mulčovat',ic:'✂️',typ:'care'},
             {m:9,t:'Sklizeň zralých dýní',ic:'🎃',typ:'harvest'}, {m:10,t:'Dosklizeň před mrazem, nechat dozrát',ic:'🎃',typ:'harvest'} ] },
 
-  { id:'hrasek', nazev:'Hrášek', lat:'Pisum sativum', emoji:'🫛', kat:'Luskovina',
+  { id:'hrasek', nazev:'Hrášek', lat:'Pisum sativum', emoji:'🫛', kat:'Luskovina', celed:'Bobovité', jednotka:'kg',
     sow:[3,4], plant:[], harvest:[6,7], hustota:50,
     rozestup:'5 × 40 cm', hloubka:'4 cm', slunce:'Slunce až polostín',
     pozor:'Snáší chlad, ale v letním horku končí. Padlí v suchu, zalévat ke korenům.',
@@ -929,7 +991,7 @@ const CROPS = [
             {m:4,t:'Dosev pro pozdější sklizeň',ic:'🌱',typ:'sow'}, {m:5,t:'Navést na oporu, okopat',ic:'✂️',typ:'care'},
             {m:6,t:'Sklizeň lusků',ic:'🫛',typ:'harvest'}, {m:7,t:'Dosklizeň, zarýt zbytky',ic:'🫛',typ:'harvest'} ] },
 
-  { id:'brambory', nazev:'Brambory', lat:'Solanum tuberosum', emoji:'🥔', kat:'Kořenová',
+  { id:'brambory', nazev:'Brambory', lat:'Solanum tuberosum', emoji:'🥔', kat:'Kořenová', celed:'Lilkovité', jednotka:'kg',
     sow:[], plant:[4,5], harvest:[7,8,9], hustota:4.8,
     rozestup:'30 × 70 cm', hloubka:'8–10 cm', slunce:'Plné slunce',
     pozor:'Mandelinka bramborová, kontrolovat listy od května a sbírat ručně. Plíseň při vlhku. Nesázet po rajčatech.',
@@ -940,7 +1002,7 @@ const CROPS = [
             {m:5,t:'Sázet pozdní, nahrnout',ic:'🥔',typ:'plant'}, {m:6,t:'Nahrnout, kontrola mandelinky',ic:'✂️',typ:'care'},
             {m:7,t:'Sklizeň raných',ic:'🥔',typ:'harvest'}, {m:9,t:'Hlavní sklizeň, usušit před uložením',ic:'🥔',typ:'harvest'} ] },
 
-  { id:'spenat', nazev:'Špenát', lat:'Spinacia oleracea', emoji:'🥬', kat:'Listová',
+  { id:'spenat', nazev:'Špenát', lat:'Spinacia oleracea', emoji:'🥬', kat:'Listová', celed:'Laskavcovité', jednotka:'kg',
     sow:[3,4,8,9], plant:[], harvest:[5,6,10,11], hustota:90,
     rozestup:'5 × 20 cm', hloubka:'2 cm', slunce:'Polostín, nesnáší horko',
     pozor:'V dlouhém dni a horku vybíhá do květu. Je to jarní a podzimní plodina, ne letní.',
@@ -952,7 +1014,7 @@ const CROPS = [
             {m:9,t:'Podzimní výsev na přezimování',ic:'🌱',typ:'sow'}, {m:10,t:'Podzimní sklizeň',ic:'🥬',typ:'harvest'},
             {m:11,t:'Zakrýt chvojím na zimu',ic:'✂️',typ:'care'} ] },
 
-  { id:'jahody', nazev:'Jahody', lat:'Fragaria × ananassa', emoji:'🍓', kat:'Ovoce',
+  { id:'jahody', nazev:'Jahody', lat:'Fragaria × ananassa', emoji:'🍓', kat:'Ovoce', celed:'Růžovité', jednotka:'kg',
     sow:[], plant:[8,9], harvest:[6,7], hustota:8,
     rozestup:'30 × 40 cm', hloubka:'Srdíčko na úrovni země', slunce:'Plné slunce',
     pozor:'Srdíčko nesmí být zasypané ani vyvýšené, jinak hnije nebo zasychá. Plody na zemi hnijí, mulčovat slámou.',
@@ -1200,6 +1262,9 @@ const IK = {
   guma:     S('<path d="M4.5 16 10 10.5l7 7-3.5 3.5H8z"/><path d="M10 10.5 15 5.5l7 7-5 5"/><path d="M3 21h18"/>'),
   plus:     S('<path d="M12 5v14M5 12h14"/>'),
   adresa:   S('<circle cx="12" cy="10.5" r="3"/><path d="M12 21s7-5.6 7-10.5a7 7 0 1 0-14 0C5 15.4 12 21 12 21z"/>'),
+  dnes:     S('<path d="M4 12.5 9 17.5l11-11"/>'),
+  hotovo:   S('<circle cx="12" cy="12" r="9"/><path d="M8 12.2l2.8 2.8L16 9.8"/>'),
+  vaha:     S('<path d="M12 4.5v15M7 19.5h10"/><path d="M12 7 4.5 9.5 7 15h10l2.5-5.5z"/>'),
 };
 const ik = (id) => IK[id] || pixSvg(id);
 
@@ -1324,7 +1389,7 @@ function novyPrvek(typ, keys) {
   const id = 'p' + state.nextId++;
   const n = items().filter(i => i.typ === typ).length + 1;
   const it = state.items[id] = { id, typ, cells:[], nazev: PRVKY[typ].nazev + ' ' + n,
-    cropId:null, datumVysadby:'', poznamka:'', fotky:[], hnojeni:[], zalivka:[], rostliny:null, zamek:false };
+    cropId:null, datumVysadby:'', poznamka:'', fotky:[], hnojeni:[], zalivka:[], sklizen:[], historie:[], rostliny:null, zamek:false };
   addCells(it, keys);
   return it;
 }
@@ -1710,6 +1775,138 @@ function dialogPoctu(id) {
   };
 }
 const todayISO = () => new Date().toISOString().slice(0,10);
+
+/* ============ SKLIZEŇ ============
+   To hlavní, co zahradník chce rok od roku porovnávat: kolik toho
+   záhon dal. Zapisuje se datum, množství a jednotka podle plodiny. */
+const sklizne = (it) => (it.sklizen || []).slice().sort((a,b) => a.datum < b.datum ? 1 : -1);
+const lastHarvest = (it) => sklizne(it)[0] || null;
+function sklizenSoucet(it, rok) {
+  const out = {};
+  (it.sklizen || []).forEach(s => {
+    if (rok && Number(String(s.datum).slice(0,4)) !== rok) return;
+    const j = s.jednotka || 'kg';
+    out[j] = (out[j] || 0) + (Number(s.mnozstvi) || 0);
+  });
+  return out;
+}
+const soucetText = (o) => Object.keys(o).filter(j => o[j] > 0)
+  .map(j => fmtN(o[j]) + ' ' + j).join(' · ');
+/* Součet za celou zahradu podle plodin */
+function sklizenRoku(rok) {
+  const m = {};
+  beds().forEach(b => {
+    (b.sklizen || []).forEach(s => {
+      if (Number(String(s.datum).slice(0,4)) !== rok) return;
+      const cid = s.cropId || b.cropId;
+      const c = crop(cid);
+      if (!c) return;
+      const k = c.id;
+      m[k] = m[k] || { c, kg:0, ks:0 };
+      const j = s.jednotka || 'kg';
+      m[k][j === 'ks' ? 'ks' : 'kg'] += (Number(s.mnozstvi) || 0);
+    });
+  });
+  return Object.values(m).sort((a,b) => (b.kg + b.ks/10) - (a.kg + a.ks/10));
+}
+
+/* ============ OSEVNÍ POSTUP ============
+   Stejná čeleď po sobě na jednom místě vyčerpá půdu a nechá v ní
+   choroby. Záhon si proto pamatuje, co na něm který rok rostlo. */
+function zapisHistorii(it, cropId) {
+  if (!cropId) return;
+  it.historie = it.historie || [];
+  const rok = new Date().getFullYear();
+  if (it.historie.some(x => x.rok === rok && x.cropId === cropId)) return;
+  it.historie = it.historie.filter(x => !(x.rok === rok && x.cropId === cropId));
+  it.historie.push({ rok, cropId });
+  it.historie = it.historie.slice(-12);
+}
+function postupVarovani(it, cropId) {
+  const c = crop(cropId);
+  if (!c || !c.celed) return null;
+  const rok = new Date().getFullYear();
+  const kol = (it.historie || []).filter(x => {
+    if (x.rok >= rok) return false;
+    const cc = crop(x.cropId);
+    return cc && cc.celed === c.celed;
+  }).sort((a,b) => b.rok - a.rok);
+  if (!kol.length) return null;
+  const nej = kol[0];
+  const odstup = rok - nej.rok;
+  if (odstup > 3) return null;
+  const cc = crop(nej.cropId);
+  return `Osevní postup: v roce ${nej.rok} tu byla stejná čeleď (${cc.nazev} — ${c.celed.toLowerCase()}). `
+    + `Stejná čeleď má na stejné místo přijít nejdřív po čtyřech letech, jinak se v půdě drží choroby a ubývá živin.`;
+}
+/* Co po čem: luskoviny nechávají v půdě dusík, hodí se před náročné plodiny */
+function postupRada(it) {
+  const h = (it.historie || []).slice().sort((a,b) => b.rok - a.rok);
+  if (!h.length) return null;
+  const loni = h.find(x => x.rok === new Date().getFullYear() - 1);
+  if (!loni) return null;
+  const c = crop(loni.cropId);
+  if (!c) return null;
+  if (c.celed === 'Bobovité') return `Loni tady: ${c.nazev}. Luskoviny nechávají v půdě dusík — posaď sem letos něco náročného, třeba zelí, dýni nebo rajče.`;
+  return `Loni tady: ${c.nazev} (${c.celed.toLowerCase()}). Letos vyber jinou čeleď.`;
+}
+
+/* ============ CO TEĎ ============
+   Jedna konkrétní věc, která se na tomhle záhonu dá udělat dnes,
+   a hlavně proč. Skládá se z kalendáře plodiny, počasí a zápisů. */
+function dalsiKrok(b) {
+  const c = crop(b.cropId);
+  const m = new Date().getMonth() + 1;
+  if (!c) return { ik:'sazenice', t:'Vyber, co tu poroste', s:'Zatím tu nic není. Teprve podle plodiny ti appka poradí, kdy sít, zalévat a sklízet.', akce:'edit' };
+
+  if (c.harvest.includes(m)) {
+    const ls = lastHarvest(b);
+    return { ik:'kosik', t:'Sklízet', akce:'sklid',
+      s: ls ? `Sklizeň běží, naposledy ${relDays(ls.datum)}. Zapiš, kolik jsi odnesl.`
+            : `${MESICE[m-1].charAt(0).toUpperCase()+MESICE[m-1].slice(1)} je sklizňový měsíc: ${c.nazev}. Zapiš, kolik toho záhon dal.` };
+  }
+
+  // zálivka: jen v sezóně, jen když nemá pršet
+  if (m >= 4 && m <= 9) {
+    const w = lok(), dny = w.dny || [];
+    const maMm = dny.some(d => d.mm != null);
+    const prsi = dny.slice(0,2).some(d => maMm ? d.mm >= 3 : d.p >= 60);
+    const lw = lastWater(b);
+    const dn = lw ? dnuOd(lw) : null;
+    if (!prsi && (dn == null || dn >= 3)) {
+      return { ik:'konev', t:'Zalít', akce:'zalij',
+        s: dn == null ? 'Zálivka tu není zapsaná. Po zalití klepni na Zalít a appka ti to začne hlídat.'
+                      : `Naposledy zalito před ${dn} dny a déšť se nechystá.` };
+    }
+    if (prsi) {
+      const d = dny.slice(0,2).find(x => maMm ? x.mm >= 3 : x.p >= 60);
+      return { ik:'dest', t:'Zalévat nemusíš', akce:null,
+        s:`${d.d} ${maMm && d.mm > 0 ? 'spadne ' + fmtN(d.mm) + ' mm' : 'je ' + d.p + ' % šance na déšť'}. Nech to na přírodu.` };
+    }
+  }
+
+  // úkon z kalendáře plodiny
+  const poradi = { soil:0, sow:1, plant:2, care:3, harvest:4 };
+  const u = ukonyOf(c).filter(x => x.m === m).sort((a,b2) => poradi[a.typ] - poradi[b2.typ])[0];
+  if (u) return { ik: UKON_PIX[u.typ] || 'sazenice', t: u.t, akce:null,
+    s:`${MESICE[m-1].charAt(0).toUpperCase()+MESICE[m-1].slice(1)} · ${TYP_LABEL[u.typ]} — ${c.nazev}.` };
+
+  // hnojení, když dlouho nic
+  const lf = lastFert(b);
+  const dnF = lf ? dnuOd(lf.datum) : null;
+  if (m >= 3 && m <= 9 && (dnF == null || dnF > 60)) {
+    return { ik:'hnojivo', t:'Přihnojit', akce:'hnoj',
+      s: dnF == null ? 'Hnojení tu není zapsané. Kompost na jaře udělá nejvíc práce.'
+                     : `Naposledy hnojeno před ${dnF} dny.` };
+  }
+
+  if (m >= 10 || m <= 2) {
+    const r = postupRada(b);
+    return { ik:'klid', t:'Teď je klid', akce:null,
+      s: r || `${c.nazev} má po sezóně. Přes zimu stačí záhon zakrýt kompostem nebo listím.` };
+  }
+  return { ik:'klid', t:'Nic nutného', akce:null, s:`${c.nazev} teď nic nepotřebuje. Příští úkon se objeví sám.` };
+}
 function lastWater(it) {
   const z = (it.zalivka || []).slice().sort();
   return z.length ? z[z.length-1] : null;
@@ -2192,6 +2389,7 @@ const el = (id) => document.getElementById(id);
 const esc = (s) => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 const TABY = {
+  dnes:    { nadpis: 'Dnes',     render: () => kresliDnes() },
   map:     { nadpis: 'Zahrada',  render: () => kresliMapu() },
   beds:    { nadpis: 'Záhonky',  render: () => kresliZahonky() },
   crops:   { nadpis: 'Plodiny',  render: () => kresliPlodiny() },
@@ -2199,7 +2397,7 @@ const TABY = {
   weather: { nadpis: 'Počasí',   render: () => kresliPocasi() },
 };
 function prepni(tab) {
-  if (!TABY[tab]) tab = 'map';
+  if (!TABY[tab]) tab = 'dnes';
   state.tab = tab; save();
   document.querySelectorAll('.scr').forEach(s => s.classList.remove('on'));
   el('s-' + tab).classList.add('on');
@@ -2215,6 +2413,125 @@ function toast(zprava) {
   t.textContent = zprava; t.style.opacity = '1';
   clearTimeout(toastT);
   toastT = setTimeout(() => { t.style.opacity = '0'; }, 2200);
+}
+
+/* ============ OBRAZOVKA: DNES ============
+   Domovská obrazovka odpovídá na jedinou otázku: co mám dneska udělat.
+   Úkoly nevznikají ručně — appka je odvodí z plodin, počasí a zápisů,
+   a odškrtnutí rovnou zapíše zálivku, hnojení nebo sklizeň. */
+function ukolyDnes() {
+  const out = [];
+  beds().forEach(b => {
+    const k = dalsiKrok(b);
+    if (!k.akce || k.akce === 'edit') return;
+    out.push({ b, k });
+  });
+  const vaha = { sklid:0, zalij:1, hnoj:2 };
+  out.sort((x,y) => (vaha[x.k.akce] ?? 9) - (vaha[y.k.akce] ?? 9));
+  return out;
+}
+function kresliDnes() {
+  const s = el('s-dnes');
+  const w = lok(), dnes = w.dny[0];
+  const rok = new Date().getFullYear();
+  const uk = ukolyDnes();
+  const hlidac = zalivkaStav().filter(x => x.alert);
+  const sklizen = sklizenRoku(rok);
+  const celkem = { kg:0, ks:0 };
+  sklizen.forEach(x => { celkem.kg += x.kg; celkem.ks += x.ks; });
+  const hotovoDnes = beds().filter(b => {
+    const t = todayISO();
+    return (b.zalivka||[]).includes(t) || (b.hnojeni||[]).some(f=>f.datum===t) || (b.sklizen||[]).some(f=>f.datum===t);
+  }).length;
+  const den = ['v neděli','v pondělí','v úterý','ve středu','ve čtvrtek','v pátek','v sobotu'][new Date().getDay()];
+
+  s.innerHTML = `<div class="scroll">
+    <div class="dnes-hlava">
+      <div class="dh-t">
+        <b>${esc(pozdrav())}</b>
+        <span>${esc(formatDate(todayISO()))}</span>
+      </div>
+      <button class="dh-w" id="d-pocasi">
+        <span class="wi">${ikonaDne(dnes)}</span>
+        <span class="wt"><b>${fmtN(w.t)}°</b><span>${esc(w.nazev)}</span></span>
+      </button>
+    </div>
+
+    ${!beds().length ? `<div class="empty" style="padding:30px 10px 10px">
+      <div class="ei">${ik('zahon')}</div>
+      <h3>Začni zahradou</h3>
+      <p>Načti parcelu z katastru, nakresli záhony<br>a přiřaď jim plodiny. Pak se tu objeví úkoly.</p>
+      <button class="btn" id="d-naplan">Otevřít plán zahrady</button>
+    </div>` : `
+
+    <div class="sec">
+      <div class="sec-h"><h2>Na dnešek</h2><span class="n">${uk.length ? uk.length : 'hotovo'}</span></div>
+      ${uk.length ? `<div class="list">
+        ${uk.map(o => `<div class="card ukol">
+          <span class="ui ${o.k.akce}">${ik(o.k.ik)}</span>
+          <span class="um"><b>${esc(o.k.t)} — ${esc(o.b.nazev)}</b><span>${esc(o.k.s)}</span></span>
+          <button class="ok" data-hotovo="${o.b.id}|${o.k.akce}" aria-label="Hotovo">${ik('hotovo')}</button>
+        </div>`).join('')}
+      </div>` : `<div class="card task">
+        <span class="ti2" style="background:var(--acc-soft);color:var(--acc-dark)">${ik('hotovo')}</span>
+        <span class="tm"><b>Dneska nic nehoří</b><span>${hotovoDnes ? 'Zapsal sis ' + hotovoDnes + '× práci. ' : ''}Zahrada si vystačí sama, stav najdeš v Záhoncích.</span></span>
+      </div>`}
+    </div>
+
+    ${hlidac.length ? `<div class="sec">
+      <div class="sec-h"><h2>Hlídač počasí</h2><span class="n">${hlidac.length}</span></div>
+      <div class="list">
+        ${hlidac.map(x=>`<div class="card watch alert"><span class="wi">${x.ic}</span>
+          <span class="wb"><b>${esc(x.title)}</b><span>${esc(x.sub)}</span></span></div>`).join('')}
+      </div>
+    </div>` : ''}
+
+    <div class="sec">
+      <div class="sec-h"><h2>Sklizeň ${rok}</h2>
+        <span class="n">${celkem.kg || celkem.ks ? esc(soucetText(celkem)) : '—'}</span></div>
+      ${sklizen.length ? `<div class="list">
+        ${sklizen.slice(0,6).map(x=>`<button class="card row" data-crop="${x.c.id}">
+          <span class="thumb">${cropArt(x.c)}</span>
+          <span class="mid"><b>${esc(x.c.nazev)}</b><span>${esc(soucetText({kg:x.kg, ks:x.ks}))}</span></span>
+          <svg class="go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
+        </button>`).join('')}
+      </div>` : `<p class="note" style="margin-top:0">Zatím nic zapsaného. Až něco sklidíš, klepni u záhonku na <b>Sklidit</b> a zapiš kolik — za pár let uvidíš, který záhon se vyplatí.</p>`}
+    </div>
+
+    <div class="sec">
+      <div class="sec-h"><h2>Předpověď</h2><span class="n">${esc(w.nazev)}</span></div>
+      <div class="wdays wdays-plain">
+        ${w.dny.map(d=>`<div class="wday"><div class="dd">${esc(d.d)}</div><div class="ic">${ikonaDne(d)}</div>
+          <div class="mx">${Math.round(d.max)}°</div><div class="mn">${Math.round(d.min)}°</div></div>`).join('')}
+      </div>
+      <button class="btn sm sec wide" id="d-vice" style="margin-top:12px">Počasí a hlídač podrobně</button>
+    </div>
+    `}
+  </div>`;
+
+  const np = el('d-naplan'); if (np) np.onclick = () => prepni('map');
+  const dv = el('d-vice'); if (dv) dv.onclick = () => otevriPocasi();
+  el('d-pocasi').onclick = () => otevriPocasi();
+  s.querySelectorAll('[data-crop]').forEach(b => b.onclick = () => dialogPlodiny(b.dataset.crop));
+  s.querySelectorAll('[data-hotovo]').forEach(b => b.onclick = () => {
+    const [id, akce] = b.dataset.hotovo.split('|');
+    if (akce === 'zalij') { quickWater(id); kresliDnes(); }
+    else if (akce === 'hnoj') { quickFert(id); kresliDnes(); }
+    else if (akce === 'sklid') dialogSklizne(id, () => kresliDnes());
+  });
+}
+function pozdrav() {
+  const hod = new Date().getHours();
+  if (hod < 10) return 'Dobré ráno';
+  if (hod < 18) return 'Dobrý den';
+  return 'Dobrý večer';
+}
+/* Počasí je teď podstránka Dneška, ne samostatná záložka */
+function otevriPocasi() {
+  document.querySelectorAll('.scr').forEach(x => x.classList.remove('on'));
+  el('s-weather').classList.add('on');
+  el('bar-title').textContent = 'Počasí';
+  kresliPocasi();
 }
 
 /* ============ OBRAZOVKA: ZAHRADA (mapa) ============ */
@@ -2925,6 +3242,9 @@ function kartaZahonu(b, m) {
   const pr = pocetRostlin(b);
   const lw = lastWater(b), lf = lastFert(b);
   const dnes = lw && dnuOd(lw) === 0;
+  const krok = dalsiKrok(b);
+  const sez = soucetText(sklizenSoucet(b, new Date().getFullYear()));
+  const varovani = c ? postupVarovani(b, c.id) : null;
   return `<div class="card">
     ${fs.length ? `<div class="photo-strip">
       ${fs.map((f,i)=>`<figure data-foto="${b.id}|${i}"><img class="photo" src="${f.data}" alt="">
@@ -2933,34 +3253,40 @@ function kartaZahonu(b, m) {
 
     <div class="row">
       <span class="thumb">${c ? cropArt(c) : prvekPix(b.typ)}</span>
-      <span class="mid"><b>${esc(c ? c.nazev : b.nazev)}</b><span>${esc(b.nazev)} · ${fmtA(itArea(b))}</span></span>
-      <button class="act ${dnes?'done':''}" data-zalij="${b.id}" aria-label="Zalít">${ik('konev')}</button>
+      <span class="mid"><b>${esc(c ? c.nazev : b.nazev)}</b><span>${esc(b.nazev)} · ${fmtA(itArea(b))}${pr != null ? ' · ' + pr + ' ' + rostlinSlovo(pr) : ''}</span></span>
     </div>
 
-    ${pr != null ? `<div class="count">
-      <button data-minus="${b.id}" aria-label="O jednu méně">−</button>
-      <button class="cv" data-pocet="${b.id}"><b>${pr}</b><span>${pr===1?'rostlina':(pr>=2&&pr<=4?'rostliny':'rostlin')}</span></button>
-      <button data-plus="${b.id}" aria-label="O jednu víc">+</button>
+    <div class="krok ${krok.akce || 'klid'}">
+      <span class="ki">${ik(krok.ik)}</span>
+      <span class="km"><b>${esc(krok.t)}</b><span>${esc(krok.s)}</span></span>
+    </div>
+
+    ${c ? `<div class="akce">
+      <button data-zalij="${b.id}" class="${dnes?'done':''}">${ik('konev')}<span>${dnes?'Zalito':'Zalít'}</span></button>
+      <button data-hnoj="${b.id}">${ik('hnojivo')}<span>Pohnojit</span></button>
+      <button data-sklid="${b.id}">${ik('kosik')}<span>Sklidit</span></button>
     </div>` : ''}
 
     <div class="tags">
+      ${sez ? `<span class="tag silny">${ik('vaha')}letos ${esc(sez)}</span>` : ''}
       ${lw ? `<span class="tag">${ik('konev')}${esc(relDays(lw))}</span>` : ''}
       ${lf ? `<span class="tag">${ik('hnojivo')}${esc(relDays(lf.datum))}</span>` : ''}
       ${b.zamek ? `<span class="tag">${ik('zamek')}zamčeno</span>` : ''}
       ${!itemInside(b) ? `<span class="tag warn">mimo zahradu</span>` : ''}
-      <button class="tag" data-hnoj="${b.id}">${ik('hnojivo')}Pohnojit</button>
+      ${pr != null ? `<button class="tag" data-pocet="${b.id}">${pr} ${rostlinSlovo(pr)}</button>` : ''}
       <button class="tag" data-upravit="${b.id}">Upravit</button>
       ${c ? `<button class="tag" data-plodina="${c.id}">O plodině</button>` : ''}
     </div>
+    ${varovani ? `<p class="varovani">${ik('pozor')}<span>${esc(varovani)}</span></p>` : ''}
   </div>`;
 }
+const rostlinSlovo = (n) => n === 1 ? 'rostlina' : (n >= 2 && n <= 4 ? 'rostliny' : 'rostlin');
 
 function napojZahonky(s) {
   s.querySelectorAll('[data-zalij]').forEach(b => b.onclick = () => { quickWater(b.dataset.zalij); kresliZahonky(); });
   s.querySelectorAll('[data-hnoj]').forEach(b => b.onclick = () => { quickFert(b.dataset.hnoj); kresliZahonky(); });
-  s.querySelectorAll('[data-minus]').forEach(b => b.onclick = () => { zmenRostliny(b.dataset.minus, -1); kresliZahonky(); });
-  s.querySelectorAll('[data-plus]').forEach(b => b.onclick = () => { zmenRostliny(b.dataset.plus, 1); kresliZahonky(); });
   s.querySelectorAll('[data-pocet]').forEach(b => b.onclick = () => dialogPoctu(b.dataset.pocet));
+  s.querySelectorAll('[data-sklid]').forEach(b => b.onclick = () => dialogSklizne(b.dataset.sklid, () => kresliZahonky()));
   s.querySelectorAll('[data-upravit]').forEach(b => b.onclick = () => dialogPrvku(b.dataset.upravit));
   s.querySelectorAll('[data-plodina]').forEach(b => b.onclick = () => dialogPlodiny(b.dataset.plodina));
   s.querySelectorAll('[data-addfoto]').forEach(b => b.onclick = () => pridejFotku(b.dataset.addfoto));
@@ -3083,8 +3409,8 @@ function kresliNakup(s) {
 /* ============ OBRAZOVKA: KALENDÁŘ ============ */
 const DNY_ZKR = ['Po','Út','St','Čt','Pá','So','Ne'];
 const UKON_PIX = { soil:'ryc', sow:'semeno', plant:'sazenice', care:'pece', harvest:'kosik' };
-const ZAPIS_PIX = { voda:'konev', hnuj:'hnojivo', vysadba:'sazenice' };
-const ZAPIS_NAZEV = { voda:'Zalito', hnuj:'Pohnojeno', vysadba:'Vyseto nebo vysazeno' };
+const ZAPIS_PIX = { voda:'konev', hnuj:'hnojivo', vysadba:'sazenice', sklizen:'kosik' };
+const ZAPIS_NAZEV = { voda:'Zalito', hnuj:'Pohnojeno', vysadba:'Vyseto nebo vysazeno', sklizen:'Sklizeno' };
 
 /* Vsechno, co je v zahrade zapsane na konkretni den: zalivka, hnojeni, vysadba */
 function zapisyPoDnech() {
@@ -3094,6 +3420,7 @@ function zapisyPoDnech() {
     (b.zalivka || []).forEach(dt => pridej(dt, { typ:'voda', b }));
     (b.hnojeni || []).forEach(h => pridej(h.datum, { typ:'hnuj', b, co:h.co }));
     if (b.datumVysadby) pridej(b.datumVysadby, { typ:'vysadba', b });
+    (b.sklizen || []).forEach(s => pridej(s.datum, { typ:'sklizen', b, co: fmtN(s.mnozstvi) + ' ' + (s.jednotka||'kg') }));
   });
   return map;
 }
@@ -3152,6 +3479,7 @@ function kresliKalendar() {
         <span><i style="background:var(--sky)"></i>zalito</span>
         <span><i style="background:var(--earth)"></i>hnojeno</span>
         <span><i style="background:var(--acc)"></i>výsev či výsadba</span>
+        <span><i style="background:var(--sun)"></i>sklizeň</span>
       </div>
       ${mi !== dnes.getMonth() || rok !== dnes.getFullYear()
         ? `<button class="btn sm sec wide" id="c-dnes" style="margin-top:14px">Zpátky na dnešek</button>` : ''}
@@ -3220,6 +3548,7 @@ function kresliPocasi() {
   const w = lok(), dnes = w.dny[0], hlidac = zalivkaStav();
   s.innerHTML = `<div class="scroll">
     <div class="sec" style="margin-top:14px">
+      <button class="btn sm sec" id="w-zpet-dnes" style="margin-bottom:14px">← Zpět na Dnes</button>
       <div class="row2" style="margin-bottom:10px">
         <input class="chip" id="w-obec" style="flex:1;height:44px;padding:0 14px;border-radius:12px;font-weight:600"
           placeholder="Obec" value="${esc(state.liveDotaz || '')}">
@@ -3262,6 +3591,7 @@ function kresliPocasi() {
         : `Uložená data odečtená ${esc(ODECTENO)}. Tlačítkem Načíst zkusí appka stáhnout živou předpověď pro jakoukoli obec.`}</div>
     </div>
   </div>`;
+  el('w-zpet-dnes').onclick = () => prepni('dnes');
   el('w-nacti').onclick = () => {
     const q = el('w-obec').value.trim();
     if (!q) { toast('Napiš obec'); return; }
@@ -3291,6 +3621,51 @@ function potvrd(nadpis, text, ano) {
   d.querySelector('#c-ano').onclick = () => { zavri(); ano(); };
 }
 
+/* --- zápis sklizně --- */
+function dialogSklizne(id, potom) {
+  const it = state.items[id]; if (!it) return;
+  const c = crop(it.cropId);
+  const jed = (c && c.jednotka) || 'kg';
+  const letos = sklizenSoucet(it, new Date().getFullYear());
+  const d = dialog(`<h2>Kolik jsi sklidil</h2>
+    <p class="lead">${esc(it.nazev)}${c ? ' · ' + esc(c.nazev) : ''}</p>
+    ${soucetText(letos) ? `<div class="info" style="margin-bottom:16px;background:var(--acc-soft);color:var(--acc-dark)">Letos už máš z tohohle záhonu <b>${esc(soucetText(letos))}</b>.</div>` : ''}
+    <div class="row2">
+      <div class="field" style="flex:1.4"><label for="s-mn">Množství</label>
+        <input type="number" id="s-mn" min="0" step="0.1" inputmode="decimal" placeholder="0"></div>
+      <div class="field" style="flex:1"><label for="s-j">Jednotka</label>
+        <select id="s-j"><option value="kg" ${jed==='kg'?'selected':''}>kg</option>
+        <option value="ks" ${jed==='ks'?'selected':''}>kusů</option></select></div>
+    </div>
+    <div class="field"><label for="s-d">Datum</label><input type="date" id="s-d" value="${todayISO()}"></div>
+    <div class="field"><label for="s-p">Poznámka</label><input id="s-p" placeholder="Jaké byly, co s nimi…"></div>
+    ${sklizne(it).length ? `<div class="sec-h"><h2>Zapsané sklizně</h2></div>
+      <div class="list" style="gap:7px;margin-bottom:16px">
+        ${sklizne(it).slice(0,8).map((f,i)=>`<div class="card row" style="padding:10px 12px">
+          <span class="mid"><b style="font-size:15px">${fmtN(f.mnozstvi)} ${esc(f.jednotka||'kg')}</b>
+            <span>${esc(formatDate(f.datum))}${f.pozn ? ' · ' + esc(f.pozn) : ''}</span></span>
+          <button class="tag" data-srm="${esc(f.datum)}|${i}">×</button></div>`).join('')}
+      </div>` : ''}
+    <div class="dacts"><button class="btn sec" id="s-zrus">Zrušit</button>
+    <button class="btn" id="s-ok">Zapsat sklizeň</button></div>`);
+  d.querySelector('#s-zrus').onclick = zavri;
+  d.querySelectorAll('[data-srm]').forEach(b => b.onclick = () => {
+    const f = sklizne(it)[Number(b.dataset.srm.split('|')[1])];
+    it.sklizen = (it.sklizen||[]).filter(x => x !== f);
+    save(); dialogSklizne(id, potom);
+  });
+  d.querySelector('#s-ok').onclick = () => {
+    const mn = parseFloat(d.querySelector('#s-mn').value);
+    if (!(mn > 0)) { toast('Napiš, kolik toho bylo'); return; }
+    it.sklizen = it.sklizen || [];
+    it.sklizen.push({ datum: d.querySelector('#s-d').value || todayISO(), mnozstvi: mn,
+      jednotka: d.querySelector('#s-j').value, pozn: d.querySelector('#s-p').value.trim(), cropId: it.cropId });
+    zapisHistorii(it, it.cropId);
+    save(); zavri(); kresliZahonky(); toast('Sklizeň zapsána: ' + fmtN(mn) + ' ' + d.querySelector('#s-j').value);
+    if (potom) potom();
+  };
+}
+
 /* --- prvek na plánu --- */
 function dialogPrvku(id) {
   const it = state.items[id]; if (!it) return;
@@ -3316,7 +3691,20 @@ function dialogPrvku(id) {
       ${odhadRostlin(it) != null ? `<div class="field"><label for="d-rost">Počet rostlin</label>
         <input type="number" id="d-rost" min="0" value="${pocetRostlin(it)}">
         <p class="note" style="margin-top:6px">Z plochy a rozestupu vychází ${odhadRostlin(it)}.</p></div>` : ''}
+      ${postupVarovani(it, it.cropId) ? `<p class="varovani" style="padding:0 0 14px">${ik('pozor')}<span>${esc(postupVarovani(it, it.cropId))}</span></p>` : ''}
       <div class="field"><label for="d-datum">Datum výsevu</label><input type="date" id="d-datum" value="${esc(it.datumVysadby)}"></div>
+
+      <div class="field"><label>Sklizeň</label>
+        ${soucetText(sklizenSoucet(it, new Date().getFullYear()))
+          ? `<p class="note" style="margin:0 0 9px">Letos z tohohle záhonu <b>${esc(soucetText(sklizenSoucet(it, new Date().getFullYear())))}</b>.</p>`
+          : `<p class="note" style="margin:0 0 9px">Zatím nic zapsaného.</p>`}
+        <button class="btn sm sec wide" id="d-sklid">${ik('kosik')}Zapsat sklizeň</button>
+      </div>
+
+      ${(it.historie||[]).length ? `<div class="field"><label>Co tu rostlo dřív</label>
+        <p class="note" style="margin:0">${(it.historie||[]).slice().sort((a,b2)=>b2.rok-a.rok).map(x=>{
+          const cc = crop(x.cropId); return x.rok + ' — ' + esc(cc ? cc.nazev : '?');
+        }).join('<br>')}</p></div>` : ''}
       <div class="field"><label for="d-pozn">Poznámka</label><textarea id="d-pozn" placeholder="Odrůda, odkud sadba…">${esc(it.poznamka)}</textarea></div>
 
       <div class="field"><label>Hnojení</label>
@@ -3350,6 +3738,7 @@ function dialogPrvku(id) {
       save(); dialogPrvku(id); kresliZahonky(); toast('Hnojení zapsáno');
     };
     q('#d-foto').onclick = () => pridejFotku(id, () => dialogPrvku(id));
+    q('#d-sklid').onclick = () => dialogSklizne(id, () => dialogPrvku(id));
     d.querySelectorAll('[data-frm]').forEach(x => x.onclick = () => {
       it.hnojeni.splice(Number(x.dataset.frm),1); save(); dialogPrvku(id); kresliZahonky();
     });
@@ -3364,7 +3753,10 @@ function dialogPrvku(id) {
       if (w>0 && hh>0 && (w!==b.w || hh!==b.h)) reshapeRect(it, w, hh);
     }
     if (jeZahon) {
-      it.cropId = q('#d-crop').value || null;
+      const novy = q('#d-crop').value || null;
+      if (novy && novy !== it.cropId) zapisHistorii(it, it.cropId);
+      it.cropId = novy;
+      if (novy) zapisHistorii(it, novy);
       const rf = q('#d-rost');
       if (rf) { const rv = parseInt(rf.value,10); it.rostliny = (rv>=0 && rv!==odhadRostlin(it)) ? rv : null; }
       it.datumVysadby = q('#d-datum').value;
@@ -3689,7 +4081,7 @@ document.querySelectorAll('[data-pix]').forEach(x => { x.innerHTML = ik(x.datase
 document.querySelectorAll('#nav button').forEach(b => b.onclick = () => prepni(b.dataset.tab));
 document.addEventListener('keydown', e => { if (e.key === 'Escape') zavri(); });
 window.addEventListener('resize', () => { if (state.tab === 'map') { posadPanel(); scheduleRender(); } });
-prepni(state.tab || 'map');
+prepni(state.tab || 'dnes');
 if (!state.view) requestAnimationFrame(() => requestAnimationFrame(() => fitView()));
 
 </script>
