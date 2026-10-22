@@ -1053,7 +1053,7 @@ function seedShops() {
 function seed() {
   state.outline = [[0,0],[28,0],[28,30],[22,38],[0,38]];
   state.outlineDone = true;
-  state.adresa = 'Zdická 1351/15';
+  state.adresa = '';
   state.parcela = '1351/15';
   state.items = {};
   state.nextId = 1;
@@ -1762,14 +1762,31 @@ function parsujBudovy(xml) {
 
 const vPolygonu = (lat, lon, body) => pointInPoly(lon, lat, body.map(q => [q[1], q[0]]));
 
-/* Sousedi: parcely se dotykaji, kdyz maji lomovy bod bliz nez 1,5 m */
-function sousedi(a, b) {
-  for (const p of a) for (const q of b) {
-    const dlat = (p[0]-q[0]) * 110540, dlon = (p[1]-q[1]) * 111320 * Math.cos(p[0]*Math.PI/180);
-    if (dlat*dlat + dlon*dlon < 2.25) return true;
+/* Sousedni parcely sdili hranu, ale ne vzdy i lomovy bod. Proto meríme
+   vzdalenost vrcholu jedne parcely od hran te druhe. */
+function vzdalenostOdUsecky(p, a, b) {
+  const dx = b[0]-a[0], dy = b[1]-a[1];
+  const L = dx*dx + dy*dy;
+  const t = L ? Math.max(0, Math.min(1, ((p[0]-a[0])*dx + (p[1]-a[1])*dy) / L)) : 0;
+  return Math.hypot(p[0]-(a[0]+t*dx), p[1]-(a[1]+t*dy));
+}
+function sousedi(a, b, tol) {
+  tol = tol || 1.0;
+  const lat0 = a[0][0];
+  const naM = (p) => [ (p[1]) * 111320 * Math.cos(lat0*Math.PI/180), p[0] * 110540 ];
+  const A = a.map(naM), B = b.map(naM);
+  for (const dvojice of [[A,B],[B,A]]) {
+    const X = dvojice[0], Y = dvojice[1];
+    for (const q of X) {
+      for (let i = 0; i < Y.length; i++) {
+        if (vzdalenostOdUsecky(q, Y[i], Y[(i+1) % Y.length]) < tol) return true;
+      }
+    }
   }
   return false;
 }
+/* 23/1 a 23/2 jsou dily tehoz puvodniho pozemku, obvykle jednoho vlastnika */
+const kmenCisla = (c) => String(c || '').split('/')[0].trim();
 
 /* Natoceni: najdeme smer, ve kterem ma parcela nejmensi opsany obdelnik,
    a postavime ji na vysku - na telefonu se tak vyuzije cela obrazovka. */
@@ -1822,12 +1839,15 @@ async function nactiParcelu(dotaz) {
 
   katStav = { stav:'hledam', text:'Stahuji parcely z katastru…' };
   renderGarden();
-  const d = 0.0011;
-  const bbox = [ m.lat-d, m.lon-d*1.6, m.lat+d, m.lon+d*1.6 ].map(x=>x.toFixed(6)).join(',');
+  // asi 90 x 90 m. Vetsi vyrez v zastavbe narazi na strop poctu parcel
+  // a hledana zahrada se do odpovedi vubec nedostane.
+  const d = 0.00042;
+  const dLon = d / Math.cos(m.lat * Math.PI / 180);
+  const bbox = [ m.lat-d, m.lon-dLon, m.lat+d, m.lon+dLon ].map(x=>x.toFixed(6)).join(',');
   const uP = CUZK_CP + '?service=WFS&version=2.0.0&request=GetFeature'
     + '&typenames=' + encodeURIComponent('cp:CadastralParcel')
     + '&namespaces=' + encodeURIComponent('xmlns(cp,' + CP_NS + ')')
-    + '&count=80&srsName=' + encodeURIComponent(CRS84)
+    + '&count=60&srsName=' + encodeURIComponent(CRS84)
     + '&BBOX=' + bbox + ',' + encodeURIComponent(CRS84);
   const xmlP = await httpGet(uP, 'application/xml');
   const chyba = chybaSluzby(xmlP);
@@ -1862,16 +1882,35 @@ async function nactiParcelu(dotaz) {
     renderGarden(); return;
   }
 
-  // vybereme parcelu pod adresou a k ni prilehle parcely bez budovy = zahrada
-  const vybrane = new Set([adresni]);
-  parcely.forEach((p, i) => {
-    if (i === adresni || p.zastavena) return;
-    if (sousedi(p.body, parcely[adresni].body)) vybrane.add(i);
+  // Sousedni parcela bez budovy muze byt zahrada, ale taky ulice nebo
+  // verejna zelen. Rozhoduje kmen cisla: 23/2 patri k domu na 23/1.
+  const adr = parcely[adresni];
+  const adrKmen = kmenCisla(adr.cislo);
+  parcely.forEach((q, i) => {
+    q.sousedi = i === adresni || sousedi(q.body, adr.body);
+    q.stejnyKmen = kmenCisla(q.cislo) === adrKmen;
   });
+  const vybrane = new Set([adresni]);
+  parcely.forEach((q, i) => {
+    if (i === adresni || q.zastavena || !q.sousedi) return;
+    if (q.stejnyKmen) vybrane.add(i);
+  });
+  // kdyz se podle cisla nic nenaslo, vezmeme jedinou rozumne velkou sousedni
+  if (vybrane.size === 1) {
+    const kand = parcely.map((q,i)=>({q,i}))
+      .filter(o => o.i !== adresni && !o.q.zastavena && o.q.sousedi
+                   && o.q.vymera && o.q.vymera <= Math.max(1200, (adr.vymera||300) * 4));
+    if (kand.length === 1) vybrane.add(kand[0].i);
+  }
 
-  state.katParcely = parcely.map((p,i) => ({
-    cislo: p.cislo, vymera: p.vymera, zastavena: p.zastavena,
-    body: p.body, budovy: p.budovy, vybrana: vybrane.has(i),
+  const nabidka = parcely.map((q,i) => ({ q, i }))
+    .filter(o => o.i === adresni || (o.q.sousedi && (!o.q.vymera || o.q.vymera < 8000)))
+    .sort((x,y) => (x.i === adresni ? -1 : y.i === adresni ? 1
+      : (y.q.stejnyKmen - x.q.stejnyKmen) || ((x.q.vymera||0) - (y.q.vymera||0))));
+  state.katParcely = nabidka.map(o => ({
+    cislo: o.q.cislo, vymera: o.q.vymera, zastavena: o.q.zastavena,
+    stejnyKmen: o.q.stejnyKmen, adresni: o.i === adresni,
+    body: o.q.body, budovy: o.q.budovy, vybrana: vybrane.has(o.i),
   }));
   state.katStred = { lat: m.lat, lon: m.lon };
   state.katObec = (m.nazev || '').split(',').slice(0,3).join(',').trim();
@@ -2013,7 +2052,7 @@ function renderGarden() {
 
         ${state.panelAdresa ? `<div class="adresa-panel">
           <div class="addr-row">
-            <input id="addr-input" placeholder="Zdická 1351/15" value="${esc(state.adresa)}" aria-label="Ulice a číslo" style="flex:2">
+            <input id="addr-input" placeholder="Věštínská 815" value="${esc(state.adresa)}" aria-label="Ulice a číslo" style="flex:2">
             <input id="psc-input" placeholder="PSČ" inputmode="numeric" maxlength="7" value="${esc(state.psc || '')}" aria-label="PSČ" style="flex:0 0 92px">
           </div>
           <button class="btn" id="addr-load" style="width:100%;justify-content:center;margin-top:9px">
@@ -2046,10 +2085,10 @@ function renderGarden() {
       <div class="pp-list">
         ${state.katParcely.map((q,i)=>`<button class="pp ${q.vybrana?'on':''}" data-parcela="${i}">
           <span class="pp-no">${esc(q.cislo || '—')}</span>
-          <span class="pp-m">${q.vymera ? Math.round(q.vymera)+' m²' : ''}${q.zastavena ? ' · dům' : ''}</span>
+          <span class="pp-m">${q.vymera ? Math.round(q.vymera)+' m²' : ''}${q.zastavena ? ' · dům' : (q.stejnyKmen ? ' · zahrada' : '')}</span>
         </button>`).join('')}
       </div>
-      <p class="pp-note">${esc(state.katObec || '')}</p>
+      <p class="pp-note">${esc(state.katObec || '')}${state.katParcely.length > 1 ? ' · klepnutím přidáš nebo odebereš' : ''}</p>
     </div>` : ''}
 
     ${sel ? (() => {
