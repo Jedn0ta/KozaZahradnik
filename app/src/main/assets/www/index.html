@@ -610,29 +610,7 @@ body { font-size: 17px; }
 }
 .cfoto figure > button.x { left: auto; right: 4px; top: 4px; bottom: auto; font-size: 17px; font-weight: 700; padding: 0; }
 
-/* sezónní animace v zamčené zahradě */
-.sezona { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 1; }
-.sezona .cas { position: absolute; line-height: 1; will-change: transform; opacity: .85; }
-.sezona .pad { top: -8%; animation-name: padani; animation-timing-function: linear; animation-iteration-count: infinite; }
-.sezona .let { left: -10%; animation-name: letani; animation-timing-function: ease-in-out; animation-iteration-count: infinite; }
-@keyframes padani {
-  0%   { transform: translate3d(0, -10vh, 0) rotate(0deg); opacity: 0; }
-  10%  { opacity: .85; }
-  90%  { opacity: .85; }
-  100% { transform: translate3d(var(--drift), 115vh, 0) rotate(420deg); opacity: 0; }
-}
-@keyframes letani {
-  0%   { transform: translate3d(-10%, 0, 0); opacity: 0; }
-  12%  { opacity: .9; }
-  50%  { transform: translate3d(50vw, var(--drift), 0); }
-  88%  { opacity: .9; }
-  100% { transform: translate3d(115vw, 0, 0); opacity: 0; }
-}
-@media (prefers-reduced-motion: reduce) { .sezona { display: none; } }
 
-.nahled { display: block; width: 100%; height: 100%; }
-.mrail button .nahled { width: 30px; height: 30px; }
-.pick button .nahled, .emovolba .nahled { width: 36px; height: 36px; }
 
 /* ikony ze sad Material Symbols */
 .msym {
@@ -899,7 +877,7 @@ body { font-size: 17px; }
 
 <script>
 
-const VERZE = 'v2.5 · 22. 10. 2026';
+const VERZE = 'v2.6 · 22. 10. 2026';
 const LOGO_KOZEL = `<svg viewBox="0 0 32 32" aria-hidden="true">
   <path d="M11.2 9.4C9.6 6.6 7.4 4.6 4.6 3.9c-.5-.1-.9.3-.8.8.5 2.9 1.9 5.4 4.1 7.2.7.6 1.5 1 2.4 1.3z" fill="#fff" opacity=".95"/>
   <path d="M20.8 9.4c1.6-2.8 3.8-4.8 6.6-5.5.5-.1.9.3.8.8-.5 2.9-1.9 5.4-4.1 7.2-.7.6-1.5 1-2.4 1.3z" fill="#fff" opacity=".95"/>
@@ -947,7 +925,6 @@ let state = {
   theme: null,
   uiVerze: 5,
   panelSkryt: false,   // svisla lista nastroju na planu
-  animace: true,       // sezonni animace v zamcene zahrade
   radyEdit: {},        // uzivatelske prepisy vestavenych rad
   vlastniRady: [],     // rady, ktere si zahradnik napsal sam
   akce: null,          // rychle akce u zahonku, vcetne vlastnich
@@ -1272,7 +1249,7 @@ const PRVKY = {
             popis:'Dlažba, beton, štěrk' },
 };
 const roste = (it) => !!(it && PRVKY[it.typ] && PRVKY[it.typ].roste);
-const prvekPix = (typ) => `<span class="emo">${(PRVKY[typ] || PRVKY.bed).emoji}</span>`;
+const prvekPix = (typ) => ik('p_' + (PRVKY[typ] ? typ : 'bed'));
 
 /* Vychozi seznam ceskych obchodu s osivem. Uzivatel je muze mazat i doplnovat. */
 const OBCHODY_ZAKLAD = [
@@ -1495,44 +1472,19 @@ const IK = {
   schovat:  S('<path d="M14.5 5.5 8 12l6.5 6.5"/>'),
   nastroje: S('<path d="M9.5 18.5 16 12 9.5 5.5"/><path d="M4.5 6v12"/>'),
   poznamka: S('<path d="M5 4.5h14v15H5z"/><path d="M8.5 9h7M8.5 13h7M8.5 16.5h4"/>'),
+  /* Prvky plánu. Každý má jiný obrys, ať se nepletou ani v malém. */
+  p_bed:    S('<path d="M2.5 13.5h19v7h-19z"/><path d="M2.5 17h19"/><path d="M7 13.5V9M7 10.5 5 9M7 10.5 9 9M12 13.5V7.5M12 9 9.5 7.5M12 9l2.5-1.5M17 13.5V9M17 10.5 15 9M17 10.5 19 9"/>'),
+  p_raised: S('<path d="M3 8.5h18v4H3z"/><path d="M3 12.5h18v7H3z"/><path d="M7.5 12.5v7M12 12.5v7M16.5 12.5v7"/><path d="M3 19.5v2M21 19.5v2"/><path d="M8 8.5V5M8 6 6.2 4.6M8 6l1.8-1.4M16 8.5V5.5M16 6.8l-1.8-1.4M16 6.8l1.8-1.4"/>'),
+  p_trough: S('<path d="M3 10h18l-2.5 9h-13z"/><path d="M3.8 13h16.4"/><path d="M8 10V6.5M8 7.6 6.3 6.2M8 7.6 9.7 6.2M16 10V7M16 8.2l-1.7-1.4M16 8.2l1.7-1.4"/>'),
+  p_pot:    S('<path d="M6.5 11.5h11l-1.3 9H7.8z"/><path d="M5 8.5h14v3H5z"/><path d="M12 8.5V4M12 6c2 0 3.2-1.2 3.2-3C13.2 3 12 4.2 12 6zM12 6c-2 0-3.2-1.2-3.2-3C10.8 3 12 4.2 12 6z"/>'),
+  p_paved:  S('<path d="M8 21c0-6 8-7.5 8-13.5 0-2.2-1-3.8-2.4-4.5"/><path d="M4.6 19.4h6.8M5.4 15.6h6.6M8 11.9h6.6M10.6 8.2h6M12.4 4.6h4.4"/>'),
+  p_house:  S('<path d="M3.5 10.5 12 4l8.5 6.5V20h-17z"/><path d="M1.6 11.8 12 3.8l10.4 8"/><path d="M9.5 20v-5.5h5V20"/>'),
   dnes:     S('<path d="M4 12.5 9 17.5l11-11"/>'),
   hotovo:   S('<circle cx="12" cy="12" r="9"/><path d="M8 12.2l2.8 2.8L16 9.8"/>'),
   vaha:     S('<path d="M12 4.5v15M7 19.5h10"/><path d="M12 7 4.5 9.5 7 15h10l2.5-5.5z"/>'),
   uhyn:     S('<path d="M11 21c-.5-4.5-2.5-7.5-6-9"/><path d="M11 14c-.4-3 1-5.6 4-7.6-.4 3.3-1.8 5.8-4 7.6z"/><path d="M11 16.5c-2.6-1.2-4-3.4-4-6.6 2.6 1.2 4 3.4 4 6.6z"/><path d="M16 17.5l4 4M20 17.5l-4 4"/>'),
 };
 const ik = (id) => IK[id] || pixSvg(id);
-
-/* Náhled štětce = zmenšenina toho, co se opravdu nakreslí na plán.
-   Cesta vypadá jako cestička, květináč jako květináč. */
-function nahledPrvku(typ) {
-  const d = PRVKY[typ];
-  const S2 = (vnitrek) => `<svg class="nahled" viewBox="0 0 32 32" aria-hidden="true">${vnitrek}</svg>`;
-  if (typ === 'bed') return S2(
-    `<rect x="2" y="12" width="28" height="16" rx="3" fill="${d.fill}" stroke="${d.line}" stroke-width="1.6"/>` +
-    `<path d="M6 17h20M6 21h20M6 25h20" stroke="rgba(0,0,0,.14)" stroke-width="1.4"/>` +
-    `<path d="M10 12V8M10 9l-3-2M10 9l3-2M22 12V7M22 8l-3-2M22 8l3-2" stroke="#4e9b48" stroke-width="2" stroke-linecap="round" fill="none"/>`);
-  if (typ === 'raised') return S2(
-    `<rect x="2" y="10" width="28" height="18" rx="2.5" fill="#8a6038"/>` +
-    `<rect x="4.5" y="12.5" width="23" height="7" rx="1.5" fill="#6b4527"/>` +
-    `<path d="M2 20h28M9 20v8M23 20v8" stroke="rgba(0,0,0,.2)" stroke-width="1.6"/>` +
-    `<path d="M11 12V7M11 8l-2.5-2M11 8l2.5-2M21 12V8M21 9l-2.5-2M21 9l2.5-2" stroke="#4e9b48" stroke-width="2" stroke-linecap="round" fill="none"/>`);
-  if (typ === 'trough') return S2(
-    `<path d="M4 14h24l-2.5 12h-19z" fill="${d.fill}" stroke="${d.line}" stroke-width="1.6" stroke-linejoin="round"/>` +
-    `<rect x="5" y="14" width="22" height="3.5" fill="#6b4527" opacity=".55"/>` +
-    `<path d="M10 14V9M10 10l-2.5-2M10 10l2.5-2M16 14V7M22 14V9.5M22 10.5l-2.5-2M22 10.5l2.5-2" stroke="#4e9b48" stroke-width="2" stroke-linecap="round" fill="none"/>`);
-  if (typ === 'pot') return S2(
-    `<path d="M8 15h16l-1.8 12H9.8z" fill="${d.fill}" stroke="${d.line}" stroke-width="1.6" stroke-linejoin="round"/>` +
-    `<rect x="6.5" y="12" width="19" height="4" rx="1.2" fill="${d.line}"/>` +
-    `<path d="M16 12V6M16 8c2.6 0 4.2-1.5 4.2-3.8C17.6 4.2 16 5.7 16 8zM16 8c-2.6 0-4.2-1.5-4.2-3.8C14.4 4.2 16 5.7 16 8z" fill="#4e9b48" stroke="#4e9b48" stroke-width="1.4" stroke-linejoin="round"/>`);
-  if (typ === 'house') return S2(
-    `<path d="M16 5 29 15v13H3V15z" fill="#eef1f3" stroke="#7f8c95" stroke-width="1.6" stroke-linejoin="round"/>` +
-    `<path d="M16 4 31 15.5H1z" fill="#b24a3a" stroke="#8d3a2d" stroke-width="1.4" stroke-linejoin="round"/>` +
-    `<rect x="13" y="19" width="6" height="9" fill="#7f8c95"/>`);
-  if (typ === 'paved') return S2(
-    `<path d="M11 29c0-8 10-10 10-18 0-3-1.4-5-3-6" fill="none" stroke="${d.fill}" stroke-width="10" stroke-linecap="round"/>` +
-    `<path d="M11 29c0-8 10-10 10-18 0-3-1.4-5-3-6" fill="none" stroke="${d.line}" stroke-width="10" stroke-linecap="round" stroke-dasharray="1 5.5" opacity=".55"/>`);
-  return S2(`<rect x="4" y="4" width="24" height="24" rx="4" fill="${d.fill}" stroke="${d.line}" stroke-width="1.6"/>`);
-}
 
 /* Plodiny: ploché vektorové ilustrace, jedna pro každou plodinu.
    Kreslí se plnými tvary, takže zůstanou ostré v jakékoli velikosti. */
@@ -2894,16 +2846,6 @@ function kresliNastaveni() {
       </div>
       <p class="note" style="margin-top:0">Tmavý režim šetří oči večer na zahradě i baterii.</p>
 
-      <div class="sec-h" style="margin-top:22px"><h2>Zamčená zahrada</h2></div>
-      <div class="list">
-        <div class="card row" style="padding:12px 13px">
-          <span class="mid"><b>Sezónní animace</b>
-            <span>${esc(SEZONNI_POPIS[sezonaTed()])}</span></span>
-          <button class="tag" id="n-animace">${state.animace === false ? 'Zapnout' : 'Vypnout'}</button>
-        </div>
-      </div>
-      <p class="note">Po zamčení plánu se zahrada vykreslí s trávou, hlínou a dlažbou — a přes ni přeletí, co zrovna patří do ročního období.</p>
-
       <div class="sec-h" style="margin-top:24px"><h2>Rychlé akce u záhonku</h2><span class="n">${ak.length}</span></div>
       <div class="list">
         ${ak.map(a=>`<div class="card row" style="padding:11px 13px">
@@ -2973,11 +2915,6 @@ function kresliNastaveni() {
       state.akce = akceSeznam().filter(x => x.id !== a.id); save(); kresliNastaveni(); kresliZahonky();
     });
   });
-  el('n-animace').onclick = () => {
-    state.animace = state.animace === false ? true : false;
-    save(); kresliNastaveni();
-    toast(state.animace === false ? 'Animace vypnutá' : 'Animace zapnutá');
-  };
   el('n-akce').onclick = () => dialogAkce(null);
   el('n-rada').onclick = () => dialogRady(null);
   el('n-zahrada').onclick = () => prepni('map');
@@ -2989,12 +2926,6 @@ function kresliNastaveni() {
     location.reload();
   });
 }
-const SEZONNI_POPIS = {
-  jaro:'Na jaře přes zahradu poletují motýli a okvětní lístky.',
-  leto:'V létě nad zahradou létají včely.',
-  podzim:'Na podzim padá listí.',
-  zima:'V zimě sněží.',
-};
 const MESICE_KR2 = ['led','úno','bře','dub','kvě','čvn','čvc','srp','zář','říj','lis','pro'];
 
 function dialogRady(id) {
@@ -3289,7 +3220,7 @@ function otevriPocasi() {
 
 /* ============ OBRAZOVKA: ZAHRADA (mapa) ============ */
 /* Co se dá na plán přidat. Zobrazí se v dialogu Přidat. */
-const PRIDAT = ['bed','raised','trough','pot','house','paved'];
+const PRIDAT = ['bed','raised','trough','pot','paved','house'];
 const RADY = {
   outline:  { t:'Kreslíš obrys zahrady', s:'Klepej po obvodu. Vrcholy se dají tahat, kroužkem na hraně vložíš nový.' },
   erase:    { t:'Mažeš', s:'Táhni prstem přes to, co má zmizet.' },
@@ -3314,7 +3245,7 @@ function kresliMapu() {
 
   s.innerHTML = `
     <div class="map">
-      <div id="cv"><svg id="svg" aria-label="Plán zahrady"></svg>${sezonniVrstva()}</div>
+      <div id="cv"><svg id="svg" aria-label="Plán zahrady"></svg></div>
 
       ${prazdno && !state.panel ? `<div class="empty" style="position:absolute;inset:0;display:grid;place-content:center;z-index:2">
         <div class="ei">${ik('mapa')}</div>
@@ -3325,7 +3256,7 @@ function kresliMapu() {
       ${nacitam ? `<div class="m-load"><div class="spin"></div><span>${esc(katStav.text)}</span></div>` : ''}
 
       ${rezim ? `<div class="m-mode">
-        <span class="mi">${state.tool === 'outline' ? ik('obrys') : (state.tool === 'erase' ? ik('guma') : `<span class="emo">${PRVKY[state.tool].emoji}</span>`)}</span>
+        <span class="mi">${state.tool === 'outline' ? ik('obrys') : (state.tool === 'erase' ? ik('guma') : ik('p_' + state.tool))}</span>
         <span class="mt"><b>${esc(rezim.t)}</b><span>${esc(rezim.s)}</span></span>
         <button id="m-hotovo">Hotovo</button>
       </div>` : ''}
@@ -3381,7 +3312,7 @@ function kresliMapu() {
         <button id="r-zpet" aria-label="Krok zpět" title="Zpět" ${zpetZasobnik.length?'':'disabled'}>${ik('zpet')}</button>
         <hr class="del">
         ${PRIDAT.map(t=>`<button class="${state.tool===t?'on':''}" data-nastroj="${t}"
-          aria-label="${esc(PRVKY[t].nazev)}" title="${esc(PRVKY[t].nazev)}">${nahledPrvku(t)}</button>`).join('')}
+          aria-label="${esc(PRVKY[t].nazev)}" title="${esc(PRVKY[t].nazev)}">${ik('p_' + t)}</button>`).join('')}
         <hr class="del">
         <button class="${state.tool==='outline'?'on':''}" data-nastroj="outline" aria-label="Upravit obrys zahrady" title="Obrys zahrady">${ik('obrys')}</button>
         <button class="${state.tool==='erase'?'on':''}" data-nastroj="erase" aria-label="Mazat" title="Mazat">${ik('guma')}</button>
@@ -3453,49 +3384,13 @@ function kresliMapu() {
   requestAnimationFrame(() => { posadPanel(); kresliPlatno(); });
 }
 
-/* ============ SEZÓNNÍ ANIMACE ============
-   Jen v zamčené zahradě — když už se nekreslí, může se koukat. Na jaře
-   motýli a okvětní lístky, v létě včely, na podzim listí, v zimě sníh.
-   Vypnout jde v Nastavení a respektuje se i systémové omezení pohybu. */
-const SEZONY = {
-  jaro:   { znaky:['🦋','🌸','🌼','🦋','🌸'], pad:true,  rychlost:[11,19] },
-  leto:   { znaky:['🐝','🦋','🐝'],           pad:false, rychlost:[9,16]  },
-  podzim: { znaky:['🍂','🍁','🍃','🍂'],       pad:true,  rychlost:[8,15]  },
-  zima:   { znaky:['❄️','❅','❄️','*'],        pad:true,  rychlost:[12,22] },
-};
-function sezonaTed() {
-  const m = new Date().getMonth() + 1;
-  if (m >= 3 && m <= 5) return 'jaro';
-  if (m >= 6 && m <= 8) return 'leto';
-  if (m >= 9 && m <= 11) return 'podzim';
-  return 'zima';
-}
-function sezonniVrstva() {
-  if (!state.zamek || state.animace === false) return '';
-  const s = SEZONY[sezonaTed()];
-  const n = s.pad ? 14 : 7;
-  let out = '';
-  for (let i = 0; i < n; i++) {
-    const zn = s.znaky[i % s.znaky.length];
-    const trvani = (s.rychlost[0] + (i * 1.37 % (s.rychlost[1] - s.rychlost[0]))).toFixed(1);
-    const zpozdeni = (-(i * 2.3) % 14).toFixed(1);
-    const vel = (14 + (i * 7 % 13)).toFixed(0);
-    const poz = ((i * 13 + 5) % 95).toFixed(0);
-    const drift = (i % 2 ? 1 : -1) * (18 + (i * 11 % 34));
-    out += s.pad
-      ? `<span class="cas pad" style="left:${poz}%;font-size:${vel}px;animation-duration:${trvani}s;animation-delay:${zpozdeni}s;--drift:${drift}px">${zn}</span>`
-      : `<span class="cas let" style="top:${(10 + (i*13 % 70))}%;font-size:${vel}px;animation-duration:${trvani}s;animation-delay:${zpozdeni}s;--drift:${drift}px">${zn}</span>`;
-  }
-  return `<div class="sezona" aria-hidden="true">${out}</div>`;
-}
-
 /* Dialog Přidat: pixelartové dlaždice, ať je to čitelné i pro dítě */
 function dialogPridat() {
   const d = dialog(`<h2>Co přidáš do zahrady</h2>
     <p class="lead">Vyber a pak to na plánu nakresli prstem.</p>
     <div class="pick">
       ${PRIDAT.map(t=>`<button data-pridat="${t}">
-        <span class="pe">${PRVKY[t].emoji}</span>
+        <span class="pe">${ik('p_' + t)}</span>
         <span class="pn2"><b>${esc(PRVKY[t].nazev)}</b><span>${esc(PRVKY[t].popis)}</span></span>
       </button>`).join('')}
     </div>
@@ -3801,7 +3696,8 @@ function kresliPlatno() {
 
     /* Obrázek a jméno vedle sebe, bez podkladu. Cesty a zpevněné plochy
        žádnou ikonu nedostanou, jen popisek. */
-    const zn = (it.typ === 'paved') ? null : (c ? plodinaZnak(c) : { typ:'emoji', v: d.emoji });
+    const zn = (it.typ === 'paved') ? null
+      : (c ? plodinaZnak(c) : { typ:'prvek', v:'p_' + it.typ });
     const txt = c ? c.nazev : it.nazev;
     const fs = Math.min(13, Math.max(9, bh * 0.36));
     const velI = Math.min(bh * 0.62, bw * 0.5, 30);
@@ -3824,6 +3720,8 @@ function kresliPlatno() {
         parts.push(`<image href="${zn.v}" x="${(cx-rr).toFixed(1)}" y="${(cy-rr).toFixed(1)}" width="${(rr*2).toFixed(1)}" height="${(rr*2).toFixed(1)}" preserveAspectRatio="xMidYMid slice" clip-path="url(#${cid})"/>`);
       } else if (zn.typ === 'msym') {
         parts.push(`<text x="${cx.toFixed(1)}" y="${cy.toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="${velI.toFixed(1)}" font-family="${SADY[zn.sada].font}" fill="${barva}" style="paint-order:stroke" stroke="${halo}" stroke-width="2.6">${esc(zn.v)}</text>`);
+      } else if (zn.typ === 'prvek') {
+        parts.push(`<g color="${barva}" opacity=".92">` + artInto(zn.v, cx - velI/2, cy - velI/2, velI) + `</g>`);
       } else {
         parts.push(`<text x="${cx.toFixed(1)}" y="${cy.toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="${velI.toFixed(1)}">${zn.v}</text>`);
       }
@@ -4089,10 +3987,8 @@ function napojPlatno() {
       } else {
         target = novyPrvek(box.prvek, keys);
       }
-      const fresh = !sousedi.size && keys.length === 1 || !sousedi.size;
       state.sel = null;
       save(); kresliMapu();
-      if (fresh && target && roste(target) && !PRVKY[box.prvek].samostatny) dialogPrvku(target.id);
       return;
     }
     if (g.type === 'stretch') { save(); kresliMapu(); return; }
