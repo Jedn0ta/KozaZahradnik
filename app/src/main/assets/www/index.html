@@ -24,9 +24,9 @@
   --sun: #d99a1f;
   --sky: #2f7fa8;
   --danger: #c0392b;
-  --paper: #fafbf8;
-  --dot: #c3d0c1;
-  --grid: #e8eee6;
+  --paper: #f7f6ee;
+  --dot: #cdd5c3;
+  --grid: #eceee1;
   --house: #8d96a0;
   --house-soft: #e7eaee;
   --r: 16px;
@@ -429,6 +429,7 @@ h1,h2,h3,h4 { margin: 0; font-weight: 800; letter-spacing: -.02em; }
 .cal .cday .dots i.sklizen { background: var(--sun); }
 .cal .cday .dots i.uhyn { background: var(--danger); }
 .cal .cday .dots i.dosadba { background: var(--acc); }
+.cal .cday .dots i.akce { background: var(--ink3); }
 .cal .cday.mam { background: var(--card); border-color: var(--line); }
 .callegend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 12px; font-size: 11.5px; font-weight: 700; color: var(--ink3); }
 .callegend span { display: flex; align-items: center; gap: 5px; }
@@ -606,6 +607,80 @@ body { font-size: 17px; }
 }
 .cfoto figure > button.x { left: auto; right: 4px; top: 4px; bottom: auto; font-size: 17px; font-weight: 700; padding: 0; }
 
+/* ---------- roční přehled: období, ne dny ---------- */
+.rok { display: flex; flex-direction: column; gap: 4px; }
+.rhead, .rrow { display: grid; grid-template-columns: 102px 1fr; align-items: center; gap: 8px; width: 100%; text-align: left; }
+.rhead { padding-bottom: 2px; }
+.rhead > span:not(.rn) { display: none; }
+.rhead .rn { display: block; }
+.rhead::after {
+  content: ''; display: grid; grid-template-columns: repeat(12, 1fr);
+}
+.rmesice { display: grid; grid-template-columns: repeat(12, 1fr); gap: 2px; }
+.rmesice span { font-size: 10px; font-weight: 800; color: var(--ink3); text-align: center; text-transform: uppercase; }
+.rmesice span.ted { color: var(--acc-dark); }
+.rrow { padding: 7px 0; border-top: 1px solid var(--line2); }
+.rrow:active { background: var(--bg2); }
+.rrow .rn { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.rrow .rn .ra { width: 28px; height: 28px; flex: none; border-radius: 9px; overflow: hidden; background: var(--bg2); padding: 3px; }
+.rrow .rn b { font-size: 13.5px; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rrow .rn i { display: none; }
+.rpas { position: relative; display: flex; flex-direction: column; gap: 3px; }
+.rmr { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(12, 1fr); gap: 2px; pointer-events: none; }
+.rmr i { display: block; background: var(--bg2); border-radius: 3px; }
+.rmr i.ted { background: var(--acc-soft); }
+.rl { position: relative; display: grid; grid-template-columns: repeat(12, 1fr); gap: 2px; height: 9px; }
+.rl i { display: block; border-radius: 3px; }
+
+/* ---------- stavové odznaky ---------- */
+.hlava { position: relative; }
+.odznaky { position: absolute; left: 10px; top: 10px; display: flex; gap: 6px; z-index: 2; }
+.odznak {
+  width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center;
+  padding: 7px; color: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.28), 0 0 0 2px rgba(255,255,255,.85);
+}
+.odznak .ik { width: 100%; height: 100%; }
+
+/* ---------- info o plodině na kartě záhonu ---------- */
+.plodinka {
+  display: block; width: 100%; text-align: left; margin: 0 13px 12px; width: calc(100% - 26px);
+  border: 1.5px solid var(--line); border-radius: 14px; background: var(--bg); overflow: hidden;
+}
+.plodinka:active { background: var(--bg2); }
+.plodinka .pf { display: flex; flex-wrap: wrap; gap: 0; padding: 4px 0; }
+.plodinka .pf > span {
+  display: block; flex: 1 1 33%; min-width: 96px; padding: 8px 12px;
+  font-size: 14px; font-weight: 700; color: var(--ink);
+}
+.plodinka .pf i {
+  display: block; font-style: normal; font-size: 11px; font-weight: 700; color: var(--ink3);
+  text-transform: uppercase; letter-spacing: .05em; margin-bottom: 2px;
+}
+.plodinka .pp {
+  display: flex; gap: 8px; align-items: flex-start; padding: 10px 12px;
+  background: #fdf4e3; color: #8a6414; font-size: 13.5px; font-weight: 600; line-height: 1.45;
+}
+.plodinka .pp .ik { width: 18px; height: 18px; flex: none; margin-top: 1px; }
+.plodinka .pv {
+  display: flex; align-items: center; gap: 6px; padding: 10px 12px;
+  border-top: 1px solid var(--line2); font-size: 13.5px; font-weight: 700; color: var(--acc-dark);
+}
+.plodinka .pv .go { width: 16px; height: 16px; margin-left: auto; }
+
+/* ---------- nastavení ---------- */
+.rada .rh { display: flex; align-items: center; gap: 10px; width: 100%; padding: 13px; text-align: left; }
+.rada.vyp { opacity: .55; }
+.rada .rm { display: block; flex: 1; min-width: 0; }
+.rada .rm b { display: block; font-size: 16px; font-weight: 800; }
+.rada .rm span { display: block; font-size: 13px; font-weight: 600; color: var(--ink3); margin-top: 2px; }
+.rada .go { width: 18px; height: 18px; flex: none; color: var(--ink3); }
+.ikony { display: flex; flex-wrap: wrap; gap: 8px; }
+.ikony button {
+  width: 52px; height: 52px; border-radius: 14px; border: 1.5px solid var(--line);
+  background: var(--bg); display: grid; place-items: center; padding: 13px; color: var(--ink2);
+}
+.ikony button.on { border-color: var(--acc); background: var(--acc-soft); color: var(--acc-dark); }
+
 /* ---------- obrazovka Dnes ---------- */
 .dnes-hlava { display: flex; align-items: center; gap: 12px; margin-top: 18px; }
 .dh-t { flex: 1; min-width: 0; }
@@ -705,8 +780,8 @@ body { font-size: 17px; }
       <h1 id="bar-title">Zahrada</h1>
       <div class="sub" id="bar-ver"></div>
     </div>
-    <button class="bar-btn" id="bar-theme" aria-label="Přepnout motiv">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2M12 19.5v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2.5 12h2M19.5 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/></svg>
+    <button class="bar-btn" id="bar-nast" aria-label="Nastavení">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 14.6a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.56-1.1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1-1.56V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9a1.7 1.7 0 0 0 1.56 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1.03z"/></svg>
     </button>
   </header>
 
@@ -717,6 +792,7 @@ body { font-size: 17px; }
     <section class="scr" id="s-crops"></section>
     <section class="scr" id="s-cal"></section>
     <section class="scr" id="s-weather"></section>
+    <section class="scr" id="s-nast"></section>
 
   </div>
 
@@ -731,7 +807,7 @@ body { font-size: 17px; }
 
 <script>
 
-const VERZE = 'v2.1 · 22. 10. 2026';
+const VERZE = 'v2.2 · 22. 10. 2026';
 const LOGO_KOZEL = `<svg viewBox="0 0 32 32" aria-hidden="true">
   <path d="M11.2 9.4C9.6 6.6 7.4 4.6 4.6 3.9c-.5-.1-.9.3-.8.8.5 2.9 1.9 5.4 4.1 7.2.7.6 1.5 1 2.4 1.3z" fill="#fff" opacity=".95"/>
   <path d="M20.8 9.4c1.6-2.8 3.8-4.8 6.6-5.5.5-.1.9.3.8.8-.5 2.9-1.9 5.4-4.1 7.2-.7.6-1.5 1-2.4 1.3z" fill="#fff" opacity=".95"/>
@@ -778,6 +854,10 @@ let state = {
   cropFilter: 'Vše',
   theme: null,
   uiVerze: 5,
+  radyEdit: {},        // uzivatelske prepisy vestavenych rad
+  vlastniRady: [],     // rady, ktere si zahradnik napsal sam
+  akce: null,          // rychle akce u zahonku, vcetne vlastnich
+  calRezim: 'mesic',   // mesic | rok
 };
 let view = { ox: -3, oy: -3, scale: 11 };   // ox/oy = levy horni roh v metrech, scale = px na metr
 let snapStep = 1;
@@ -803,6 +883,9 @@ function load() {
         if (typeof state.zamek !== 'boolean') state.zamek = false;
         if (!PRVKY[state.tool] && ['pan','outline','erase'].indexOf(state.tool) < 0) state.tool = 'pan';
         if (!state.calRok) state.calRok = new Date().getFullYear();
+        if (!state.radyEdit) state.radyEdit = {};
+        if (!Array.isArray(state.vlastniRady)) state.vlastniRady = [];
+        if (!state.calRezim) state.calRezim = 'mesic';
         // po přestavbě rozhraní se pohled na plán jednou srovná znovu
         if (state.uiVerze !== 5) { state.uiVerze = 5; state.view = null; }
         items().forEach(i => {
@@ -813,6 +896,7 @@ function load() {
           if (!Array.isArray(i.sklizen)) i.sklizen = [];
           if (!Array.isArray(i.historie)) i.historie = [];
           if (!Array.isArray(i.udalosti)) i.udalosti = [];
+          if (!Array.isArray(i.zaznamy)) i.zaznamy = [];
           if (!PRVKY[i.typ]) i.typ = 'bed';
           if (i.thumb !== undefined) delete i.thumb;
           i.fotky = (i.fotky || []).map(f => typeof f === 'string' ? { data:f, datum:'' } : f);
@@ -1053,12 +1137,12 @@ const TYP_LABEL = { soil:'Příprava půdy', sow:'Výsev', plant:'Výsadba', car
 /* Prvky planu. "roste" znamena, ze se do nich sazi, takze maji plodinu,
    zalivku, hnojeni, fotky i pocet rostlin — a objevi se v Zahoncich. */
 const PRVKY = {
-  bed:    { nazev:'Záhon',           pix:'zahon',    roste:true, fill:'#a9663a', line:'#8a5230' },
-  raised: { nazev:'Vyvýšený záhon',  pix:'vyvyseny', roste:true, fill:'#b5834e', line:'#7d5729' },
-  trough: { nazev:'Truhlík',         pix:'truhlik',  roste:true, fill:'#c39a63', line:'#7d5729', maly:true },
-  pot:    { nazev:'Květináč',        pix:'kvetinac', roste:true, fill:'#cc7a4e', line:'#a85c36', maly:true, samostatny:true },
-  house:  { nazev:'Dům',             pix:'dum',      fill:'var(--house-soft)', line:'var(--house)' },
-  paved:  { nazev:'Zpevněná plocha', pix:'cesta',    fill:'#d8d3c6', line:'#a8a194' },
+  bed:    { nazev:'Záhon',           pix:'zahon',    roste:true, fill:'#b98c5f', line:'#7d5733' },
+  raised: { nazev:'Vyvýšený záhon',  pix:'vyvyseny', roste:true, fill:'#c79a63', line:'#7d5733' },
+  trough: { nazev:'Truhlík',         pix:'truhlik',  roste:true, fill:'#d2a876', line:'#8a6038', maly:true },
+  pot:    { nazev:'Květináč',        pix:'kvetinac', roste:true, fill:'#d4825a', line:'#a2593a', maly:true, samostatny:true },
+  house:  { nazev:'Dům',             pix:'dum',      fill:'#e2e5e8', line:'#93a0a8' },
+  paved:  { nazev:'Zpevněná plocha', pix:'cesta',    fill:'#e4dfd2', line:'#b3ab99' },
 };
 const roste = (it) => !!(it && PRVKY[it.typ] && PRVKY[it.typ].roste);
 const prvekPix = (typ) => ik((PRVKY[typ] || PRVKY.bed).pix);
@@ -1321,6 +1405,61 @@ function artInto(id, x, y, size) {
 }
 const cropArtId = (c) => (c && PLOD[c.id]) ? c.id : null;
 
+/* ============ WIKI: CO KDY JAK DĚLAT ============
+   Vestavěné rady jsou jen výchozí text. Každou jde v Nastavení přepsat,
+   vypnout nebo doplnit vlastní — appka má radit tak, jak to dělá tenhle
+   zahradník na týhle zahradě, ne obecně. */
+const RADY_ZAKLAD = [
+  { id:'r-leden', skupina:'Měsíc po měsíci', mesice:[1], nadpis:'Leden — plánování',
+    text:'Nakresli si, co kam přijde, a objednej osivo, dokud je z čeho vybírat. Zkontroluj uskladněné brambory a jablka, vyber nahnilé. Sníh ze skleníku a z keřů setřes, ať je neroztrhá.' },
+  { id:'r-unor', skupina:'Měsíc po měsíci', mesice:[2], nadpis:'Únor — první výsevy na okně',
+    text:'Rajčata, papriky a celer vysej do truhlíku na okno. Potřebují teplo kolem 20 °C a hodně světla, jinak se vytáhnou. Ovocné stromy prořež, dokud spí a nemrzne pod −5 °C.' },
+  { id:'r-brezen', skupina:'Měsíc po měsíci', mesice:[3], nadpis:'Březen — půda se probouzí',
+    text:'Jakmile půda není rozbředlá, nahrab záhony a zarej kompost. Vysej mrkev, ředkvičku, hrášek a špenát. Sazenice z okna přepíchej do větších kelímků.' },
+  { id:'r-duben', skupina:'Měsíc po měsíci', mesice:[4], nadpis:'Duben — sázení naplno',
+    text:'Brambory do země, cibule a česnek dokončit. Sazenice otužuj — vynášej je přes den ven. Pozor na noční mrazíky, netkanou textilii měj po ruce.' },
+  { id:'r-kveten', skupina:'Měsíc po měsíci', mesice:[5], nadpis:'Květen — až po zmrzlých',
+    text:'Rajčata, papriky, cukety a dýně ven až po 15. květnu. Záhony mulčuj, ušetří to polovinu zálivky. Plevel vytrhej, dokud je malý.' },
+  { id:'r-cerven', skupina:'Měsíc po měsíci', mesice:[6], nadpis:'Červen — péče a první sklizně',
+    text:'Rajčatům vyštipuj zálistky a vyvazuj je. Zalévej vydatně a ráno, ke korenům. Sklízej hrášek, ředkvičku, salát a jahody.' },
+  { id:'r-cervenec', skupina:'Měsíc po měsíci', mesice:[7], nadpis:'Červenec — sucho a sklizeň',
+    text:'Hlavní sezóna zálivky. Radši jednou týdně vydatně než denně po troše — kořeny musí jít za vodou do hloubky. Po sklizni raných plodin zasej druhou várku salátu nebo špenátu.' },
+  { id:'r-srpen', skupina:'Měsíc po měsíci', mesice:[8], nadpis:'Srpen — sbírej a zakládej',
+    text:'Hlavní sklizeň rajčat, cuket a fazolí. Zakládej jahodník z výběžků. Na uvolněné záhony zasej zelené hnojení, třeba hořčici nebo svazenku.' },
+  { id:'r-zari', skupina:'Měsíc po měsíci', mesice:[9], nadpis:'Září — podzimní práce',
+    text:'Dýně sklízej, než přijde první mrazík. Vysej polníček a špenát na přezimování. Kompost přehoď a prolej.' },
+  { id:'r-rijen', skupina:'Měsíc po měsíci', mesice:[10], nadpis:'Říjen — sklizeň a česnek',
+    text:'Sklidit zbytek kořenové zeleniny, než přijdou mrazy. Sázej česnek — do poloviny listopadu stihne zakořenit. Zalévat se venku už nemusí.' },
+  { id:'r-listopad', skupina:'Měsíc po měsíci', mesice:[11], nadpis:'Listopad — zazimování',
+    text:'Záhony zakryj kompostem nebo listím, holá půda v zimě trpí. Hadice vypusť, konve obrať dnem vzhůru, ať nepopraskají. Květináče odnes pod střechu.' },
+  { id:'r-prosinec', skupina:'Měsíc po měsíci', mesice:[12], nadpis:'Prosinec — klid',
+    text:'Zahrada spí. Projdi si zápisy sezóny: co se urodilo, co uhynulo a proč. Z toho vyjde plán na příští rok.' },
+  { id:'r-zalivka', skupina:'Zásady', mesice:[], nadpis:'Jak zalévat',
+    text:'Ráno, ke korenům, vydatně a méně často. Voda na listech za slunce pálí a v noci zve plíseň. Mulč ze slámy nebo posekané trávy udrží vláhu výrazně déle.' },
+  { id:'r-postup', skupina:'Zásady', mesice:[], nadpis:'Osevní postup',
+    text:'Stejná čeleď na stejné místo nejdřív po čtyřech letech. Po luskovinách (hrách, fazole) přijde náročná plodina — nechaly v půdě dusík. Po kořenové zelenině se hodí listová.' },
+  { id:'r-hnojeni', skupina:'Zásady', mesice:[], nadpis:'Čím hnojit',
+    text:'Základ je kompost na podzim nebo brzy zjara. Čerstvý hnůj snesou jen dýně a cukety, mrkev po něm rozvětví. Během sezóny přihnojuj kopřivovou zálivkou ředěnou 1:10.' },
+  { id:'r-mraz', skupina:'Zásady', mesice:[], nadpis:'Mráz a chlad',
+    text:'Zmrzlí muži kolem 15. května jsou poslední riziko pro teplomilné plodiny. Netkaná textilie přidá zhruba 3 °C. Kyblíky a truhlíky promrzají dřív než záhon, odnes je ke zdi.' },
+];
+const akceZaklad = () => ([
+  { id:'zalij', nazev:'Zalít', ikona:'konev', vlastni:false },
+  { id:'hnoj',  nazev:'Pohnojit', ikona:'hnojivo', vlastni:false },
+  { id:'sklid', nazev:'Sklidit', ikona:'kosik', vlastni:false },
+]);
+const IKONY_AKCI = ['konev','hnojivo','kosik','pece','ryc','semeno','sazenice','foto','pozor','listek','klid','uhyn'];
+
+/* Rada = vestavena, uzivatelem prepsana, nebo uplne vlastni */
+function vsechnyRady() {
+  const ed = state.radyEdit || {};
+  const zaklad = RADY_ZAKLAD.map(r => Object.assign({}, r, ed[r.id] || {}));
+  return zaklad.concat((state.vlastniRady || []).map(r => Object.assign({ skupina:'Moje rady', vlastni:true }, r)));
+}
+const radyMesice = (m) => vsechnyRady().filter(r => r.zap !== false && (!r.mesice || !r.mesice.length ? false : r.mesice.includes(m)));
+const akceSeznam = () => (state.akce && state.akce.length) ? state.akce : akceZaklad();
+const akceById = (id) => akceSeznam().find(a => a.id === id) || null;
+
 const HNOJIVA = ['Kompost','Zralý hnůj','Cererit (NPK)','Rohová moučka','Kostní moučka','Dřevěný popel','Kopřivová zálivka','Vermikompost','Vápnění dolomitem','Zelené hnojení','Jiné'];
 
 /* ============ GEOMETRIE ============
@@ -1408,7 +1547,7 @@ function novyPrvek(typ, keys) {
   const id = 'p' + state.nextId++;
   const n = items().filter(i => i.typ === typ).length + 1;
   const it = state.items[id] = { id, typ, cells:[], nazev: PRVKY[typ].nazev + ' ' + n,
-    cropId:null, datumVysadby:'', poznamka:'', fotky:[], hnojeni:[], zalivka:[], sklizen:[], historie:[], udalosti:[], rostliny:null, zamek:false };
+    cropId:null, datumVysadby:'', poznamka:'', fotky:[], hnojeni:[], zalivka:[], sklizen:[], historie:[], udalosti:[], zaznamy:[], rostliny:null, zamek:false };
   addCells(it, keys);
   return it;
 }
@@ -1739,6 +1878,17 @@ function quickWater(id) {
   it.zalivka.push(t);
   save(); kresliZahonky();
   toast('Zalito dnes — ' + it.nazev);
+}
+/* vlastni akce: zapise se jen datum a pripadna poznamka */
+function zapisAkci(id, akceId) {
+  const it = state.items[id]; if (!it) return;
+  const a = akceById(akceId); if (!a) return;
+  it.zaznamy = it.zaznamy || [];
+  const t = todayISO();
+  const i = it.zaznamy.findIndex(z => z.akceId === akceId && z.datum === t);
+  if (i >= 0) { it.zaznamy.splice(i,1); save(); toast(a.nazev + ' — zápis zrušen'); return; }
+  it.zaznamy.push({ datum: t, akceId });
+  save(); toast(a.nazev + ' — zapsáno dnes');
 }
 function quickFert(id) {
   const it = state.items[id]; if (!it) return;
@@ -2505,6 +2655,241 @@ function toast(zprava) {
   toastT = setTimeout(() => { t.style.opacity = '0'; }, 2200);
 }
 
+/* ============ OBRAZOVKA: NASTAVENÍ ============
+   Vzhled, vlastní akce a hlavně wiki rad — všechno, co appka radí,
+   si jde přepsat nebo doplnit vlastním. */
+function otevriNastaveni() {
+  document.querySelectorAll('.scr').forEach(x => x.classList.remove('on'));
+  el('s-nast').classList.add('on');
+  el('bar-title').textContent = 'Nastavení';
+  kresliNastaveni();
+}
+function kresliNastaveni() {
+  const s = el('s-nast');
+  const motiv = state.theme || 'auto';
+  const rady = vsechnyRady();
+  const skupiny = [];
+  rady.forEach(r => { if (!skupiny.includes(r.skupina)) skupiny.push(r.skupina); });
+  const ak = akceSeznam();
+
+  s.innerHTML = `<div class="scroll">
+    <div class="sec" style="margin-top:14px">
+      <button class="btn sm sec" id="n-zpet" style="margin-bottom:18px">← Zpět</button>
+
+      <div class="sec-h"><h2>Vzhled</h2></div>
+      <div class="seg" style="margin-bottom:8px">
+        <button class="${motiv==='light'?'on':''}" data-motiv="light">Světlý</button>
+        <button class="${motiv==='dark'?'on':''}" data-motiv="dark">Tmavý</button>
+        <button class="${motiv==='auto'?'on':''}" data-motiv="auto">Podle telefonu</button>
+      </div>
+      <p class="note" style="margin-top:0">Tmavý režim šetří oči večer na zahradě i baterii.</p>
+
+      <div class="sec-h" style="margin-top:24px"><h2>Rychlé akce u záhonku</h2><span class="n">${ak.length}</span></div>
+      <div class="list">
+        ${ak.map(a=>`<div class="card row" style="padding:11px 13px">
+          <span class="thumb" style="width:44px;height:44px;padding:9px">${ik(a.ikona)}</span>
+          <span class="mid"><b>${esc(a.nazev)}</b><span>${a.vlastni ? 'vlastní akce' : 'vestavěná'}</span></span>
+          ${a.vlastni ? `<button class="tag" data-aedit="${a.id}">Upravit</button>
+            <button class="tag" data-adel="${a.id}">×</button>` : ''}
+        </div>`).join('')}
+      </div>
+      <button class="btn sm sec wide" id="n-akce" style="margin-top:10px">+ Přidat vlastní akci</button>
+      <p class="note">Třeba Postřik, Okopat, Přivázat, Protrhat. Objeví se jako tlačítko u každého záhonku a zapíše se do kalendáře.</p>
+
+      <div class="sec-h" style="margin-top:24px"><h2>Rady a pravidla</h2><span class="n">${rady.length}</span></div>
+      <p class="note" style="margin-top:0">Tohle appka radí na obrazovce Dnes. Každou radu můžeš přepsat podle své zahrady, vypnout, nebo si přidat vlastní.</p>
+      ${skupiny.map(g=>`
+        <div class="sec-h" style="margin-top:16px"><h2 style="text-transform:none;letter-spacing:0;font-size:15px;color:var(--ink)">${esc(g)}</h2></div>
+        <div class="list">
+          ${rady.filter(r=>r.skupina===g).map(r=>`<div class="card rada ${r.zap===false?'vyp':''}">
+            <button class="rh" data-radu="${esc(r.id)}">
+              <span class="rm"><b>${esc(r.nadpis)}</b>
+                <span>${r.mesice && r.mesice.length ? r.mesice.map(m=>MESICE_KR2[m-1]).join(', ') : 'celoročně'}${r.vlastni?' · moje':''}${r.zap===false?' · vypnuto':''}</span></span>
+              <svg class="go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
+            </button>
+          </div>`).join('')}
+        </div>`).join('')}
+      <button class="btn sm sec wide" id="n-rada" style="margin-top:12px">+ Přidat vlastní radu</button>
+
+      <div class="sec-h" style="margin-top:26px"><h2>Zahrada</h2></div>
+      <div class="list">
+        <div class="card row" style="padding:12px 13px">
+          <span class="mid"><b>${esc(state.adresa || 'Adresa nezadaná')}</b>
+            <span>${state.outline.length ? fmtA(polyArea(state.outline)) + ' · ' + beds().length + ' záhonků' : 'plán ještě není'}</span></span>
+          <button class="tag" id="n-zahrada">Otevřít</button>
+        </div>
+        <div class="card row" style="padding:12px 13px">
+          <span class="mid"><b>${state.zamek ? 'Plán je zamčený' : 'Plán je odemčený'}</b>
+            <span>${state.zamek ? 'nedá se s ním hýbat' : 'dá se překreslovat'}</span></span>
+          <button class="tag" id="n-zamek">${state.zamek ? 'Odemknout' : 'Zamknout'}</button>
+        </div>
+      </div>
+
+      <div class="sec-h" style="margin-top:24px"><h2>Data</h2></div>
+      <button class="btn sm sec wide" id="n-export" style="margin-bottom:10px">Uložit zálohu zahrady</button>
+      <button class="btn sm sec wide" id="n-import" style="margin-bottom:10px">Načíst zálohu</button>
+      <button class="btn sm sec wide" id="n-reset" style="color:var(--danger)">Smazat všechno a začít znovu</button>
+      <p class="note">Záloha je jeden soubor se vším — plánem, fotkami i zápisy. Hodí se před výměnou telefonu.</p>
+      <p class="note" style="text-align:center;margin-top:18px">Koza Zahradník ${esc(VERZE)}</p>
+    </div>
+  </div>`;
+
+  el('n-zpet').onclick = () => prepni(state.tab || 'dnes');
+  s.querySelectorAll('[data-motiv]').forEach(b => b.onclick = () => {
+    const v = b.dataset.motiv;
+    state.theme = v === 'auto' ? null : v;
+    if (v === 'auto') document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme', v);
+    save(); kresliNastaveni();
+  });
+  s.querySelectorAll('[data-radu]').forEach(b => b.onclick = () => dialogRady(b.dataset.radu));
+  s.querySelectorAll('[data-aedit]').forEach(b => b.onclick = () => dialogAkce(b.dataset.aedit));
+  s.querySelectorAll('[data-adel]').forEach(b => b.onclick = () => {
+    const a = akceById(b.dataset.adel);
+    potvrd('Smazat akci ' + a.nazev + '?', 'Zápisy, které už u záhonků máš, zůstanou.', () => {
+      state.akce = akceSeznam().filter(x => x.id !== a.id); save(); kresliNastaveni(); kresliZahonky();
+    });
+  });
+  el('n-akce').onclick = () => dialogAkce(null);
+  el('n-rada').onclick = () => dialogRady(null);
+  el('n-zahrada').onclick = () => prepni('map');
+  el('n-zamek').onclick = () => { state.zamek = !state.zamek; save(); kresliNastaveni(); kresliMapu(); };
+  el('n-export').onclick = () => exportZalohy();
+  el('n-import').onclick = () => importZalohy();
+  el('n-reset').onclick = () => potvrd('Smazat celou zahradu?', 'Zmizí plán, záhonky, fotky i všechny zápisy. Tohle se nedá vrátit.', () => {
+    try { localStorage.removeItem('zahradka-v2'); } catch (e) {}
+    location.reload();
+  });
+}
+const MESICE_KR2 = ['led','úno','bře','dub','kvě','čvn','čvc','srp','zář','říj','lis','pro'];
+
+function dialogRady(id) {
+  const vse = vsechnyRady();
+  const r = id ? vse.find(x => x.id === id) : { id:'', nadpis:'', text:'', mesice:[], skupina:'Moje rady', vlastni:true };
+  if (!r) return;
+  let mes = (r.mesice || []).slice();
+  const kresli = () => {
+    const d = dialog(`<h2>${id ? 'Rada' : 'Nová rada'}</h2>
+      <div class="field"><label for="r-n">Nadpis</label><input id="r-n" value="${esc(r.nadpis)}" placeholder="Třeba: Na jahody dát slámu"></div>
+      <div class="field"><label for="r-t">Text</label><textarea id="r-t" style="min-height:140px" placeholder="Co přesně dělat a proč">${esc(r.text)}</textarea></div>
+      <div class="field"><label>Kdy radit</label>
+        <div class="chips" style="flex-wrap:wrap">
+          ${MESICE.map((nm,i)=>`<button class="chip ${mes.includes(i+1)?'on':''}" data-rm="${i+1}">${esc(MESICE_KR2[i])}</button>`).join('')}
+        </div>
+        <p class="note" style="margin-top:8px">Bez vybraného měsíce je to obecná zásada — najdeš ji tady v Nastavení, ale na Dnešek nevyskočí.</p>
+      </div>
+      ${id ? `<button class="btn sm sec wide" id="r-zap" style="margin-bottom:14px">${r.zap===false?'Zapnout radu':'Vypnout radu'}</button>` : ''}
+      <div class="dacts">
+        ${id && r.vlastni ? `<button class="btn sec" id="r-del" style="color:var(--danger)">Smazat</button>` : ''}
+        ${id && !r.vlastni ? `<button class="btn sec" id="r-zpet">Výchozí text</button>` : ''}
+        <button class="btn" id="r-ok">Uložit</button>
+      </div>`);
+    d.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => {
+      const m = Number(b.dataset.rm);
+      const i = mes.indexOf(m);
+      if (i >= 0) mes.splice(i,1); else mes.push(m);
+      r.nadpis = d.querySelector('#r-n').value; r.text = d.querySelector('#r-t').value;
+      kresli();
+    });
+    const z = d.querySelector('#r-zap');
+    if (z) z.onclick = () => {
+      ulozRadu(r, d.querySelector('#r-n').value, d.querySelector('#r-t').value, mes, r.zap === false);
+      zavri(); kresliNastaveni(); kresliDnes();
+    };
+    const zp = d.querySelector('#r-zpet');
+    if (zp) zp.onclick = () => {
+      if (state.radyEdit) delete state.radyEdit[r.id];
+      save(); zavri(); kresliNastaveni(); toast('Vrácen výchozí text');
+    };
+    const dl = d.querySelector('#r-del');
+    if (dl) dl.onclick = () => {
+      state.vlastniRady = (state.vlastniRady || []).filter(x => x.id !== r.id);
+      save(); zavri(); kresliNastaveni(); kresliDnes();
+    };
+    d.querySelector('#r-ok').onclick = () => {
+      const nd = d.querySelector('#r-n').value.trim(), tx = d.querySelector('#r-t').value.trim();
+      if (!nd) { toast('Napiš nadpis'); return; }
+      ulozRadu(r, nd, tx, mes, r.zap !== false);
+      zavri(); kresliNastaveni(); kresliDnes(); toast('Uloženo');
+    };
+  };
+  kresli();
+}
+function ulozRadu(r, nadpis, text, mesice, zap) {
+  if (r.vlastni) {
+    state.vlastniRady = state.vlastniRady || [];
+    const i = state.vlastniRady.findIndex(x => x.id === r.id);
+    const obj = { id: r.id || ('vr' + Date.now()), nadpis, text, mesice: mesice.slice().sort((a,b)=>a-b), zap };
+    if (i >= 0) state.vlastniRady[i] = obj; else state.vlastniRady.push(obj);
+  } else {
+    state.radyEdit = state.radyEdit || {};
+    state.radyEdit[r.id] = { nadpis, text, mesice: mesice.slice().sort((a,b)=>a-b), zap };
+  }
+  save();
+}
+
+function dialogAkce(id) {
+  const ak = akceSeznam();
+  const a = id ? ak.find(x => x.id === id) : { id:'', nazev:'', ikona:'pece', vlastni:true };
+  if (!a) return;
+  let iko = a.ikona;
+  const kresli = () => {
+    const d = dialog(`<h2>${id ? 'Vlastní akce' : 'Nová akce'}</h2>
+      <p class="lead">Objeví se jako tlačítko u každého záhonku.</p>
+      <div class="field"><label for="a-n">Název</label><input id="a-n" value="${esc(a.nazev)}" placeholder="Postřik, Okopat, Protrhat…"></div>
+      <div class="field"><label>Ikona</label>
+        <div class="ikony">${IKONY_AKCI.map(x=>`<button class="${x===iko?'on':''}" data-ai="${x}">${ik(x)}</button>`).join('')}</div>
+      </div>
+      <div class="dacts"><button class="btn sec" id="a-zrus">Zrušit</button>
+      <button class="btn" id="a-ok">Uložit</button></div>`);
+    d.querySelectorAll('[data-ai]').forEach(b => b.onclick = () => { iko = b.dataset.ai; a.nazev = d.querySelector('#a-n').value; kresli(); });
+    d.querySelector('#a-zrus').onclick = zavri;
+    d.querySelector('#a-ok').onclick = () => {
+      const nz = d.querySelector('#a-n').value.trim();
+      if (!nz) { toast('Napiš název'); return; }
+      const sez = akceSeznam().slice();
+      if (id) { const i = sez.findIndex(x=>x.id===id); sez[i] = { id, nazev:nz, ikona:iko, vlastni:true }; }
+      else sez.push({ id:'a'+Date.now(), nazev:nz, ikona:iko, vlastni:true });
+      state.akce = sez; save(); zavri(); kresliNastaveni(); kresliZahonky(); toast('Uloženo');
+    };
+  };
+  kresli();
+}
+
+function exportZalohy() {
+  try {
+    const data = JSON.stringify(state);
+    const a = document.createElement('a');
+    a.href = 'data:application/json;charset=utf-8,' + encodeURIComponent(data);
+    a.download = 'koza-zahradnik-' + todayISO() + '.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    toast('Záloha uložena');
+  } catch (e) { toast('Zálohu se nepodařilo uložit'); }
+}
+function importZalohy() {
+  let inp = el('inp-zal');
+  if (!inp) {
+    inp = document.createElement('input');
+    inp.type='file'; inp.accept='application/json,.json'; inp.id='inp-zal'; inp.hidden=true;
+    document.body.appendChild(inp);
+    inp.onchange = (e) => {
+      const f = e.target.files && e.target.files[0]; e.target.value='';
+      if (!f) return;
+      const r = new FileReader();
+      r.onload = () => {
+        try {
+          const p = JSON.parse(r.result);
+          if (!p || typeof p !== 'object') throw 0;
+          localStorage.setItem('zahradka-v2', JSON.stringify(p));
+          location.reload();
+        } catch (err) { toast('Tohle není záloha Kozy Zahradníka'); }
+      };
+      r.readAsText(f);
+    };
+  }
+  inp.click();
+}
+
 /* ============ OBRAZOVKA: DNES ============
    Domovská obrazovka odpovídá na jedinou otázku: co mám dneska udělat.
    Úkoly nevznikají ručně — appka je odvodí z plodin, počasí a zápisů,
@@ -2588,6 +2973,17 @@ function kresliDnes() {
       </div>` : `<p class="note" style="margin-top:0">Zatím nic zapsaného. Až něco sklidíš, klepni u záhonku na <b>Sklidit</b> a zapiš kolik — za pár let uvidíš, který záhon se vyplatí.</p>`}
     </div>
 
+    ${radyMesice(new Date().getMonth()+1).length ? `<div class="sec">
+      <div class="sec-h"><h2>Co dělat v ${esc(MESICE[new Date().getMonth()])}u</h2>
+        <span class="n">${radyMesice(new Date().getMonth()+1).length}</span></div>
+      <div class="list">
+        ${radyMesice(new Date().getMonth()+1).map(r=>`<button class="card task" data-radu="${esc(r.id)}" style="width:100%;text-align:left">
+          <span class="ti2" style="background:var(--acc-soft);color:var(--acc-dark)">${ik('listek')}</span>
+          <span class="tm"><b>${esc(r.nadpis)}</b><span>${esc(r.text)}</span></span>
+        </button>`).join('')}
+      </div>
+    </div>` : ''}
+
     <div class="sec">
       <div class="sec-h"><h2>Předpověď</h2><span class="n">${esc(w.nazev)}</span></div>
       <div class="wdays wdays-plain">
@@ -2603,6 +2999,7 @@ function kresliDnes() {
   const dv = el('d-vice'); if (dv) dv.onclick = () => otevriPocasi();
   el('d-pocasi').onclick = () => otevriPocasi();
   s.querySelectorAll('[data-crop]').forEach(b => b.onclick = () => dialogPlodiny(b.dataset.crop));
+  s.querySelectorAll('[data-radu]').forEach(b => b.onclick = () => dialogRady(b.dataset.radu));
   s.querySelectorAll('[data-hotovo]').forEach(b => b.onclick = () => {
     const [id, akce] = b.dataset.hotovo.split('|');
     if (akce === 'zalij') { quickWater(id); kresliDnes(); }
@@ -2953,7 +3350,7 @@ function kresliPlatno() {
   const tile = dotStep * view.scale, tile5 = dotStep * 5 * view.scale;
   const px = -view.ox * view.scale, py = -view.oy * view.scale;
   cv.style.backgroundImage =
-    'radial-gradient(circle, var(--dot) 1.3px, transparent 1.9px),' +
+    'radial-gradient(circle, var(--dot) 1.1px, transparent 1.7px),' +
     'linear-gradient(to right, var(--grid) 1px, transparent 1px),' +
     'linear-gradient(to bottom, var(--grid) 1px, transparent 1px)';
   cv.style.backgroundSize = `${tile}px ${tile}px, ${tile5}px ${tile5}px, ${tile5}px ${tile5}px`;
@@ -2972,13 +3369,14 @@ function kresliPlatno() {
   (state.vedlejsi || []).forEach(poly => {
     if (poly.length < 3) return;
     const ps = poly.map(q => w2s(q[0],q[1]).map(n=>n.toFixed(1)).join(',')).join(' ');
-    parts.push(`<polygon points="${ps}" fill="var(--acc-soft)" fill-opacity="0.38" stroke="var(--acc)" stroke-width="1.6" stroke-dasharray="6 4"/>`);
+    parts.push(`<polygon points="${ps}" fill="#e4f0da" fill-opacity="0.8" stroke="#79a35e" stroke-width="1.8" stroke-dasharray="7 5" stroke-linejoin="round"/>`);
   });
   // obrys parcely
   if (state.outline.length >= 2) {
     const pstr = state.outline.map(p => w2s(p[0],p[1]).map(n=>n.toFixed(1)).join(',')).join(' ');
     if (state.outlineDone && state.outline.length >= 3) {
-      parts.push(`<polygon points="${pstr}" fill="var(--acc-soft)" fill-opacity="0.5" stroke="var(--acc)" stroke-width="2.5" stroke-linejoin="round"/>`);
+      parts.push(`<polygon points="${pstr}" fill="#dceccf" fill-opacity="0.95" stroke="#79a35e" stroke-width="7" stroke-opacity=".28" stroke-linejoin="round"/>`);
+      parts.push(`<polygon points="${pstr}" fill="none" stroke="#4f8c3f" stroke-width="2.6" stroke-linejoin="round"/>`);
     } else {
       parts.push(`<polyline points="${pstr}" fill="none" stroke="var(--acc)" stroke-width="2.5" stroke-dasharray="7 5" stroke-linejoin="round" stroke-linecap="round"/>`);
     }
@@ -2991,41 +3389,96 @@ function kresliPlatno() {
     const d = PRVKY[it.typ] || PRVKY.bed;
     const c = crop(it.cropId);
     const out = !itemInside(it);
-    const fill = (roste(it) && c) ? 'var(--acc)' : d.fill;
-    let fp = '', sach = '';
-    cellsOf(it).forEach(k => {
-      const cc = cxy(k), sp = w2s(cc[0], cc[1]);
-      const d2 = `M${sp[0].toFixed(1)} ${sp[1].toFixed(1)}h${(s+ov).toFixed(1)}v${(s+ov).toFixed(1)}h${(-(s+ov)).toFixed(1)}Z`;
-      fp += d2;
-      if ((cc[0] + cc[1]) % 2) sach += d2;   // sachovnice: plocha vypada jako dlazdice
-    });
-    parts.push(`<path d="${fp}" fill="${fill}" fill-opacity="${roste(it)?0.92:0.95}"/>`);
-
-    let ep = '';
-    edgeSegments(it).forEach(g => {
-      const a = w2s(g[0], g[1]), b2 = w2s(g[2], g[3]);
-      ep += `M${a[0].toFixed(1)} ${a[1].toFixed(1)}L${b2[0].toFixed(1)} ${b2[1].toFixed(1)}`;
-    });
-    parts.push(`<path d="${ep}" fill="none" stroke="${out?'var(--danger)':d.line}" stroke-width="${out?2.5:1.6}" stroke-linecap="square" ${out?'stroke-dasharray="5 4"':''}/>`);
-
     const b = itBBox(it);
     const sp0 = w2s(b.x0, b.y0), bw = b.w*s, bh = b.h*s;
-    // pixelartovy obrazek: plodina, kdyz tam neco roste, jinak obrazek prvku
+    const r = Math.min(7, s*0.3);
+
+    /* Obdelnikove prvky kreslime jako jeden zakulaceny tvar — plan tak
+       vypada jako zahrada, ne jako milimetrovy papir. Nepravidelne
+       tvary zustavaji po ctverecich. */
+    const jednoduchy = isRect(it);
+    const telo = (vypln, opacita, posunX, posunY, uzsi) => {
+      if (jednoduchy) {
+        return `<rect x="${(sp0[0]+(posunX||0)).toFixed(1)}" y="${(sp0[1]+(posunY||0)).toFixed(1)}" width="${Math.max(1,bw-(uzsi||0)*2).toFixed(1)}" height="${Math.max(1,bh-(uzsi||0)*2).toFixed(1)}" rx="${r.toFixed(1)}" fill="${vypln}" fill-opacity="${opacita}"/>`;
+      }
+      let fp = '';
+      cellsOf(it).forEach(k => {
+        const cc = cxy(k), sp = w2s(cc[0], cc[1]);
+        fp += `M${sp[0].toFixed(1)} ${sp[1].toFixed(1)}h${(s+ov).toFixed(1)}v${(s+ov).toFixed(1)}h${(-(s+ov)).toFixed(1)}Z`;
+      });
+      return `<path d="${fp}" fill="${vypln}" fill-opacity="${opacita}"/>`;
+    };
+
+    // měkký stín, aby prvky na papíře ležely a neplavaly
+    if (jednoduchy && s > 4) parts.push(`<rect x="${(sp0[0]+1.5).toFixed(1)}" y="${(sp0[1]+2.5).toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}" rx="${r.toFixed(1)}" fill="rgba(31,45,28,.13)"/>`);
+
+    parts.push(telo(d.fill, 1));
+    // hlína v záhonu: jemné řádky, ne šachovnice
+    if (roste(it) && s >= 7 && jednoduchy) {
+      let rad = '';
+      for (let y = b.y0 + 0.5; y < b.y1; y += 0.5) {
+        const a2 = w2s(b.x0 + 0.25, y), b3 = w2s(b.x1 - 0.25, y);
+        rad += `M${a2[0].toFixed(1)} ${a2[1].toFixed(1)}L${b3[0].toFixed(1)} ${b3[1].toFixed(1)}`;
+      }
+      parts.push(`<path d="${rad}" stroke="rgba(0,0,0,.08)" stroke-width="1" fill="none"/>`);
+    }
+    // osázený záhon má zelený nádech
+    if (roste(it) && c) parts.push(telo('#3f8c3f', 0.3));
+    // dřevěný rám u vyvýšeného záhonu a truhlíku
+    if ((it.typ === 'raised' || it.typ === 'trough') && jednoduchy && Math.min(bw,bh) > 16) {
+      parts.push(`<rect x="${(sp0[0]+3).toFixed(1)}" y="${(sp0[1]+3).toFixed(1)}" width="${(bw-6).toFixed(1)}" height="${(bh-6).toFixed(1)}" rx="${Math.max(1,r-2).toFixed(1)}" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.6"/>`);
+    }
+    // obrys
+    if (jednoduchy) {
+      parts.push(`<rect x="${sp0[0].toFixed(1)}" y="${sp0[1].toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}" rx="${r.toFixed(1)}" fill="none" stroke="${out?'var(--danger)':d.line}" stroke-width="${out?2.6:2}" ${out?'stroke-dasharray="6 4"':''}/>`);
+    } else {
+      let ep = '';
+      edgeSegments(it).forEach(g => {
+        const a = w2s(g[0], g[1]), b2 = w2s(g[2], g[3]);
+        ep += `M${a[0].toFixed(1)} ${a[1].toFixed(1)}L${b2[0].toFixed(1)} ${b2[1].toFixed(1)}`;
+      });
+      parts.push(`<path d="${ep}" fill="none" stroke="${out?'var(--danger)':d.line}" stroke-width="${out?2.6:2}" stroke-linejoin="round" stroke-linecap="round" ${out?'stroke-dasharray="6 4"':''}/>`);
+    }
+
+    // obrázek: barevná ilustrace plodiny na bílém kolečku, ať je čitelná
     const znak = cropArtId(c) || (!c ? d.pix : null);
-    const vel = Math.min(bw * 0.72, bh * 0.72, 56);
-    if (bw > 20 && bh > 18 && znak && vel >= 11) {
-      parts.push(`<g color="${roste(it) ? '#ffffff' : 'var(--ink2)'}">` + artInto(znak, sp0[0] + (bw - vel)/2, sp0[1] + (bh - vel)/2 - (bh > 48 ? 6 : 0), vel) + `</g>`);
-    } else if (bw > 30 && bh > 26 && c) {
-      parts.push(`<text x="${(sp0[0]+bw/2).toFixed(1)}" y="${(sp0[1]+bh/2).toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="${Math.min(24, bh*0.5).toFixed(0)}">${c.emoji}</text>`);
+    const velMax = Math.min(bw, bh) * 0.66;
+    const vel = Math.min(velMax, 46);
+    const foto = c ? cropFotky(c.id)[0] : null;
+    if (bw > 26 && bh > 22 && vel >= 15 && (znak || foto)) {
+      const cx = sp0[0] + bw/2, cy = sp0[1] + bh/2 - (bh > 52 ? 7 : 0);
+      const rr = vel/2 + 4;
+      parts.push(`<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${rr.toFixed(1)}" fill="#fffdf6" stroke="rgba(31,45,28,.18)" stroke-width="1.2"/>`);
+      if (foto) {
+        const cid = 'cl' + it.id;
+        parts.push(`<clipPath id="${cid}"><circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${(rr-1.5).toFixed(1)}"/></clipPath>`);
+        parts.push(`<image href="${foto}" x="${(cx-rr+1.5).toFixed(1)}" y="${(cy-rr+1.5).toFixed(1)}" width="${((rr-1.5)*2).toFixed(1)}" height="${((rr-1.5)*2).toFixed(1)}" preserveAspectRatio="xMidYMid slice" clip-path="url(#${cid})"/>`);
+      } else {
+        parts.push(`<g color="var(--ink2)">` + artInto(znak, cx - vel/2, cy - vel/2, vel) + `</g>`);
+      }
     }
-    if (bw > 44 && bh > 12) {
-      const col = roste(it) ? '#ffffff' : 'var(--ink)';
-      const fs = Math.min(13, Math.max(9.5, bh * 0.55));
-      const ty = (bh > 48 && znak) ? sp0[1] + bh - 8 : sp0[1] + bh/2 + fs*0.36;
-      parts.push(`<text x="${(sp0[0]+bw/2).toFixed(1)}" y="${ty.toFixed(1)}" text-anchor="middle" font-size="${fs.toFixed(1)}" font-weight="700" fill="${col}" style="paint-order:stroke" stroke="${roste(it)?'rgba(0,0,0,.28)':'rgba(255,255,255,.5)'}" stroke-width="2.4">${esc(c ? c.nazev : it.nazev)}</text>`);
+
+    // jmenovka: světlý štítek pod obrázkem místo obtaženého písma
+    if (bw > 48 && bh > 14) {
+      const txt = c ? c.nazev : it.nazev;
+      const fs = Math.min(12.5, Math.max(9, bh * 0.4));
+      const sirka = Math.min(bw - 6, txt.length * fs * 0.56 + 12);
+      const ty = (bh > 52 && (znak || foto)) ? sp0[1] + bh - 7 - fs*0.75 : sp0[1] + bh/2 - fs*0.78;
+      parts.push(`<rect x="${(sp0[0] + (bw - sirka)/2).toFixed(1)}" y="${ty.toFixed(1)}" width="${sirka.toFixed(1)}" height="${(fs*1.6).toFixed(1)}" rx="${(fs*0.6).toFixed(1)}" fill="rgba(255,253,246,.92)"/>`);
+      parts.push(`<text x="${(sp0[0]+bw/2).toFixed(1)}" y="${(ty + fs*1.14).toFixed(1)}" text-anchor="middle" font-size="${fs.toFixed(1)}" font-weight="700" fill="var(--ink)">${esc(txt)}</text>`);
     }
-    // zamek v rohu
-    if (it.zamek && bw > 26 && bh > 26) parts.push(`<g color="${roste(it) ? 'rgba(255,255,255,.85)' : 'var(--ink2)'}">` + artInto('zamek', sp0[0] + bw - 20, sp0[1] + 4, 16) + `</g>`);
+    // stavove odznaky v rohu: co tenhle zahon prave potrebuje
+    if (roste(it) && bw > 24 && bh > 20) {
+      const sv = stavy(it).filter(x => x !== 'prazdny').slice(0, bw > 80 ? 3 : (bw > 52 ? 2 : 1));
+      const r2 = Math.min(8.5, Math.max(6, Math.min(bw, bh) * 0.18));
+      sv.forEach((sx, i) => {
+        const cx = sp0[0] + bw - 3 - r2 - i * (r2*2 + 2.5), cy = sp0[1] + 3 + r2;
+        parts.push(`<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${r2.toFixed(1)}" fill="${STAV_BARVY[sx].bg}" stroke="#fffdf6" stroke-width="1.8"/>`);
+        parts.push(`<g color="#ffffff">` + artInto(STAV_BARVY[sx].ik, cx - r2*0.62, cy - r2*0.62, r2*1.24) + `</g>`);
+      });
+    } else if (it.zamek && bw > 26 && bh > 26) {
+      parts.push(`<g color="var(--ink2)">` + artInto('zamek', sp0[0] + bw - 20, sp0[1] + 4, 16) + `</g>`);
+    }
   });
   // vybrany prvek: ramec a uchyty
   const sel = state.sel ? state.items[state.sel] : null;
@@ -3337,11 +3790,15 @@ function kartaZahonu(b, m) {
   const sez = soucetText(sklizenSoucet(b, new Date().getFullYear()));
   const varovani = c ? postupVarovani(b, c.id) : null;
   const uhyn = uhynLetos(b), duv = uhyn ? nejcastejsiDuvod(b) : null;
+  const sv = stavy(b);
   return `<div class="card">
-    ${fs.length ? `<div class="photo-strip">
-      ${fs.map((f,i)=>`<figure data-foto="${b.id}|${i}"><img class="photo" src="${f.data}" alt="">
-        <figcaption>${esc(relDays(f.datum))}</figcaption></figure>`).join('')}
-    </div>` : `<button class="addphoto" data-addfoto="${b.id}">${ik('foto')}Vyfotit ${esc(PRVKY[b.typ].nazev.toLowerCase())}</button>`}
+    <div class="hlava">
+      ${fs.length ? `<div class="photo-strip">
+        ${fs.map((f,i)=>`<figure data-foto="${b.id}|${i}"><img class="photo" src="${f.data}" alt="">
+          <figcaption>${esc(relDays(f.datum))}</figcaption></figure>`).join('')}
+      </div>` : `<button class="addphoto" data-addfoto="${b.id}">${ik('foto')}Vyfotit ${esc(PRVKY[b.typ].nazev.toLowerCase())}</button>`}
+      ${sv.length ? `<div class="odznaky">${sv.map(stavOdznak).join('')}</div>` : ''}
+    </div>
 
     <div class="row">
       <span class="thumb">${c ? cropArt(c) : prvekPix(b.typ)}</span>
@@ -3360,10 +3817,22 @@ function kartaZahonu(b, m) {
     </div>` : ''}
 
     ${c ? `<div class="akce">
-      <button data-zalij="${b.id}" class="${dnes?'done':''}">${ik('konev')}<span>${dnes?'Zalito':'Zalít'}</span></button>
-      <button data-hnoj="${b.id}">${ik('hnojivo')}<span>Pohnojit</span></button>
-      <button data-sklid="${b.id}">${ik('kosik')}<span>Sklidit</span></button>
+      ${akceSeznam().map(a => {
+        const hot = a.id === 'zalij' ? dnes : (b.zaznamy||[]).some(z => z.akceId === a.id && z.datum === todayISO());
+        return `<button data-akce="${b.id}|${a.id}" class="${hot?'done':''}">${ik(a.ikona)}<span>${esc(hot && a.id==='zalij' ? 'Zalito' : a.nazev)}</span></button>`;
+      }).join('')}
     </div>` : ''}
+
+    ${c ? `<button class="plodinka" data-plodina="${c.id}">
+      <span class="pf">
+        ${c.rozestup ? `<span><i>Rozestup</i>${esc(c.rozestup)}</span>` : ''}
+        ${c.slunce ? `<span><i>Stanoviště</i>${esc(c.slunce)}</span>` : ''}
+        ${c.celed ? `<span><i>Čeleď</i>${esc(c.celed)}</span>` : ''}
+      </span>
+      ${c.pozor ? `<span class="pp">${ik('pozor')}<span>${esc(c.pozor)}</span></span>` : ''}
+      <span class="pv">Celý list o plodině
+        <svg class="go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span>
+    </button>` : ''}
 
     <div class="tags">
       ${sez ? `<span class="tag silny">${ik('vaha')}letos ${esc(sez)}</span>` : ''}
@@ -3378,11 +3847,46 @@ function kartaZahonu(b, m) {
     ${varovani ? `<p class="varovani">${ik('pozor')}<span>${esc(varovani)}</span></p>` : ''}
   </div>`;
 }
+/* ============ STAVOVÉ IKONY ============
+   Jedním pohledem na plán i na kartu: co ten záhon zrovna potřebuje.
+   Stejná sada ikon a barev na obou místech, ať se to nemusí učit dvakrát. */
+const STAV_BARVY = {
+  zalij:  { bg:'#2f7fa8', ik:'konev',    popis:'Potřebuje zalít' },
+  sklid:  { bg:'#1e7a3c', ik:'kosik',    popis:'Je čas sklízet' },
+  hnoj:   { bg:'#a9663a', ik:'hnojivo',  popis:'Dlouho bez hnojení' },
+  uhyn:   { bg:'#c0392b', ik:'uhyn',     popis:'Letos tu uhynuly rostliny' },
+  prace:  { bg:'#d99a1f', ik:'pece',     popis:'Čeká tu práce z kalendáře' },
+  zamek:  { bg:'#5c6b5e', ik:'zamek',    popis:'Zamčeno' },
+  ven:    { bg:'#c0392b', ik:'pozor',    popis:'Přesahuje obrys zahrady' },
+  prazdny:{ bg:'#8a9a8c', ik:'sazenice', popis:'Bez plodiny' },
+};
+function stavy(b) {
+  const out = [];
+  const c = crop(b.cropId);
+  const m = new Date().getMonth() + 1;
+  if (!itemInside(b)) out.push('ven');
+  if (b.zamek) out.push('zamek');
+  if (!c) { out.push('prazdny'); return out; }
+  const k = dalsiKrok(b);
+  if (k.akce === 'zalij') out.push('zalij');
+  if (k.akce === 'sklid' || c.harvest.includes(m)) out.push('sklid');
+  if (k.akce === 'hnoj') out.push('hnoj');
+  if (!k.akce && ukonyOf(c).some(u => u.m === m)) out.push('prace');
+  if (uhynLetos(b) > 0) out.push('uhyn');
+  return out;
+}
+const stavOdznak = (s) => `<span class="odznak" style="background:${STAV_BARVY[s].bg}" title="${esc(STAV_BARVY[s].popis)}">${ik(STAV_BARVY[s].ik)}</span>`;
+
 const rostlinSlovo = (n) => n === 1 ? 'rostlina' : (n >= 2 && n <= 4 ? 'rostliny' : 'rostlin');
 
 function napojZahonky(s) {
-  s.querySelectorAll('[data-zalij]').forEach(b => b.onclick = () => { quickWater(b.dataset.zalij); kresliZahonky(); });
-  s.querySelectorAll('[data-hnoj]').forEach(b => b.onclick = () => { quickFert(b.dataset.hnoj); kresliZahonky(); });
+  s.querySelectorAll('[data-akce]').forEach(b => b.onclick = () => {
+    const [id, aid] = b.dataset.akce.split('|');
+    if (aid === 'zalij') { quickWater(id); kresliZahonky(); }
+    else if (aid === 'hnoj') { quickFert(id); kresliZahonky(); }
+    else if (aid === 'sklid') dialogSklizne(id, () => kresliZahonky());
+    else { zapisAkci(id, aid); kresliZahonky(); }
+  });
   s.querySelectorAll('[data-pocet]').forEach(b => b.onclick = () => dialogPoctu(b.dataset.pocet));
   s.querySelectorAll('[data-sklid]').forEach(b => b.onclick = () => dialogSklizne(b.dataset.sklid, () => kresliZahonky()));
   s.querySelectorAll('[data-uhyn]').forEach(b => b.onclick = () => dialogPorostu(b.dataset.uhyn, 'uhyn'));
@@ -3509,8 +4013,8 @@ function kresliNakup(s) {
 /* ============ OBRAZOVKA: KALENDÁŘ ============ */
 const DNY_ZKR = ['Po','Út','St','Čt','Pá','So','Ne'];
 const UKON_PIX = { soil:'ryc', sow:'semeno', plant:'sazenice', care:'pece', harvest:'kosik' };
-const ZAPIS_PIX = { voda:'konev', hnuj:'hnojivo', vysadba:'sazenice', sklizen:'kosik', uhyn:'uhyn', dosadba:'sazenice' };
-const ZAPIS_NAZEV = { voda:'Zalito', hnuj:'Pohnojeno', vysadba:'Vyseto nebo vysazeno', sklizen:'Sklizeno', uhyn:'Úhyn rostlin', dosadba:'Dosazeno' };
+const ZAPIS_PIX = { voda:'konev', hnuj:'hnojivo', vysadba:'sazenice', sklizen:'kosik', uhyn:'uhyn', dosadba:'sazenice', akce:'pece' };
+const ZAPIS_NAZEV = { voda:'Zalito', hnuj:'Pohnojeno', vysadba:'Vyseto nebo vysazeno', sklizen:'Sklizeno', uhyn:'Úhyn rostlin', dosadba:'Dosazeno', akce:'' };
 
 /* Vsechno, co je v zahrade zapsane na konkretni den: zalivka, hnojeni, vysadba */
 function zapisyPoDnech() {
@@ -3521,6 +4025,7 @@ function zapisyPoDnech() {
     (b.hnojeni || []).forEach(h => pridej(h.datum, { typ:'hnuj', b, co:h.co }));
     if (b.datumVysadby) pridej(b.datumVysadby, { typ:'vysadba', b });
     (b.sklizen || []).forEach(s => pridej(s.datum, { typ:'sklizen', b, co: fmtN(s.mnozstvi) + ' ' + (s.jednotka||'kg') }));
+    (b.zaznamy || []).forEach(z => { const a = akceById(z.akceId); if (a) pridej(z.datum, { typ:'akce', b, co:a.nazev, ikona:a.ikona }); });
     (b.udalosti || []).forEach(u => pridej(u.datum, { typ:u.typ, b,
       co: (u.typ === 'uhyn' ? '−' : '+') + u.pocet + (u.duvod ? ', ' + u.duvod.toLowerCase() : '') }));
   });
@@ -3562,6 +4067,11 @@ function kresliKalendar() {
 
   s.innerHTML = `<div class="scroll">
     <div class="sec" style="margin-top:14px">
+      <div class="seg" style="margin-bottom:14px">
+        <button class="${state.calRezim!=='rok'?'on':''}" data-crez="mesic">Měsíc</button>
+        <button class="${state.calRezim==='rok'?'on':''}" data-crez="rok">Celý rok</button>
+      </div>
+      ${state.calRezim === 'rok' ? rokovyPrehled(rok) : `
       <div class="calhead">
         <button class="ar" id="c-prev" aria-label="Předchozí měsíc">‹</button>
         <span class="nm"><b>${esc(MESICE[mi])}</b><span>${rok}${zapisuVMesici ? ' · ' + zapisuVMesici + ' dnů se zápisem' : ''}</span></span>
@@ -3595,8 +4105,17 @@ function kresliKalendar() {
       </div>
       ${ukOst.length ? `<div class="sec-h" style="margin-top:24px"><h2>Co se dá dělat navíc</h2><span class="n">${ukOst.length}</span></div>
       <div class="list">${ukOst.map(u => radekUkonu(u, false)).join('')}</div>` : ''}
+      `}
     </div>
   </div>`;
+
+  s.querySelectorAll('[data-crez]').forEach(b => b.onclick = () => {
+    state.calRezim = b.dataset.crez; save(); kresliKalendar();
+  });
+  if (state.calRezim === 'rok') {
+    s.querySelectorAll('[data-crop]').forEach(b => b.onclick = () => dialogPlodiny(b.dataset.crop));
+    return;
+  }
 
   const posun2 = (k) => {
     mi += k;
@@ -3604,6 +4123,7 @@ function kresliKalendar() {
     if (mi > 11) { mi = 0; rok++; }
     state.calMonth = mi; state.calRok = rok; save(); kresliKalendar();
   };
+  if (!el('c-prev')) return;
   el('c-prev').onclick = () => posun2(-1);
   el('c-next').onclick = () => posun2(1);
   const cd = el('c-dnes');
@@ -3612,6 +4132,47 @@ function kresliKalendar() {
   };
   s.querySelectorAll('[data-den]').forEach(b => b.onclick = () => dialogDne(b.dataset.den));
   s.querySelectorAll('[data-crop]').forEach(b => b.onclick = () => dialogPlodiny(b.dataset.crop));
+}
+
+/* ============ ROČNÍ PŘEHLED ============
+   Zahradničení běží v intervalech, ne v jednotlivých dnech. Každá plodina
+   má pruh přes dvanáct měsíců: kdy připravit půdu, sít, sázet, pečovat
+   a sklízet. Hned je vidět, kdy se záhon uvolní pro další plodinu. */
+const PAS_BARVA = { soil:'#a9663a', sow:'#7bb04c', plant:'#1e7a3c', care:'#d99a1f', harvest:'#c0392b' };
+const PAS_NAZEV = { soil:'půda', sow:'výsev', plant:'výsadba', care:'péče', harvest:'sklizeň' };
+function rokovyPrehled(rok) {
+  const dnesM = new Date().getMonth() + 1;
+  const moje = [];
+  beds().forEach(b => { const c = crop(b.cropId); if (c && !moje.some(x => x.c.id === c.id)) moje.push({ c, b }); });
+  const seznam = moje.length ? moje : allCrops().slice(0, 8).map(c => ({ c, b:null }));
+  return `
+    <p class="note" style="margin-top:0">${moje.length ? 'Plodiny, které pěstuješ.' : 'Zatím nic nepěstuješ, tohle je ukázka ze seznamu plodin.'} Barevné pruhy jsou období, kdy se co dělá.</p>
+    <div class="rok">
+      <div class="rhead"><span class="rn"></span>
+        <span class="rmesice">${MESICE_KR2.map((m,i)=>`<span class="${i+1===dnesM?'ted':''}">${m.charAt(0).toUpperCase()}</span>`).join('')}</span>
+      </div>
+      ${seznam.map(o => {
+        const typy = {};
+        ukonyOf(o.c).forEach(u => { (typy[u.typ] = typy[u.typ] || []).push(u.m); });
+        const poradi = ['soil','sow','plant','care','harvest'].filter(t => typy[t] && typy[t].length);
+        return `<button class="rrow" data-crop="${o.c.id}">
+          <span class="rn"><span class="ra">${cropArt(o.c)}</span><b>${esc(o.c.nazev)}</b>
+            ${o.b ? `<i>${esc(o.b.nazev)}</i>` : ''}</span>
+          <span class="rpas">
+            <span class="rmr">${MESICE_KR2.map((x,i)=>`<i class="${i+1===dnesM?'ted':''}"></i>`).join('')}</span>
+            ${poradi.map(t => `<span class="rl">
+              ${Array.from({length:12},(_,i)=>{
+                const on = typy[t].includes(i+1);
+                return `<i class="${on?'on':''}" style="${on?'background:'+PAS_BARVA[t]:''}"></i>`;
+              }).join('')}
+            </span>`).join('')}
+          </span>
+        </button>`;
+      }).join('')}
+    </div>
+    <div class="callegend" style="margin-top:14px">
+      ${Object.keys(PAS_NAZEV).map(t=>`<span><i style="background:${PAS_BARVA[t]};border-radius:2px"></i>${PAS_NAZEV[t]}</span>`).join('')}
+    </div>`;
 }
 
 /* Co se ten den v zahradě dělo a co se tam dá dopsat */
@@ -3625,8 +4186,8 @@ function dialogDne(iso) {
     <p class="lead">${esc(DNY_ZKR[(new Date(iso+'T12:00:00').getDay()+6)%7])} · ${esc(relDays(iso)) || 'dnes'}</p>
     ${zapisy.length ? `<div class="list" style="margin-bottom:16px">
       ${zapisy.map(e=>`<div class="card row" style="padding:11px 12px">
-        <span class="thumb" style="width:38px;height:38px;padding:5px">${ik(ZAPIS_PIX[e.typ])}</span>
-        <span class="mid"><b style="font-size:14.5px">${esc(ZAPIS_NAZEV[e.typ])}${e.co ? ' — ' + esc(e.co) : ''}</b>
+        <span class="thumb" style="width:38px;height:38px;padding:5px">${ik(e.ikona || ZAPIS_PIX[e.typ])}</span>
+        <span class="mid"><b style="font-size:14.5px">${esc(ZAPIS_NAZEV[e.typ] || '')}${ZAPIS_NAZEV[e.typ] && e.co ? ' — ' : ''}${e.co ? esc(e.co) : ''}</b>
           <span>${esc(e.b.nazev)}</span></span></div>`).join('')}
     </div>` : `<p class="note" style="margin-top:0">Na tenhle den nic zapsaného není.</p>`}
     ${uk.length ? `<div class="sec-h"><h2>Úkony měsíce</h2></div>
@@ -4187,13 +4748,7 @@ function dialogObchodu(id) {
 load();
 el('bar-mark').innerHTML = LOGO_KOZEL;
 el('bar-ver').textContent = VERZE;
-el('bar-theme').onclick = () => {
-  const cur = document.documentElement.getAttribute('data-theme');
-  const tmavy = cur === 'dark' || (!cur && window.matchMedia('(prefers-color-scheme: dark)').matches);
-  document.documentElement.setAttribute('data-theme', tmavy ? 'light' : 'dark');
-  state.theme = tmavy ? 'light' : 'dark'; save();
-  if (state.tab === 'map') kresliPlatno();
-};
+el('bar-nast').onclick = () => otevriNastaveni();
 if (state.theme) document.documentElement.setAttribute('data-theme', state.theme);
 document.querySelectorAll('[data-pix]').forEach(x => { x.innerHTML = ik(x.dataset.pix); });
 document.querySelectorAll('#nav button').forEach(b => b.onclick = () => prepni(b.dataset.tab));
