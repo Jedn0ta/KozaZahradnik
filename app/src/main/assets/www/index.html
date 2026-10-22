@@ -185,7 +185,108 @@ main {
 .btn svg { width: 16px; height: 16px; }
 .btn[disabled] { opacity: .45; pointer-events: none; }
 
-/* ---- Plánovač ---- */
+
+/* ---- Mapove rozhrani pudorysu ---- */
+.mapa {
+  margin-left: calc(-1 * max(16px, env(safe-area-inset-left, 0px)));
+  margin-right: calc(-1 * max(16px, env(safe-area-inset-right, 0px)));
+  margin-top: -16px;
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+  position: relative;
+}
+#canvas {
+  position: relative; height: clamp(340px, 58vh, 560px);
+  touch-action: none; background-color: var(--paper); overflow: hidden;
+}
+
+.map-top {
+  position: absolute; top: 12px; left: 12px; right: 12px; z-index: 3;
+  display: flex; gap: 8px;
+}
+.fab-wide {
+  flex: 1; min-width: 0; display: flex; align-items: center; gap: 9px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 26px;
+  padding: 13px 17px; box-shadow: 0 3px 14px rgba(20,30,12,.16);
+  font-weight: 700; font-size: 14.5px; color: var(--fg); text-align: left;
+}
+.fab-wide.on { border-color: var(--accent); color: var(--accent-deep); }
+.fab-wide .fw-ico { font-size: 17px; flex: none; color: var(--accent); }
+.fab-wide .fw-txt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.adresa-panel {
+  position: absolute; top: 66px; left: 12px; right: 12px; z-index: 4;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 13px; box-shadow: 0 8px 26px rgba(20,30,12,.22);
+}
+
+.map-side {
+  position: absolute; right: 12px; bottom: 14px; z-index: 3;
+  display: flex; flex-direction: column; gap: 9px;
+}
+.fab {
+  width: 48px; height: 48px; border-radius: 15px; border: 1px solid var(--line);
+  background: var(--surface); color: var(--fg); font-size: 23px; font-weight: 800;
+  display: grid; place-items: center; line-height: 1; box-shadow: 0 3px 12px rgba(20,30,12,.16);
+}
+.fab svg { width: 21px; height: 21px; }
+
+.map-tools {
+  display: flex; gap: 7px; overflow-x: auto; scrollbar-width: none;
+  padding: 11px max(16px, env(safe-area-inset-left, 0px));
+  background: var(--surface); border-top: 1px solid var(--line);
+}
+.map-tools::-webkit-scrollbar { display: none; }
+.mt {
+  flex: none; display: flex; flex-direction: column; align-items: center; gap: 5px;
+  background: none; border: none; padding: 4px 6px; min-width: 62px;
+  color: var(--fg-faint); font-size: 11.5px; font-weight: 800;
+}
+.mt .mt-ico {
+  width: 46px; height: 46px; border-radius: 15px; background: var(--surface-2);
+  border: 1px solid var(--line); display: grid; place-items: center; color: var(--fg-soft);
+}
+.mt .mt-ico svg { width: 21px; height: 21px; }
+.mt .mt-ico i.sw { width: 19px; height: 19px; border-radius: 5px; display: block; }
+.mt.active { color: var(--accent-deep); }
+.mt.active .mt-ico { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.cv-load {
+  position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 13px;
+  background: color-mix(in srgb, var(--paper) 86%, transparent);
+  font-weight: 800; font-size: 14px; color: var(--fg-soft);
+}
+.spin {
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 3.5px solid var(--line); border-top-color: var(--accent);
+  animation: sp .8s linear infinite;
+}
+@keyframes sp { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spin { animation-duration: 2.4s; } }
+.cv-empty .ce-ico { width: 60px; height: 60px; margin: 0 auto 10px; }
+.cv-empty .ce-ico svg { width: 100%; height: 100%; image-rendering: pixelated; }
+
+.parcel-pick {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 13px; margin-top: 14px;
+}
+.parcel-pick .pp-head { font-size: 12px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 10px; }
+.pp-list { display: flex; gap: 8px; flex-wrap: wrap; }
+.pp {
+  border: 2px solid var(--line); background: var(--bg); border-radius: 13px;
+  padding: 10px 14px; display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
+}
+.pp.on { border-color: var(--accent); background: var(--accent-soft); }
+.pp .pp-no { font-weight: 800; font-size: 15px; color: var(--fg); }
+.pp .pp-m { font-size: 11.5px; font-weight: 700; color: var(--fg-faint); }
+.pp.on .pp-m { color: var(--accent-deep); }
+.pp-note { font-size: 12px; color: var(--fg-faint); margin: 10px 2px 0; }
+
+.stat-row { display: flex; gap: 8px; margin-top: 14px; }
+.map-hint { font-size: 13px; color: var(--fg-faint); margin: 12px 2px 0; line-height: 1.5; }
+
+/* ---- Plánovač (starší části) ---- */
 .addr-card {
   background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
   box-shadow: var(--shadow); padding: 12px; margin-bottom: 12px;
@@ -209,14 +310,6 @@ main {
 .tool svg { width: 15px; height: 15px; }
 .tool i.sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; border: 1px solid rgba(0,0,0,.15); }
 
-.canvas-wrap {
-  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
-  box-shadow: var(--shadow); overflow: hidden; position: relative;
-}
-#canvas {
-  position: relative; height: clamp(320px, 52vh, 460px);
-  touch-action: none; background-color: var(--paper); overflow: hidden;
-}
 #cv-svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .cv-empty {
   position: absolute; inset: 0; display: grid; place-items: center; text-align: center;
@@ -233,20 +326,6 @@ main {
   padding: 4px 7px; border-radius: 7px; display: flex; align-items: flex-end; gap: 7px;
 }
 .scalebar .bar { height: 7px; border-left: 2px solid var(--fg-soft); border-right: 2px solid var(--fg-soft); border-bottom: 2px solid var(--fg-soft); }
-.zoomer { position: absolute; right: 10px; bottom: 10px; display: flex; flex-direction: column; gap: 6px; }
-.zoomer button {
-  width: 34px; height: 34px; border-radius: 9px; border: 1px solid var(--line);
-  background: color-mix(in srgb, var(--surface) 92%, transparent); color: var(--fg);
-  font-size: 18px; font-weight: 800; display: grid; place-items: center; line-height: 1;
-}
-.zoomer button svg { width: 17px; height: 17px; }
-.cv-hint {
-  position: absolute; left: 10px; top: 10px; right: 10px; pointer-events: none;
-  background: color-mix(in srgb, var(--accent-deep) 93%, transparent); color: #fff;
-  font-size: 12px; font-weight: 700; padding: 7px 11px; border-radius: 9px;
-  box-shadow: var(--shadow); line-height: 1.4;
-}
-.stats { display: flex; gap: 8px; margin-top: 11px; }
 .stat { flex: 1; min-width: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 9px 11px; }
 .stat .s-val { font-family: var(--font-display); font-size: 19px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .stat .s-lbl { font-size: 10.5px; font-weight: 800; letter-spacing: .03em; text-transform: uppercase; color: var(--fg-faint); margin-top: 1px; }
@@ -909,6 +988,10 @@ let state = {
   lokalita: 'praha',  // vybrana lokalita pro predpoved
   customCrops: [],    // vlastni plodiny uzivatele
   cropEdits: {},      // upravy vestavenych plodin: id -> castecny prepis
+  vedlejsi: [],       // dalsi vybrane parcely (vedle hlavni)
+  katParcely: null,   // parcely nalezene v katastru, k vyberu
+  katStred: null,
+  katObec: '',
   live: null,         // ziva predpoved z Open-Meteo
   liveDotaz: '',
   tool: 'pan',
@@ -938,6 +1021,7 @@ function load() {
         if (!state.cropPlan) state.cropPlan = {};
         if (!state.cropFoto) state.cropFoto = {};
         if (!state.lokalita) state.lokalita = 'praha';
+        if (!Array.isArray(state.vedlejsi)) state.vedlejsi = [];
         if (!Array.isArray(state.customCrops)) state.customCrops = [];
         if (!state.cropEdits) state.cropEdits = {};
         items().forEach(i => {
@@ -1131,9 +1215,18 @@ function reshapeRect(it, w, h) {
   it.cells = [];
   addCells(it, rectKeys(b.x0, b.y0, b.x0 + Math.max(1, Math.round(w)), b.y0 + Math.max(1, Math.round(h))));
 }
+/* Prvek je v zahrade, kdyz lezi v obrysu nebo na nektere vedlejsi parcele */
 function itemInside(it) {
   if (!state.outlineDone || state.outline.length < 3) return true;
-  return cellsOf(it).every(k => { const c = cxy(k); return pointInPoly(c[0]+0.5, c[1]+0.5, state.outline); });
+  const plochy = [state.outline].concat(state.vedlejsi || []);
+  const cs = cellsOf(it);
+  if (!cs.length) return true;
+  let uvnitr = 0;
+  cs.forEach(k => {
+    const c = cxy(k), x = c[0]+0.5, y = c[1]+0.5;
+    if (plochy.some(poly => poly.length >= 3 && pointInPoly(x, y, poly))) uvnitr++;
+  });
+  return uvnitr / cs.length >= 0.6;
 }
 /* Hrany unie ctverecku: kreslime linku jen tam, kde vedle neni dalsi ctverecek */
 function edgeSegments(it) {
@@ -1567,27 +1660,25 @@ function hnojeniZanedbano(it) {
 
 
 /* ============ KATASTR ============
-   Nacteni obrysu parcely z verejne sluzby CUZK (INSPIRE WFS, bez klice
-   a bez registrace) a prevod na metry pro plan zahrady.
+   Obrys zahrady z verejnych sluzeb CUZK, bez klice a bez registrace.
 
-   1) adresa -> souradnice  (Nominatim, nebo Open-Meteo pro obce)
-   2) souradnice -> GML s parcelami v okoli  (CUZK WFS GetFeature, BBOX)
-   3) vybereme parcelu, ve ktere bod lezi, a prevedeme ji na metry
+   1) adresa + PSC -> souradnice (Nominatim, ma importovana adresni mista z RUIAN)
+   2) parcely v okoli            (inspire-cp-wfs, typenames cp:CadastralParcel)
+   3) budovy v okoli             (inspire-CPX-wfs, typenames cp-ext:Building)
 
-   V publikovanem artefaktu je sitovy pozadavek zakazany, takze to tise
-   selze. V aplikaci (WebView s nativnim mostem) to bezi. */
-const CUZK_WFS = 'https://services.cuzk.cz/wfs/inspire-cp-wfs.asp';
+   Parcela, na ktere stoji budova, je zastavena plocha. Parcela bez budovy je
+   zahrada nebo travni porost - a presne ta nas zajima. */
+const CUZK_CP  = 'https://services.cuzk.cz/wfs/inspire-cp-wfs.asp';
+const CUZK_CPX = 'https://services.cuzk.cz/wfs/inspire-CPX-wfs.asp';
 const CRS84 = 'http://www.opengis.net/def/crs/EPSG/0/4326';
-/* Sluzba chce nazev vrstvy s predponou jmenneho prostoru, jinak dotaz odmitne. */
 const CP_NS = 'http://inspire.ec.europa.eu/schemas/cp/4.0';
-const CP_TYPE = 'cp:CadastralParcel';
+const CPX_NS = 'http://services.cuzk.cz/xsd/inspire/cp-ext/4.0';
 
-/* V aplikaci jde pozadavek pres nativni most, jinak pres fetch.
-   Most obchazi CORS, ktery by ve WebView jinak dotazy na CUZK zablokoval. */
+/* V aplikaci jde pozadavek pres nativni most, ktery obchazi CORS. */
 async function httpGet(url, accept) {
   if (window.KozaNative && typeof window.KozaNative.get === 'function') {
     const r = window.KozaNative.get(url, accept || '');
-    if (r == null || r === '') throw new Error('prazdna odpoved');
+    if (r == null || r === '') throw new Error('prázdná odpověď');
     if (r.indexOf('KOZA_ERR:') === 0) throw new Error(r.slice(9));
     return r;
   }
@@ -1596,25 +1687,16 @@ async function httpGet(url, accept) {
   return res.text();
 }
 
-async function geokoduj(adresa) {
-  const u = 'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=cz&addressdetails=0&q='
-    + encodeURIComponent(adresa);
-  const txt = await httpGet(u, 'application/json');
-  const j = JSON.parse(txt);
+async function geokoduj(dotaz) {
+  const u = 'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=cz&q='
+    + encodeURIComponent(dotaz);
+  const j = JSON.parse(await httpGet(u, 'application/json'));
   if (!j || !j.length) return null;
   return { lat: parseFloat(j[0].lat), lon: parseFloat(j[0].lon), nazev: j[0].display_name };
 }
 
-/* Prevod stupnu na metry kolem referencniho bodu. Na velikost parcely
-   je rovinna aproximace presna na centimetry. */
-function naMetry(body, lat0, lon0) {
-  const mLat = 110540, mLon = 111320 * Math.cos(lat0 * Math.PI / 180);
-  return body.map(p => [ (p[1] - lon0) * mLon, -(p[0] - lat0) * mLat ]);
-}
-
 /* Chyba je jen tehdy, kdyz je ExceptionReport korenem dokumentu. Sluzba totiz
-   k platne odpovedi pripojuje <truncatedResponse> s ExceptionReport uvnitr,
-   kdyz vypis zkratila. To neni chyba, jen upozorneni. */
+   k platne odpovedi pripojuje truncatedResponse s ExceptionReport uvnitr. */
 function chybaSluzby(xml) {
   if (!xml) return 'prázdná odpověď';
   let doc;
@@ -1624,113 +1706,263 @@ function chybaSluzby(xml) {
   if (!root || doc.querySelector('parsererror')) return 'odpověď nejde přečíst';
   if (root.localName !== 'ExceptionReport') return null;
   const t = root.getElementsByTagNameNS('*', 'ExceptionText');
-  if (t.length) return (t[0].textContent || '').trim().slice(0, 220);
-  const e = root.getElementsByTagNameNS('*', 'Exception');
-  if (e.length) return (e[0].getAttribute('exceptionCode') || 'neznámá chyba');
+  if (t.length) return (t[0].textContent || '').trim().slice(0, 200);
   return 'služba vrátila chybové hlášení';
 }
-/* Sluzba zkratila vypis: parcely jsou platne, jen jich je v okoli vic */
-function zkraceno(xml) {
-  return !!xml && xml.indexOf('truncatedResponse') >= 0;
-}
-/* Z GML vytahneme souradnicove seznamy. Poradi os overujeme podle rozsahu CR. */
-function parsujGml(xml) {
-  const doc = new DOMParser().parseFromString(xml, 'application/xml');
-  if (doc.querySelector('parsererror')) throw new Error('odpověď nejde přečíst');
+
+/* Souradnice ze znacky: poradi os overujeme podle rozsahu CR */
+function paryZTextu(txt) {
+  const c = (txt || '').trim().split(/\s+/).map(Number);
   const out = [];
-  const uzly = doc.getElementsByTagNameNS('*', 'posList');
-  for (let i = 0; i < uzly.length; i++) {
-    const cisla = (uzly[i].textContent || '').trim().split(/\s+/).map(Number);
-    const body = [];
-    for (let k = 0; k + 1 < cisla.length; k += 2) {
-      let a = cisla[k], b = cisla[k+1];
-      // v CR je zemepisna sirka 48-52, delka 12-19
-      const prohodit = !(a > 48 && a < 52 && b > 12 && b < 19);
-      body.push(prohodit ? [b, a] : [a, b]);
-    }
-    if (body.length >= 4) out.push(body);
+  for (let k = 0; k + 1 < c.length; k += 2) {
+    const a = c[k], b = c[k+1];
+    const ok = (a > 48 && a < 52 && b > 12 && b < 19);
+    out.push(ok ? [a, b] : [b, a]);
   }
   return out;
 }
 
-async function nactiParcelu(adresa) {
-  katStav = { stav:'geokoduji', text:'Hledám adresu…' };
-  renderGarden();
-  const m = await geokoduj(adresa);
-  if (!m) { katStav = { stav:'chyba', text:'Adresu „' + adresa + '" jsem nenašel. Zkus ji doplnit o PSČ nebo obec.' }; renderGarden(); return; }
-  const kde = (m.nazev || '').split(',').slice(0,3).join(',').trim();
+/* Parcely: pole polygonu, kazdy { body:[[lat,lon]], cislo, vymera } */
+function parsujParcely(xml) {
+  const doc = new DOMParser().parseFromString(xml, 'application/xml');
+  const out = [];
+  const cleny = doc.getElementsByTagNameNS('*', 'CadastralParcel');
+  for (let i = 0; i < cleny.length; i++) {
+    const el = cleny[i];
+    const pl = el.getElementsByTagNameNS('*', 'posList');
+    if (!pl.length) continue;
+    const body = paryZTextu(pl[0].textContent);
+    if (body.length < 4) continue;
+    const lab = el.getElementsByTagNameNS('*', 'label');
+    const ar = el.getElementsByTagNameNS('*', 'areaValue');
+    out.push({
+      body,
+      cislo: lab.length ? (lab[0].textContent || '').trim() : '',
+      vymera: ar.length ? parseFloat(ar[0].textContent) : null,
+    });
+  }
+  return out;
+}
 
-  katStav = { stav:'parcela', text:'Mám souřadnice, stahuji parcelu z katastru…' };
-  renderGarden();
-  const d = 0.0012;  // asi 130 m na vysku
-  const bbox = [ (m.lat-d), (m.lon-d*1.6), (m.lat+d), (m.lon+d*1.6) ].map(x=>x.toFixed(6)).join(',');
-  const u = CUZK_WFS + '?service=WFS&version=2.0.0&request=GetFeature'
-    + '&typenames=' + encodeURIComponent(CP_TYPE)
-    + '&namespaces=' + encodeURIComponent('xmlns(cp,' + CP_NS + ')')
-    + '&count=60'
-    + '&srsName=' + encodeURIComponent(CRS84)
-    + '&BBOX=' + bbox + ',' + encodeURIComponent(CRS84);
-  const xml = await httpGet(u, 'application/xml');
+/* Budovy: jen poloha symbolu a natoceni, pudorys sluzba nedava */
+function parsujBudovy(xml) {
+  const doc = new DOMParser().parseFromString(xml, 'application/xml');
+  const out = [];
+  const cleny = doc.getElementsByTagNameNS('*', 'Building');
+  for (let i = 0; i < cleny.length; i++) {
+    const pos = cleny[i].getElementsByTagNameNS('*', 'pos');
+    if (!pos.length) continue;
+    const p = paryZTextu(pos[0].textContent);
+    if (!p.length) continue;
+    const rot = cleny[i].getElementsByTagNameNS('*', 'rotation');
+    out.push({ lat: p[0][0], lon: p[0][1], uhel: rot.length ? parseFloat(rot[0].textContent) || 0 : 0 });
+  }
+  return out;
+}
 
-  // sluzba hlasi chyby jako ExceptionReport, ne jako HTTP chybu
-  const vyjimka = chybaSluzby(xml);
-  if (vyjimka) {
-    katStav = { stav:'chyba', text:'Katastr odmítl dotaz: ' + vyjimka };
-    renderGarden(); return;
-  }
-  const polygony = parsujGml(xml);
-  if (!polygony.length) {
-    katStav = { stav:'chyba', text:'Katastr pro tohle místo nevrátil žádnou parcelu. Může jít o území bez digitální mapy, nebo je adresa mimo zastavěnou část.' };
-    renderGarden(); return;
-  }
+const vPolygonu = (lat, lon, body) => pointInPoly(lon, lat, body.map(q => [q[1], q[0]]));
 
-  // parcela, ve ktere nalezeny bod lezi; jinak ta s nejblizsim stredem
-  let vybrana = polygony.find(poly => pointInPoly(m.lon, m.lat, poly.map(q => [q[1], q[0]])));
-  if (!vybrana) {
-    vybrana = polygony.slice().sort((A,B) => {
-      const s = (P) => { const la = P.reduce((x,q)=>x+q[0],0)/P.length, lo = P.reduce((x,q)=>x+q[1],0)/P.length;
-        return (la-m.lat)**2 + (lo-m.lon)**2; };
-      return s(A) - s(B);
-    })[0];
+/* Sousedi: parcely se dotykaji, kdyz maji lomovy bod bliz nez 1,5 m */
+function sousedi(a, b) {
+  for (const p of a) for (const q of b) {
+    const dlat = (p[0]-q[0]) * 110540, dlon = (p[1]-q[1]) * 111320 * Math.cos(p[0]*Math.PI/180);
+    if (dlat*dlat + dlon*dlon < 2.25) return true;
   }
-  let metry = naMetry(vybrana, m.lat, m.lon);
-  const xs = metry.map(q=>q[0]), ys = metry.map(q=>q[1]);
-  const x0 = Math.min(...xs), y0 = Math.min(...ys);
-  metry = metry.map(q => [ Math.round((q[0]-x0)*10)/10, Math.round((q[1]-y0)*10)/10 ]);
-  // posledni bod bywa shodny s prvnim
-  if (metry.length > 2) {
-    const a = metry[0], b = metry[metry.length-1];
-    if (Math.abs(a[0]-b[0]) < 0.2 && Math.abs(a[1]-b[1]) < 0.2) metry.pop();
+  return false;
+}
+
+/* Natoceni: najdeme smer, ve kterem ma parcela nejmensi opsany obdelnik,
+   a postavime ji na vysku - na telefonu se tak vyuzije cela obrazovka. */
+function hezkeNatoceni(body) {
+  let nej = { uhel: 0, plocha: Infinity, w: 0, h: 0 };
+  for (let i = 0; i < body.length; i++) {
+    const a = body[i], b = body[(i+1) % body.length];
+    const uhel = Math.atan2(b[1]-a[1], b[0]-a[0]);
+    const ot = body.map(p => otoc(p, -uhel));
+    const xs = ot.map(p=>p[0]), ys = ot.map(p=>p[1]);
+    const w = Math.max(...xs)-Math.min(...xs), h = Math.max(...ys)-Math.min(...ys);
+    if (w*h < nej.plocha) nej = { uhel, plocha: w*h, w, h };
   }
-  state.outline = metry;
-  state.outlineDone = true;
-  state.sel = null; state.selVert = null;
-  katStav = { stav:'ok', text:'Parcela z katastru · ' + fmtA(polyArea(metry)) + ' · ' + metry.length + ' lomových bodů'
-    + (zkraceno(xml) ? ' · v okolí je parcel víc, vybral jsem tu pod adresou' : '')
-    + (kde ? '\n' + kde : '') };
-  save(); renderGarden(); fitView();
-  toast('Parcela načtena, ' + fmtA(polyArea(metry)));
+  // naPlan otaci o +uhel, merili jsme o -uhel; na vysku = delsi strana svisle
+  return nej.w > nej.h ? -nej.uhel + Math.PI/2 : -nej.uhel;
+}
+const otoc = (p, u) => [ p[0]*Math.cos(u) - p[1]*Math.sin(u), p[0]*Math.sin(u) + p[1]*Math.cos(u) ];
+
+/* Prevod stupnu na metry kolem referencniho bodu, pak natoceni a posun do pocatku */
+function naPlan(body, lat0, lon0, uhel) {
+  const mLat = 110540, mLon = 111320 * Math.cos(lat0 * Math.PI / 180);
+  let m = body.map(p => [ (p[1]-lon0)*mLon, -(p[0]-lat0)*mLat ]);
+  if (uhel) m = m.map(p => otoc(p, uhel));
+  return m;
+}
+function doPocatku(sada) {
+  const vse = [].concat(...sada);
+  const x0 = Math.min(...vse.map(p=>p[0])), y0 = Math.min(...vse.map(p=>p[1]));
+  return sada.map(poly => poly.map(p => [
+    Math.round((p[0]-x0)*10)/10, Math.round((p[1]-y0)*10)/10 ]));
+}
+function bezDuplicitnihoKonce(m) {
+  if (m.length > 2) {
+    const a = m[0], b = m[m.length-1];
+    if (Math.abs(a[0]-b[0]) < 0.2 && Math.abs(a[1]-b[1]) < 0.2) m.pop();
+  }
+  return m;
 }
 
 let katStav = { stav:'idle', text:'' };
+
+async function nactiParcelu(dotaz) {
+  katStav = { stav:'hledam', text:'Hledám adresu…' };
+  renderGarden();
+  const m = await geokoduj(dotaz);
+  if (!m) {
+    katStav = { stav:'chyba', text:'Adresu „' + dotaz + '" jsem nenašel. Zkus doplnit PSČ nebo obec.' };
+    renderGarden(); return;
+  }
+
+  katStav = { stav:'hledam', text:'Stahuji parcely z katastru…' };
+  renderGarden();
+  const d = 0.0011;
+  const bbox = [ m.lat-d, m.lon-d*1.6, m.lat+d, m.lon+d*1.6 ].map(x=>x.toFixed(6)).join(',');
+  const uP = CUZK_CP + '?service=WFS&version=2.0.0&request=GetFeature'
+    + '&typenames=' + encodeURIComponent('cp:CadastralParcel')
+    + '&namespaces=' + encodeURIComponent('xmlns(cp,' + CP_NS + ')')
+    + '&count=80&srsName=' + encodeURIComponent(CRS84)
+    + '&BBOX=' + bbox + ',' + encodeURIComponent(CRS84);
+  const xmlP = await httpGet(uP, 'application/xml');
+  const chyba = chybaSluzby(xmlP);
+  if (chyba) { katStav = { stav:'chyba', text:'Katastr odmítl dotaz: ' + chyba }; renderGarden(); return; }
+  const parcely = parsujParcely(xmlP);
+  if (!parcely.length) {
+    katStav = { stav:'chyba', text:'Katastr tu nenašel parcely. Může jít o území bez digitální mapy.' };
+    renderGarden(); return;
+  }
+
+  // budovy jsou nepovinne: kdyz sluzba nedopovi, jedeme dal bez nich
+  let budovy = [];
+  try {
+    const uB = CUZK_CPX + '?service=WFS&version=2.0.0&request=GetFeature'
+      + '&typenames=' + encodeURIComponent('cp-ext:Building')
+      + '&namespaces=' + encodeURIComponent('xmlns(cp-ext,' + CPX_NS + ')')
+      + '&count=60&srsName=' + encodeURIComponent(CRS84)
+      + '&BBOX=' + bbox + ',' + encodeURIComponent(CRS84);
+    const xmlB = await httpGet(uB, 'application/xml');
+    if (!chybaSluzby(xmlB)) budovy = parsujBudovy(xmlB);
+  } catch (q) {}
+
+  // ke kazde parcele poznamename, jestli na ni stoji budova
+  parcely.forEach(p => {
+    p.zastavena = budovy.some(b => vPolygonu(b.lat, b.lon, p.body));
+    p.budovy = budovy.filter(b => vPolygonu(b.lat, b.lon, p.body));
+  });
+
+  const adresni = parcely.findIndex(p => vPolygonu(m.lat, m.lon, p.body));
+  if (adresni < 0) {
+    katStav = { stav:'chyba', text:'Adresu jsem našel, ale nepadla do žádné parcely. Zkus přesnější adresu.' };
+    renderGarden(); return;
+  }
+
+  // vybereme parcelu pod adresou a k ni prilehle parcely bez budovy = zahrada
+  const vybrane = new Set([adresni]);
+  parcely.forEach((p, i) => {
+    if (i === adresni || p.zastavena) return;
+    if (sousedi(p.body, parcely[adresni].body)) vybrane.add(i);
+  });
+
+  state.katParcely = parcely.map((p,i) => ({
+    cislo: p.cislo, vymera: p.vymera, zastavena: p.zastavena,
+    body: p.body, budovy: p.budovy, vybrana: vybrane.has(i),
+  }));
+  state.katStred = { lat: m.lat, lon: m.lon };
+  state.katObec = (m.nazev || '').split(',').slice(0,3).join(',').trim();
+  state.adresa = dotaz;
+  postavZahradu();
+  katStav = { stav:'vyber', text:'' };
+  state.panelAdresa = false;
+  save(); renderGarden();
+  requestAnimationFrame(() => fitView());
+}
+
+/* Z vybranych parcel postavi novou prazdnou zahradu: obrys, dum, zadne zahony */
+function postavZahradu() {
+  const vyb = (state.katParcely || []).filter(p => p.vybrana);
+  if (!vyb.length) return;
+  const s = state.katStred;
+
+  // natoceni pocitame z nejvetsi vybrane parcely
+  const hlavni = vyb.slice().sort((a,b) => plochaStupnu(b.body) - plochaStupnu(a.body))[0];
+  const uhel = hezkeNatoceni(naPlan(hlavni.body, s.lat, s.lon, 0));
+
+  const sada = vyb.map(p => naPlan(p.body, s.lat, s.lon, uhel));
+  const budovyBody = [];
+  vyb.forEach(p => (p.budovy || []).forEach(b => {
+    budovyBody.push(naPlan([[b.lat, b.lon]], s.lat, s.lon, uhel)[0]);
+  }));
+  const vsechno = doPocatku(sada.concat(budovyBody.map(b => [b])));
+  const obrysy = vsechno.slice(0, sada.length).map(bezDuplicitnihoKonce);
+  const domy = vsechno.slice(sada.length).map(a => a[0]);
+
+  // obrysem je nejvetsi parcela bez budovy, tedy zahrada. Zastavene az potom.
+  const zast = vyb.map(p => !!p.zastavena);
+  const poradi = obrysy.map((o,i) => ({ o, z: zast[i] }));
+  poradi.sort((a,b) => (a.z === b.z) ? polyArea(b.o) - polyArea(a.o) : (a.z ? 1 : -1));
+  obrysy.length = 0;
+  poradi.forEach(q => obrysy.push(q.o));
+  state.outline = obrysy[0];
+  state.outlineDone = true;
+  state.vedlejsi = obrysy.slice(1);
+
+  // nova zahrada: zadne zahony, jen dum podle katastru
+  state.items = {};
+  state.nextId = 1;
+  state.sel = null; state.selVert = null;
+  domy.forEach((d, i) => {
+    const x = Math.max(0, Math.round(d[0]) - 3), y = Math.max(0, Math.round(d[1]) - 3);
+    const id = 'p' + state.nextId++;
+    state.items[id] = { id, typ:'house', cells: rectKeys(x, y, x+7, y+7),
+      nazev: domy.length > 1 ? 'Dům ' + (i+1) : 'Dům',
+      cropId:null, datumVysadby:'', poznamka:'', fotky:[], hnojeni:[], zalivka:[], rostliny:null };
+  });
+}
+function plochaStupnu(body) {
+  let s = 0;
+  for (let i = 0; i < body.length; i++) {
+    const a = body[i], b = body[(i+1) % body.length];
+    s += a[0]*b[1] - b[0]*a[1];
+  }
+  return Math.abs(s)/2;
+}
+
 function nactiObrys() {
   const a = (el('addr-input').value || '').trim();
   const psc = ((el('psc-input') || {}).value || '').trim();
   if (!a) { toast('Napiš ulici a číslo popisné'); return; }
   state.adresa = a; state.psc = psc; save();
-  // PSC dotaz zpresni, bez nej je stejna ulice ve vice obcich
-  const dotaz = psc ? a + ', ' + psc : a;
-  nactiParcelu(dotaz).catch(e => {
-    const m = String((e && e.message) || e);
-    katStav = { stav:'blokovano', text: m };
+  nactiParcelu(psc ? a + ', ' + psc : a).catch(e => {
+    katStav = { stav:'blokovano', text: String((e && e.message) || e) };
     renderGarden();
   });
+}
+function prepniParcelu(i) {
+  const p = (state.katParcely || [])[i];
+  if (!p) return;
+  p.vybrana = !p.vybrana;
+  if (!(state.katParcely || []).some(q => q.vybrana)) { p.vybrana = true; return; }
+  postavZahradu();
+  save(); renderGarden();
+  requestAnimationFrame(() => fitView());
 }
 function ukazkovyObrys() {
   state.outline = [[0,0],[28,0],[28,30],[22,38],[0,38]];
   state.outlineDone = true; state.sel = null; state.selVert = null;
-  katStav = { stav:'ukazka', text:'Ukázková parcela, 1040 m². Uprav si ji nástrojem Obrys.' };
-  save(); renderGarden(); fitView();
+  state.vedlejsi = []; state.katParcely = null;
+  state.items = {}; state.nextId = 1;
+  const id = 'p' + state.nextId++;
+  state.items[id] = { id, typ:'house', cells: rectKeys(2,2,13,11), nazev:'Dům',
+    cropId:null, datumVysadby:'', poznamka:'', fotky:[], hnojeni:[], zalivka:[], rostliny:null };
+  katStav = { stav:'ok', text:'Ukázková parcela 1040 m². Záhony si nakresli sám.' };
+  save(); renderGarden();
+  requestAnimationFrame(() => fitView());
 }
 
 /* ============ OBRAZOVKA: PUDORYS ============ */
@@ -1756,119 +1988,140 @@ function renderGarden() {
   const bedArea = beds().reduce((s,b) => s + itArea(b), 0);
   const sel = state.sel ? state.items[state.sel] : null;
   if (state.sel && !sel) state.sel = null;
-  const outlineClosed = state.outlineDone && state.outline.length >= 3;
+  const prazdna = !state.outline.length && !items().length;
+  const hledam = katStav.stav === 'hledam';
 
   el('screen-garden').innerHTML = `
-    <div class="section-head">
-      <h2>Půdorys zahrady</h2>
-      <span class="count">1 čtvereček = 1 m²</span>
-    </div>
-    <div class="addr-card">
-      <div class="addr-row">
-        <input id="addr-input" placeholder="Zdická 1351/15" value="${esc(state.adresa)}" aria-label="Ulice a číslo popisné" style="flex:2">
-        <input id="psc-input" placeholder="PSČ" inputmode="numeric" maxlength="7" value="${esc(state.psc || '')}" aria-label="PSČ" style="flex:0 0 94px">
-      </div>
-      <button class="btn" id="addr-load" style="width:100%;justify-content:center;margin-top:9px">
-        ${katStav.stav==='geokoduji'||katStav.stav==='parcela' ? 'Hledám…' : 'Načíst z katastru'}
-      </button>
-      ${katStav.text ? `<div class="${katStav.stav==='ok'?'live-ok':(katStav.stav==='ukazka'?'live-ok':'live-bad')}" style="margin-top:8px">${katStav.stav==='ok'?'● ':''}${esc(katStav.text)}</div>` : ''}
-      ${katStav.stav==='blokovano' ? `<div class="live-bad" style="margin-top:8px">Stažení z katastru se nepovedlo: <strong>${esc(katStav.text)}</strong><br>Zatím si obrys nakresli sám, nebo načti ukázku.</div>` : ''}
-      <div class="actrow" style="margin-top:9px">
-        <button class="btn sm ghost" id="addr-demo">Ukázková parcela</button>
-      </div>
-      <p class="addr-note">PSČ zadej taky, jinak může být stejná ulice v jiné obci. Obrys pak můžeš upravit. Digitální mapa pokrývá 99,5 % území.</p>
-    </div>
-    <div class="toolrow">
-      ${TOOLS.map(t=>`<button class="tool ${state.tool===t.id?'active':''}" data-tool="${t.id}">
-        ${t.sw ? `<i class="sw" style="background:${t.sw}"></i>` : t.ico}${t.label}</button>`).join('')}
-    </div>
-    <div class="canvas-wrap">
+    <div class="mapa">
       <div id="canvas">
         <svg id="cv-svg" aria-label="Plán zahrady"></svg>
-        ${!state.outline.length && !items().length ? `<div class="cv-empty"><div>
-          <div class="ce-ico">📐</div>
-          <h3>Prázdný tečkovaný papír</h3>
-          <p>Načti obrys podle adresy, nebo si ho nástrojem Obrys obkresli sám. Jedna tečka je jeden metr.</p>
+
+        ${prazdna ? `<div class="cv-empty"><div>
+          <div class="ce-ico">${pixSvg('konev')}</div>
+          <h3>Zatím prázdno</h3>
+          <p>Načti parcelu z katastru, nebo si obrys nakresli sám.</p>
         </div></div>` : ''}
-        <div class="cv-hint">${esc(HINTS[state.tool] || '')}</div>
-        <div class="scalebar"><span class="bar" id="sb-bar"></span><span id="sb-lbl">5 m</span></div>
-        <div class="zoomer">
-          <button id="zoom-in" aria-label="Přiblížit">+</button>
-          <button id="zoom-out" aria-label="Oddálit">−</button>
-          <button id="zoom-fit" aria-label="Zobrazit celou zahradu">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V3h5M21 8V3h-5M3 16v5h5M21 16v5h-5"/></svg>
+
+        ${hledam ? `<div class="cv-load"><div class="spin"></div><span>${esc(katStav.text)}</span></div>` : ''}
+
+        <div class="map-top">
+          <button class="fab-wide ${state.panelAdresa ? 'on' : ''}" id="toggle-adresa">
+            <span class="fw-ico">⌖</span>
+            <span class="fw-txt">${state.adresa ? esc(state.adresa) : 'Načíst parcelu z katastru'}</span>
           </button>
         </div>
+
+        ${state.panelAdresa ? `<div class="adresa-panel">
+          <div class="addr-row">
+            <input id="addr-input" placeholder="Zdická 1351/15" value="${esc(state.adresa)}" aria-label="Ulice a číslo" style="flex:2">
+            <input id="psc-input" placeholder="PSČ" inputmode="numeric" maxlength="7" value="${esc(state.psc || '')}" aria-label="PSČ" style="flex:0 0 92px">
+          </div>
+          <button class="btn" id="addr-load" style="width:100%;justify-content:center;margin-top:9px">
+            ${hledam ? 'Hledám…' : 'Načíst z katastru'}
+          </button>
+          ${katStav.text && katStav.stav !== 'hledam' ? `<div class="${katStav.stav==='ok'?'live-ok':'live-bad'}" style="margin-top:9px">${esc(katStav.text)}</div>` : ''}
+          <button class="btn ghost sm" id="addr-demo" style="width:100%;justify-content:center;margin-top:8px">Zkusit na ukázkové parcele</button>
+        </div>` : ''}
+
+        <div class="map-side">
+          <button class="fab" id="zoom-in" aria-label="Přiblížit">+</button>
+          <button class="fab" id="zoom-out" aria-label="Oddálit">−</button>
+          <button class="fab" id="zoom-fit" aria-label="Celá zahrada">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V3h5M21 8V3h-5M3 16v5h5M21 16v5h-5"/></svg>
+          </button>
+        </div>
+
+        <div class="scalebar"><span class="bar" id="sb-bar"></span><span id="sb-lbl">5 m</span></div>
+      </div>
+
+      <div class="map-tools">
+        ${TOOLS.map(t=>`<button class="mt ${state.tool===t.id?'active':''}" data-tool="${t.id}">
+          <span class="mt-ico">${t.sw ? `<i class="sw" style="background:${t.sw}"></i>` : t.ico}</span>
+          <span class="mt-lbl">${t.label}</span></button>`).join('')}
       </div>
     </div>
-    <div class="stats">
-      <div class="stat"><div class="s-val">${area ? fmtA(area) : '—'}</div><div class="s-lbl">Parcela</div></div>
-      <div class="stat"><div class="s-val">${bedArea ? fmtA(bedArea) : '—'}</div><div class="s-lbl">Záhony</div></div>
-      <div class="stat"><div class="s-val">${beds().length}</div><div class="s-lbl">Záhonků</div></div>
-    </div>
+
+    ${katStav.stav === 'vyber' && state.katParcely ? `<div class="parcel-pick">
+      <div class="pp-head">Co patří k zahradě</div>
+      <div class="pp-list">
+        ${state.katParcely.map((q,i)=>`<button class="pp ${q.vybrana?'on':''}" data-parcela="${i}">
+          <span class="pp-no">${esc(q.cislo || '—')}</span>
+          <span class="pp-m">${q.vymera ? Math.round(q.vymera)+' m²' : ''}${q.zastavena ? ' · dům' : ''}</span>
+        </button>`).join('')}
+      </div>
+      <p class="pp-note">${esc(state.katObec || '')}</p>
+    </div>` : ''}
+
     ${sel ? (() => {
-      const b = itBBox(sel), c = crop(sel.cropId);
+      const bb = itBBox(sel), c = crop(sel.cropId);
       return `<div class="selbar">
-        <span class="sl-ico">${c ? c.emoji : (sel.typ==='bed'?'🟫':(sel.typ==='house'?'🏠':'⬜'))}</span>
+        <span class="sl-ico">${c ? cropArt(c) : (sel.typ==='house'?'🏠':'⬜')}</span>
         <span class="sl-body">
           <span class="sl-name">${esc(sel.nazev)}</span>
-          <span class="sl-meta">${fmtA(itArea(sel))} · ${isRect(sel) ? fmtDim(b.w,b.h) : 'nepravidelný, ' + fmtDim(b.w,b.h)}</span>
+          <span class="sl-meta">${fmtA(itArea(sel))} · ${isRect(sel) ? fmtDim(bb.w,bb.h) : fmtDim(bb.w,bb.h)}</span>
         </span>
         <button class="btn sm ghost" id="sel-edit">Upravit</button>
         <button class="btn sm ghost" id="sel-off" aria-label="Zrušit výběr">×</button>
       </div>`;
     })() : ''}
-    <div class="actrow">
-      ${state.tool==='outline' ? `
-        ${!state.outlineDone && state.outline.length>=3 ? `<button class="btn sm" id="o-close">Uzavřít obrys</button>` : ''}
-        ${state.selVert != null && outlineClosed && state.outline.length > 3 ? `<button class="btn sm ghost" id="o-delvert">Smazat vrchol</button>` : ''}
-        ${state.outline.length ? `<button class="btn sm ghost" id="o-undo">Zpět</button>` : ''}
-        ${state.outline.length ? `<button class="btn sm ghost" id="o-clear">Smazat obrys</button>` : ''}
-      ` : ''}
-      <button class="btn sm ghost" id="g-empty">Prázdná zahrada</button>
-      <button class="btn sm ghost" id="g-demo">Ukázková zahrada</button>
+
+    <div class="stat-row">
+      <div class="stat"><div class="s-val">${area ? fmtA(area) : '—'}</div><div class="s-lbl">Parcela</div></div>
+      <div class="stat"><div class="s-val">${bedArea ? fmtA(bedArea) : '—'}</div><div class="s-lbl">Záhony</div></div>
+      <div class="stat"><div class="s-val">${beds().length}</div><div class="s-lbl">Záhonků</div></div>
     </div>
-    <p class="hint">Záhony se skládají ze čtverečků, takže mají i nepravidelný tvar.</p>
+
+    <p class="map-hint">${esc(HINTS[state.tool] || '')}</p>
+
+    ${state.tool==='outline' && state.outline.length ? `<div class="actrow">
+      ${!state.outlineDone && state.outline.length>=3 ? `<button class="btn sm" id="o-close">Uzavřít</button>` : ''}
+      ${state.selVert != null && state.outline.length > 3 ? `<button class="btn sm ghost" id="o-delvert">Smazat vrchol</button>` : ''}
+      <button class="btn sm ghost" id="o-undo">Zpět</button>
+    </div>` : ''}
+
+    <div class="actrow">
+      <button class="btn sm ghost" id="g-empty">Nová prázdná zahrada</button>
+    </div>
   `;
 
-  el('addr-load').onclick = nactiObrys;
-  const pi = el('psc-input');
-  if (pi) pi.onchange = () => { state.psc = pi.value.trim(); save(); };
-  el('addr-demo').onclick = () => confirmDialog('Načíst ukázkovou parcelu?','Přepíše to současný obrys zahrady.', ukazkovyObrys);
-  const ai = el('addr-input');
-  ai.onchange = () => { state.adresa = ai.value; save(); };
+  const ta = el('toggle-adresa');
+  if (ta) ta.onclick = () => { state.panelAdresa = !state.panelAdresa; save(); renderGarden(); };
+  const al = el('addr-load');
+  if (al) {
+    al.onclick = nactiObrys;
+    const pi = el('psc-input');
+    if (pi) pi.onchange = () => { state.psc = pi.value.trim(); save(); };
+    el('addr-demo').onclick = () => confirmDialog('Načíst ukázkovou parcelu?','Přepíše to současnou zahradu.', () => {
+      ukazkovyObrys(); state.panelAdresa = false; save(); renderGarden();
+    });
+  }
+  el('screen-garden').querySelectorAll('[data-parcela]').forEach(b =>
+    b.onclick = () => prepniParcelu(Number(b.dataset.parcela)));
   el('screen-garden').querySelectorAll('[data-tool]').forEach(b => b.onclick = () => {
     state.tool = b.dataset.tool;
     if (state.tool !== 'outline') state.selVert = null;
     if (state.tool !== 'pan') state.sel = null;
     save(); renderGarden();
   });
-
   if (sel) {
     el('sel-edit').onclick = () => openItemModal(sel.id);
     el('sel-off').onclick = () => { state.sel = null; save(); renderGarden(); };
   }
   const oc = el('o-close'); if (oc) oc.onclick = () => { state.outlineDone = true; save(); renderGarden(); toast('Obrys uzavřen'); };
   const odv = el('o-delvert'); if (odv) odv.onclick = () => {
-    state.outline.splice(state.selVert, 1); state.selVert = null;
-    save(); renderGarden(); toast('Vrchol smazán');
+    state.outline.splice(state.selVert, 1); state.selVert = null; save(); renderGarden();
   };
   const ou = el('o-undo'); if (ou) ou.onclick = () => {
     state.outline.pop(); state.selVert = null;
     if (state.outline.length < 3) state.outlineDone = false;
     save(); renderGarden();
   };
-  const ocl = el('o-clear'); if (ocl) ocl.onclick = () => confirmDialog('Smazat obrys?','Prvky uvnitř zahrady zůstanou, zmizí jen hranice parcely.', () => {
-    state.outline = []; state.outlineDone = false; state.selVert = null; save(); renderGarden();
-  });
-  el('g-empty').onclick = () => confirmDialog('Začít s prázdnou zahradou?','Smaže se obrys, dům, cesty i všechny záhonky s plodinami.', () => {
+  el('g-empty').onclick = () => confirmDialog('Nová prázdná zahrada?','Smaže se obrys, dům i všechny záhonky.', () => {
     state.outline = []; state.outlineDone = false; state.items = {}; state.nextId = 1;
-    state.sel = null; state.selVert = null;
+    state.sel = null; state.selVert = null; state.vedlejsi = []; state.katParcely = null;
+    katStav = { stav:'idle', text:'' };
     view = { ox:-3, oy:-3, scale:11 };
     state.tool = 'outline'; save(); renderGarden(); toast('Můžeš kreslit');
-  });
-  el('g-demo').onclick = () => confirmDialog('Načíst ukázkovou zahradu?','Přepíše to tvůj současný plán.', () => {
-    seed(); katStav = { stav:'idle', text:'' }; save(); renderGarden(); fitView(); toast('Ukázka načtena');
   });
 
   bindCanvas();
@@ -1883,12 +2136,26 @@ function snapW(x, y) { return [ Math.round(x/snapStep)*snapStep, Math.round(y/sn
 function cellAt(px, py) { const w = s2w(px, py); return ck(Math.floor(w[0]), Math.floor(w[1])); }
 
 function fitView() {
-  const pts = state.outline.length >= 2 ? state.outline.slice()
-    : items().flatMap(i => { const b = itBBox(i); return [[b.x0,b.y0],[b.x1,b.y1]]; });
+  let pts = [];
+  if (state.outline.length >= 2) {
+    pts = state.outline.slice();
+    (state.vedlejsi || []).forEach(v => { if (v.length >= 2) pts = pts.concat(v); });
+  } else {
+    pts = items().flatMap(i => { const b = itBBox(i); return [[b.x0,b.y0],[b.x1,b.y1]]; });
+  }
   const r = cvRect();
-  if (!pts.length || !r.width) { renderCanvas(); return; }
+  if (!pts.length) { renderCanvas(); return; }
+  // plátno ještě nemá rozměry (právě se překreslilo) - zkusíme to v dalším snímku
+  if (!r.width || !r.height) {
+    renderCanvas();
+    if (!fitView._znovu) {
+      fitView._znovu = true;
+      requestAnimationFrame(() => { fitView._znovu = false; fitView(); });
+    }
+    return;
+  }
   const b = bbox(pts);
-  const pad = 2.5;
+  const pad = 3;
   const w = Math.max(b.x1-b.x0, 4) + pad*2, h = Math.max(b.y1-b.y0, 4) + pad*2;
   view.scale = clamp(Math.min(r.width/w, r.height/h), 1.2, 60);
   view.ox = (b.x0+b.x1)/2 - r.width/(2*view.scale);
@@ -1954,6 +2221,12 @@ function renderCanvas() {
   }
 
   const parts = [];
+  // dalsi vybrane parcely pod hlavnim obrysem
+  (state.vedlejsi || []).forEach(poly => {
+    if (poly.length < 3) return;
+    const ps = poly.map(q => w2s(q[0],q[1]).map(n=>n.toFixed(1)).join(',')).join(' ');
+    parts.push(`<polygon points="${ps}" fill="var(--accent-soft)" fill-opacity="0.38" stroke="var(--accent)" stroke-width="1.6" stroke-dasharray="6 4"/>`);
+  });
   // obrys parcely
   if (state.outline.length >= 2) {
     const pstr = state.outline.map(p => w2s(p[0],p[1]).map(n=>n.toFixed(1)).join(',')).join(' ');
