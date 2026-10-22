@@ -607,6 +607,45 @@ body { font-size: 17px; }
 }
 .cfoto figure > button.x { left: auto; right: 4px; top: 4px; bottom: auto; font-size: 17px; font-weight: 700; padding: 0; }
 
+/* ---------- emoji místo kreslených ikon ---------- */
+.emo { display: grid; place-items: center; width: 100%; height: 100%; line-height: 1; font-size: 26px; }
+.row .thumb .emo { font-size: 28px; }
+.tile .top .emo { font-size: 64px; }
+.rrow .rn .ra .emo { font-size: 19px; }
+.pick { grid-template-columns: 1fr; }
+.pick button { gap: 13px; padding: 13px; align-items: center; }
+.pick button .pe { font-size: 32px; line-height: 1; flex: none; width: 42px; text-align: center; }
+.pick button .pn2 { display: block; flex: 1; min-width: 0; }
+.pick button .pn2 b { display: block; font-size: 16px; font-weight: 800; }
+.pick button .pn2 span { display: block; font-size: 13.5px; font-weight: 600; color: var(--ink2); margin-top: 1px; }
+.m-mode .mi { width: 30px; height: 30px; flex: none; display: grid; place-items: center; }
+.m-mode .mi .emo { font-size: 24px; }
+.mbtn .emo, .mrail button .emo { font-size: 22px; }
+
+/* volba ikony plodiny */
+.emovolba { display: flex; gap: 10px; margin-bottom: 18px; }
+.emovolba button {
+  flex: 1; height: 78px; border: 1.5px solid var(--line); border-radius: 15px; background: var(--bg);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  font-size: 30px; line-height: 1; overflow: hidden;
+}
+.emovolba button.on { border-color: var(--acc); background: var(--acc-soft); }
+.emovolba button i { font-style: normal; font-size: 11.5px; font-weight: 700; color: var(--ink3); }
+.emovolba button img { width: 34px; height: 34px; border-radius: 9px; object-fit: cover; }
+.emogrid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 7px; }
+.emogrid button {
+  aspect-ratio: 1; border: 1.5px solid var(--line); border-radius: 12px; background: var(--bg);
+  font-size: 26px; line-height: 1; display: grid; place-items: center;
+}
+.emogrid button.on { border-color: var(--acc); background: var(--acc-soft); }
+
+/* hlavička vybraného záhonu v přehledu na plánu */
+.selhlava { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.selhlava b { flex: 1; min-width: 0; font-size: 17px; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.msheet { max-height: 62%; }
+.msheet .card { border: 0; box-shadow: none; }
+.msheet .photo-strip { margin: 0 -16px 10px; }
+
 /* ---------- roční přehled: období, ne dny ---------- */
 .rok { display: flex; flex-direction: column; gap: 4px; }
 .rhead, .rrow { display: grid; grid-template-columns: 102px 1fr; align-items: center; gap: 8px; width: 100%; text-align: left; }
@@ -764,6 +803,7 @@ body { font-size: 17px; }
   display: grid; place-items: center; padding: 14px; color: var(--ink2);
 }
 .mrail button .ik { width: 26px; height: 26px; }
+.mrail.pryc { display: none; }
 .mrail button.on { background: var(--acc-soft); border-color: var(--acc); color: var(--acc-dark); }
 .mrail button.go { background: var(--acc); border-color: var(--acc-dark); color: var(--acc-ink); padding: 12px; }
 .mrail button:active { transform: scale(.94); }
@@ -807,7 +847,7 @@ body { font-size: 17px; }
 
 <script>
 
-const VERZE = 'v2.2 · 22. 10. 2026';
+const VERZE = 'v2.3 · 22. 10. 2026';
 const LOGO_KOZEL = `<svg viewBox="0 0 32 32" aria-hidden="true">
   <path d="M11.2 9.4C9.6 6.6 7.4 4.6 4.6 3.9c-.5-.1-.9.3-.8.8.5 2.9 1.9 5.4 4.1 7.2.7.6 1.5 1 2.4 1.3z" fill="#fff" opacity=".95"/>
   <path d="M20.8 9.4c1.6-2.8 3.8-4.8 6.6-5.5.5-.1.9.3.8.8-.5 2.9-1.9 5.4-4.1 7.2-.7.6-1.5 1-2.4 1.3z" fill="#fff" opacity=".95"/>
@@ -857,6 +897,7 @@ let state = {
   radyEdit: {},        // uzivatelske prepisy vestavenych rad
   vlastniRady: [],     // rady, ktere si zahradnik napsal sam
   akce: null,          // rychle akce u zahonku, vcetne vlastnich
+  cropIkona: {},       // cim se plodina kresli na planu
   calRezim: 'mesic',   // mesic | rok
 };
 let view = { ox: -3, oy: -3, scale: 11 };   // ox/oy = levy horni roh v metrech, scale = px na metr
@@ -897,6 +938,7 @@ function load() {
           if (!Array.isArray(i.historie)) i.historie = [];
           if (!Array.isArray(i.udalosti)) i.udalosti = [];
           if (!Array.isArray(i.zaznamy)) i.zaznamy = [];
+          if (PRVKY[i.typ] && PRVKY[i.typ].maly && !i.rozmer) i.rozmer = { w:PRVKY[i.typ].rozmer.w, h:PRVKY[i.typ].rozmer.h };
           if (!PRVKY[i.typ]) i.typ = 'bed';
           if (i.thumb !== undefined) delete i.thumb;
           i.fotky = (i.fotky || []).map(f => typeof f === 'string' ? { data:f, datum:'' } : f);
@@ -1137,15 +1179,21 @@ const TYP_LABEL = { soil:'Příprava půdy', sow:'Výsev', plant:'Výsadba', car
 /* Prvky planu. "roste" znamena, ze se do nich sazi, takze maji plodinu,
    zalivku, hnojeni, fotky i pocet rostlin — a objevi se v Zahoncich. */
 const PRVKY = {
-  bed:    { nazev:'Záhon',           pix:'zahon',    roste:true, fill:'#b98c5f', line:'#7d5733' },
-  raised: { nazev:'Vyvýšený záhon',  pix:'vyvyseny', roste:true, fill:'#c79a63', line:'#7d5733' },
-  trough: { nazev:'Truhlík',         pix:'truhlik',  roste:true, fill:'#d2a876', line:'#8a6038', maly:true },
-  pot:    { nazev:'Květináč',        pix:'kvetinac', roste:true, fill:'#d4825a', line:'#a2593a', maly:true, samostatny:true },
-  house:  { nazev:'Dům',             pix:'dum',      fill:'#e2e5e8', line:'#93a0a8' },
-  paved:  { nazev:'Zpevněná plocha', pix:'cesta',    fill:'#e4dfd2', line:'#b3ab99' },
+  bed:    { nazev:'Záhon',           emoji:'🌱', pix:'zahon',    roste:true, fill:'#b98c5f', line:'#7d5733',
+            popis:'Klasický záhon v zemi' },
+  raised: { nazev:'Vyvýšený záhon',  emoji:'🪵', pix:'vyvyseny', roste:true, fill:'#c79a63', line:'#7d5733',
+            popis:'Dřevěný rám nad zemí' },
+  trough: { nazev:'Truhlík',         emoji:'🪴', pix:'truhlik',  roste:true, fill:'#d2a876', line:'#8a6038',
+            maly:true, rozmer:{w:0.8,h:0.25}, popis:'Na zábradlí nebo u zdi' },
+  pot:    { nazev:'Květináč nebo kýbl', emoji:'🪣', pix:'kvetinac', roste:true, fill:'#d4825a', line:'#a2593a',
+            maly:true, samostatny:true, rozmer:{w:0.4,h:0.4}, popis:'Jeden kus, dá se přenášet' },
+  house:  { nazev:'Dům',             emoji:'🏠', pix:'dum',      fill:'#e2e5e8', line:'#93a0a8',
+            popis:'Dům, garáž nebo skleník' },
+  paved:  { nazev:'Cesta nebo terasa', emoji:'🧱', pix:'cesta',  fill:'#e4dfd2', line:'#b3ab99',
+            popis:'Dlažba, beton, štěrk' },
 };
 const roste = (it) => !!(it && PRVKY[it.typ] && PRVKY[it.typ].roste);
-const prvekPix = (typ) => ik((PRVKY[typ] || PRVKY.bed).pix);
+const prvekPix = (typ) => `<span class="emo">${(PRVKY[typ] || PRVKY.bed).emoji}</span>`;
 
 /* Vychozi seznam ceskych obchodu s osivem. Uzivatel je muze mazat i doplnovat. */
 const OBCHODY_ZAKLAD = [
@@ -1392,9 +1440,9 @@ const KONEV = ik('konev');
 const HNOJ_IKONA = ik('hnojivo');
 const FOTO_IKONA = ik('foto');
 const cropArt = (c) => {
-  const f = cropFotky(c.id)[0];
-  if (f) return `<img class="art-foto" src="${f}" alt="">`;
-  return PLOD[c.id] ? PLOD[c.id] : `<span class="art-emoji">${c.emoji}</span>`;
+  const z = plodinaZnak(c);
+  if (z && z.typ === 'foto') return `<img class="art-foto" src="${z.v}" alt="">`;
+  return `<span class="emo">${z ? z.v : '🌱'}</span>`;
 };
 /* Tytéž tvary do velkého SVG plánu */
 function artInto(id, x, y, size) {
@@ -1493,7 +1541,11 @@ function bbox(pts) {
 const ck = (x, y) => x + ',' + y;
 const cxy = (k) => { const p = k.split(','); return [ +p[0], +p[1] ]; };
 const cellsOf = (it) => (it && it.cells) || [];
-const itArea = (it) => cellsOf(it).length;
+const itArea = (it) => (PRVKY[it.typ] && PRVKY[it.typ].maly && it.rozmer)
+  ? (it.rozmer.w * it.rozmer.h * cellsOf(it).length)
+  : cellsOf(it).length;
+const itRozmer = (it) => (PRVKY[it.typ] && PRVKY[it.typ].maly && it.rozmer)
+  ? { w: it.rozmer.w, h: it.rozmer.h } : null;
 function itBBox(it) {
   const cs = cellsOf(it);
   if (!cs.length) return { x0:0, y0:0, x1:0, y1:0, w:0, h:0 };
@@ -1546,7 +1598,8 @@ function removeCells(keys) {
 function novyPrvek(typ, keys) {
   const id = 'p' + state.nextId++;
   const n = items().filter(i => i.typ === typ).length + 1;
-  const it = state.items[id] = { id, typ, cells:[], nazev: PRVKY[typ].nazev + ' ' + n,
+  const rz = PRVKY[typ].rozmer ? { w:PRVKY[typ].rozmer.w, h:PRVKY[typ].rozmer.h } : null;
+  const it = state.items[id] = { id, typ, cells:[], rozmer: rz, nazev: PRVKY[typ].nazev + ' ' + n,
     cropId:null, datumVysadby:'', poznamka:'', fotky:[], hnojeni:[], zalivka:[], sklizen:[], historie:[], udalosti:[], zaznamy:[], rostliny:null, zamek:false };
   addCells(it, keys);
   return it;
@@ -2222,6 +2275,24 @@ function miniPlan(hiId, size) {
   return `<svg class="mini" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" aria-label="Poloha v zahradě">${parts.join('')}</svg>`;
 }
 const cropFotky = (id) => (state.cropFoto && state.cropFoto[id]) || [];
+/* Ikona plodiny na plánu: výchozí emoji, vlastní emoji, nebo fotka */
+const cropIkona = (id) => (state.cropIkona && state.cropIkona[id]) || null;
+function nastavIkonu(id, hodnota) {
+  state.cropIkona = state.cropIkona || {};
+  if (hodnota) state.cropIkona[id] = hodnota; else delete state.cropIkona[id];
+  save();
+}
+const EMOJI_NABIDKA = ['🍅','🥕','🥬','🧄','🥒','🫜','🫛','🎃','🥔','🍓','🌽','🧅','🫑','🍆','🥦','🥗','🌶️','🍉','🍈','🍏','🍐','🍒','🌻','🌷','🌼','🌿','🪴','🍇','🥜','🫚','🍋','🥭'];
+/* Co se má u plodiny ukázat: fotka > vlastní emoji > výchozí emoji */
+function plodinaZnak(c) {
+  if (!c) return null;
+  const ik2 = cropIkona(c.id);
+  if (ik2 === 'foto') { const f = cropFotky(c.id)[0]; if (f) return { typ:'foto', v:f }; }
+  if (ik2 && ik2 !== 'foto') return { typ:'emoji', v:ik2 };
+  const f = cropFotky(c.id)[0];
+  if (f) return { typ:'foto', v:f };
+  return { typ:'emoji', v: c.emoji || '🌱' };
+}
 const shops = () => Object.values(state.shops || {});
 const shopOf = (id) => (state.shops || {})[id] || null;
 const planOf = (cropId) => (state.cropPlan || {})[cropId] || { shops:[], odruda:'' };
@@ -2828,6 +2899,30 @@ function ulozRadu(r, nadpis, text, mesice, zap) {
   save();
 }
 
+function dialogEmoji(cropId) {
+  const c = crop(cropId); if (!c) return;
+  const d = dialog(`<h2>Vyber obrázek</h2>
+    <p class="lead">${esc(c.nazev)}</p>
+    <div class="emogrid">
+      ${EMOJI_NABIDKA.map(e=>`<button data-emo="${e}" class="${cropIkona(c.id)===e?'on':''}">${e}</button>`).join('')}
+    </div>
+    <div class="field" style="margin-top:14px"><label for="e-vl">Nebo napiš vlastní</label>
+      <input id="e-vl" maxlength="4" placeholder="🥕" style="text-align:center;font-size:26px"></div>
+    <div class="dacts"><button class="btn sec" id="e-zrus">Zrušit</button>
+    <button class="btn" id="e-ok">Použít</button></div>`);
+  d.querySelectorAll('[data-emo]').forEach(b => b.onclick = () => {
+    nastavIkonu(cropId, b.dataset.emo);
+    zavri(); dialogPlodiny(cropId); kresliPlodiny(); kresliZahonky(); kresliMapu();
+  });
+  d.querySelector('#e-zrus').onclick = zavri;
+  d.querySelector('#e-ok').onclick = () => {
+    const v = d.querySelector('#e-vl').value.trim();
+    if (!v) { toast('Vyber nebo napiš obrázek'); return; }
+    nastavIkonu(cropId, v);
+    zavri(); dialogPlodiny(cropId); kresliPlodiny(); kresliZahonky(); kresliMapu();
+  };
+}
+
 function dialogAkce(id) {
   const ak = akceSeznam();
   const a = id ? ak.find(x => x.id === id) : { id:'', nazev:'', ikona:'pece', vlastni:true };
@@ -3045,7 +3140,7 @@ function kresliMapu() {
   const rezim = state.tool !== 'pan' ? RADY[state.tool] : null;
   const vyberParcel = katStav.stav === 'vyber' && state.katParcely;
   /* Adresu nabízíme jen dokud není zahrada. Potom už jen malým tlačítkem v liště. */
-  const nabidniAdresu = !state.panel && !rezim && !state.outline.length;
+  const nabidniAdresu = !state.panel && !rezim && !state.outline.length && !items().length;
 
   s.innerHTML = `
     <div class="map">
@@ -3060,7 +3155,7 @@ function kresliMapu() {
       ${nacitam ? `<div class="m-load"><div class="spin"></div><span>${esc(katStav.text)}</span></div>` : ''}
 
       ${rezim ? `<div class="m-mode">
-        <span>${state.tool === 'outline' ? ik('obrys') : (state.tool === 'erase' ? ik('guma') : prvekPix(state.tool))}</span>
+        <span class="mi">${state.tool === 'outline' ? ik('obrys') : (state.tool === 'erase' ? ik('guma') : `<span class="emo">${PRVKY[state.tool].emoji}</span>`)}</span>
         <span class="mt"><b>${esc(rezim.t)}</b><span>${esc(rezim.s)}</span></span>
         <button id="m-hotovo">Hotovo</button>
       </div>` : ''}
@@ -3093,7 +3188,14 @@ function kresliMapu() {
           <p class="note">${esc(state.katObec || '')} · klepnutím přidáš nebo odebereš${kontrolaText()}</p>
           <button class="btn sm wide" id="kat-ok" style="margin-top:12px">Takhle je to dobře</button>
         ` : ''}
-        ${vyb ? vybranyPrvek(vyb) : ''}
+        ${vyb ? (roste(vyb) ? `
+          <div class="selhlava">
+            <b>${esc(vyb.nazev)}</b>
+            <button class="tag" id="v-upravit">Upravit</button>
+            <button class="tag" id="v-off">×</button>
+          </div>
+          ${kartaZahonu(vyb, new Date().getMonth()+1)}
+        ` : vybranyPrvek(vyb)) : ''}
         ${state.tool === 'outline' && state.outline.length ? `<div class="dacts" style="margin-top:${vyberParcel||vyb?'12px':'0'}">
           ${!state.outlineDone && state.outline.length >= 3 ? `<button class="btn sm" id="o-close">Uzavřít obrys</button>` : ''}
           ${state.selVert != null && state.outline.length > 3 ? `<button class="btn sm sec" id="o-del">Smazat vrchol</button>` : ''}
@@ -3101,7 +3203,7 @@ function kresliMapu() {
         </div>` : ''}
       </div>` : ''}
 
-      <div class="mrail" id="mrail">
+      <div class="mrail ${vyb && roste(vyb) ? 'pryc' : ''}" id="mrail">
         <button class="go" id="t-pridat" aria-label="Přidat záhon nebo prvek" title="Přidat">${ik('plus')}</button>
         <button class="${state.tool==='pan'?'on':''}" id="t-ruka" aria-label="Posouvat plán" title="Posouvat">${ik('ruka')}</button>
         <button class="${state.tool==='outline'?'on':''}" id="t-obrys" aria-label="Upravit obrys zahrady" title="Obrys">${ik('obrys')}</button>
@@ -3141,7 +3243,11 @@ function kresliMapu() {
   const ko = el('kat-ok');
   if (ko) ko.onclick = () => { katStav = { stav:'ok', text:'' }; save(); kresliMapu(); requestAnimationFrame(() => fitView()); };
 
-  if (vyb) {
+  if (vyb && roste(vyb)) {
+    napojZahonky(el('msheet'));
+    el('v-upravit').onclick = () => dialogPrvku(vyb.id);
+    el('v-off').onclick = () => { state.sel = null; save(); kresliMapu(); };
+  } else if (vyb) {
     el('v-edit').onclick = () => dialogPrvku(vyb.id);
     el('v-off').onclick = () => { state.sel = null; save(); kresliMapu(); };
     el('v-zamek').onclick = () => {
@@ -3171,7 +3277,10 @@ function dialogPridat() {
   const d = dialog(`<h2>Co přidáš do zahrady</h2>
     <p class="lead">Vyber a pak to na plánu nakresli prstem.</p>
     <div class="pick">
-      ${PRIDAT.map(t=>`<button data-pridat="${t}">${prvekPix(t)}${esc(PRVKY[t].nazev)}</button>`).join('')}
+      ${PRIDAT.map(t=>`<button data-pridat="${t}">
+        <span class="pe">${PRVKY[t].emoji}</span>
+        <span class="pn2"><b>${esc(PRVKY[t].nazev)}</b><span>${esc(PRVKY[t].popis)}</span></span>
+      </button>`).join('')}
     </div>
     <div class="dacts"><button class="btn sec wide" id="pr-zrus">Zavřít</button></div>`);
   d.querySelector('#pr-zrus').onclick = zavri;
@@ -3297,7 +3406,8 @@ function fitView() {
   const zdola = panelVyska();
   const uzitna = Math.max(120, r.height - zdola - shora);
   // vlevo svislá lišta nástrojů, vpravo přiblížení
-  const zleva = el('mrail') ? 78 : 12, zprava = 72;
+  const mr = el('mrail');
+  const zleva = (mr && !mr.classList.contains('pryc')) ? 78 : 12, zprava = 72;
   const siroka = Math.max(140, r.width - zleva - zprava);
   const pad = 3;
   const w = Math.max(b.x1-b.x0, 4) + pad*2, h = Math.max(b.y1-b.y0, 4) + pad*2;
@@ -3389,14 +3499,19 @@ function kresliPlatno() {
     const d = PRVKY[it.typ] || PRVKY.bed;
     const c = crop(it.cropId);
     const out = !itemInside(it);
-    const b = itBBox(it);
+    let b = itBBox(it);
+    // malé prvky mají vlastní rozměr v metrech, klidně pod jeden metr
+    if (PRVKY[it.typ].maly && it.rozmer) {
+      b = { x0:b.x0, y0:b.y0, x1:b.x0 + it.rozmer.w, y1:b.y0 + it.rozmer.h,
+            w:it.rozmer.w, h:it.rozmer.h };
+    }
     const sp0 = w2s(b.x0, b.y0), bw = b.w*s, bh = b.h*s;
-    const r = Math.min(7, s*0.3);
+    const r = Math.min(7, Math.max(2, Math.min(bw,bh)*0.22));
 
     /* Obdelnikove prvky kreslime jako jeden zakulaceny tvar — plan tak
        vypada jako zahrada, ne jako milimetrovy papir. Nepravidelne
        tvary zustavaji po ctverecich. */
-    const jednoduchy = isRect(it);
+    const jednoduchy = isRect(it) || !!(PRVKY[it.typ].maly && it.rozmer);
     const telo = (vypln, opacita, posunX, posunY, uzsi) => {
       if (jednoduchy) {
         return `<rect x="${(sp0[0]+(posunX||0)).toFixed(1)}" y="${(sp0[1]+(posunY||0)).toFixed(1)}" width="${Math.max(1,bw-(uzsi||0)*2).toFixed(1)}" height="${Math.max(1,bh-(uzsi||0)*2).toFixed(1)}" rx="${r.toFixed(1)}" fill="${vypln}" fill-opacity="${opacita}"/>`;
@@ -3440,21 +3555,21 @@ function kresliPlatno() {
       parts.push(`<path d="${ep}" fill="none" stroke="${out?'var(--danger)':d.line}" stroke-width="${out?2.6:2}" stroke-linejoin="round" stroke-linecap="round" ${out?'stroke-dasharray="6 4"':''}/>`);
     }
 
-    // obrázek: barevná ilustrace plodiny na bílém kolečku, ať je čitelná
-    const znak = cropArtId(c) || (!c ? d.pix : null);
+    // obrázek: emoji plodiny (nebo vlastní fotka) na světlém kolečku
+    const zn = c ? plodinaZnak(c) : { typ:'emoji', v: d.emoji };
     const velMax = Math.min(bw, bh) * 0.66;
     const vel = Math.min(velMax, 46);
-    const foto = c ? cropFotky(c.id)[0] : null;
-    if (bw > 26 && bh > 22 && vel >= 15 && (znak || foto)) {
+    const maZnak = !!(zn && zn.v);
+    if (bw > 24 && bh > 20 && vel >= 13 && maZnak) {
       const cx = sp0[0] + bw/2, cy = sp0[1] + bh/2 - (bh > 52 ? 7 : 0);
       const rr = vel/2 + 4;
-      parts.push(`<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${rr.toFixed(1)}" fill="#fffdf6" stroke="rgba(31,45,28,.18)" stroke-width="1.2"/>`);
-      if (foto) {
+      parts.push(`<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${rr.toFixed(1)}" fill="#fffdf6" stroke="rgba(31,45,28,.16)" stroke-width="1.2"/>`);
+      if (zn.typ === 'foto') {
         const cid = 'cl' + it.id;
         parts.push(`<clipPath id="${cid}"><circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${(rr-1.5).toFixed(1)}"/></clipPath>`);
-        parts.push(`<image href="${foto}" x="${(cx-rr+1.5).toFixed(1)}" y="${(cy-rr+1.5).toFixed(1)}" width="${((rr-1.5)*2).toFixed(1)}" height="${((rr-1.5)*2).toFixed(1)}" preserveAspectRatio="xMidYMid slice" clip-path="url(#${cid})"/>`);
+        parts.push(`<image href="${zn.v}" x="${(cx-rr+1.5).toFixed(1)}" y="${(cy-rr+1.5).toFixed(1)}" width="${((rr-1.5)*2).toFixed(1)}" height="${((rr-1.5)*2).toFixed(1)}" preserveAspectRatio="xMidYMid slice" clip-path="url(#${cid})"/>`);
       } else {
-        parts.push(`<g color="var(--ink2)">` + artInto(znak, cx - vel/2, cy - vel/2, vel) + `</g>`);
+        parts.push(`<text x="${cx.toFixed(1)}" y="${(cy + vel*0.03).toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="${vel.toFixed(1)}">${zn.v}</text>`);
       }
     }
 
@@ -3463,14 +3578,14 @@ function kresliPlatno() {
       const txt = c ? c.nazev : it.nazev;
       const fs = Math.min(12.5, Math.max(9, bh * 0.4));
       const sirka = Math.min(bw - 6, txt.length * fs * 0.56 + 12);
-      const ty = (bh > 52 && (znak || foto)) ? sp0[1] + bh - 7 - fs*0.75 : sp0[1] + bh/2 - fs*0.78;
+      const ty = (bh > 52 && maZnak) ? sp0[1] + bh - 7 - fs*0.75 : sp0[1] + bh/2 - fs*0.78;
       parts.push(`<rect x="${(sp0[0] + (bw - sirka)/2).toFixed(1)}" y="${ty.toFixed(1)}" width="${sirka.toFixed(1)}" height="${(fs*1.6).toFixed(1)}" rx="${(fs*0.6).toFixed(1)}" fill="rgba(255,253,246,.92)"/>`);
       parts.push(`<text x="${(sp0[0]+bw/2).toFixed(1)}" y="${(ty + fs*1.14).toFixed(1)}" text-anchor="middle" font-size="${fs.toFixed(1)}" font-weight="700" fill="var(--ink)">${esc(txt)}</text>`);
     }
     // stavove odznaky v rohu: co tenhle zahon prave potrebuje
-    if (roste(it) && bw > 24 && bh > 20) {
-      const sv = stavy(it).filter(x => x !== 'prazdny').slice(0, bw > 80 ? 3 : (bw > 52 ? 2 : 1));
-      const r2 = Math.min(8.5, Math.max(6, Math.min(bw, bh) * 0.18));
+    if (roste(it) && bw > 30 && bh > 17) {
+      const sv = stavy(it).filter(x => x !== 'prazdny').slice(0, bw > 110 ? 3 : (bw > 72 ? 2 : 1));
+      const r2 = Math.min(9, Math.max(5.5, Math.min(bw, bh) * 0.2));
       sv.forEach((sx, i) => {
         const cx = sp0[0] + bw - 3 - r2 - i * (r2*2 + 2.5), cy = sp0[1] + 3 + r2;
         parts.push(`<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${r2.toFixed(1)}" fill="${STAV_BARVY[sx].bg}" stroke="#fffdf6" stroke-width="1.8"/>`);
@@ -3880,15 +3995,16 @@ const stavOdznak = (s) => `<span class="odznak" style="background:${STAV_BARVY[s
 const rostlinSlovo = (n) => n === 1 ? 'rostlina' : (n >= 2 && n <= 4 ? 'rostliny' : 'rostlin');
 
 function napojZahonky(s) {
+  const prekresli = () => { if (state.tab === 'map') kresliMapu(); else kresliZahonky(); };
   s.querySelectorAll('[data-akce]').forEach(b => b.onclick = () => {
     const [id, aid] = b.dataset.akce.split('|');
-    if (aid === 'zalij') { quickWater(id); kresliZahonky(); }
-    else if (aid === 'hnoj') { quickFert(id); kresliZahonky(); }
-    else if (aid === 'sklid') dialogSklizne(id, () => kresliZahonky());
-    else { zapisAkci(id, aid); kresliZahonky(); }
+    if (aid === 'zalij') { quickWater(id); prekresli(); }
+    else if (aid === 'hnoj') { quickFert(id); prekresli(); }
+    else if (aid === 'sklid') dialogSklizne(id, prekresli);
+    else { zapisAkci(id, aid); prekresli(); }
   });
   s.querySelectorAll('[data-pocet]').forEach(b => b.onclick = () => dialogPoctu(b.dataset.pocet));
-  s.querySelectorAll('[data-sklid]').forEach(b => b.onclick = () => dialogSklizne(b.dataset.sklid, () => kresliZahonky()));
+  s.querySelectorAll('[data-sklid]').forEach(b => b.onclick = () => dialogSklizne(b.dataset.sklid, prekresli));
   s.querySelectorAll('[data-uhyn]').forEach(b => b.onclick = () => dialogPorostu(b.dataset.uhyn, 'uhyn'));
   s.querySelectorAll('[data-dosad]').forEach(b => b.onclick = () => dialogPorostu(b.dataset.dosad, 'dosadba'));
   s.querySelectorAll('[data-upravit]').forEach(b => b.onclick = () => dialogPrvku(b.dataset.upravit));
@@ -4335,16 +4451,21 @@ function dialogPrvku(id) {
   const it = state.items[id]; if (!it) return;
   const jeZahon = roste(it);
   const b = itBBox(it), obdelnik = isRect(it);
+  const maly = !!PRVKY[it.typ].maly;
   const d = dialog(`
     <h2 style="display:flex;align-items:center;gap:10px">
       <span style="width:30px;height:30px;flex:none">${prvekPix(it.typ)}</span>${esc(PRVKY[it.typ].nazev)}</h2>
-    <p class="lead">${fmtA(itArea(it))} · ${itArea(it)} čtverečků · ${obdelnik ? fmtDim(b.w,b.h) : 'nepravidelný tvar'}</p>
+    <p class="lead">${fmtA(itArea(it))}${maly && it.rozmer ? ' · ' + fmtDim(it.rozmer.w, it.rozmer.h) : (obdelnik ? ' · ' + fmtDim(b.w,b.h) : ' · nepravidelný tvar')}</p>
     ${!itemInside(it) ? `<div class="info" style="margin-bottom:16px">Tenhle prvek přesahuje obrys zahrady.</div>` : ''}
     <button class="btn sm sec wide" id="d-zamek" style="margin-bottom:16px">
       <span style="width:22px;height:22px;flex:none">${ik(it.zamek?'zamek':'odemek')}</span>
       ${it.zamek ? 'Odemknout — teď se s ním nedá hýbat' : 'Zamknout, aby se s ním nehýbalo'}</button>
     <div class="field"><label for="d-nazev">Název</label><input id="d-nazev" value="${esc(it.nazev)}"></div>
-    ${obdelnik && !it.zamek ? `<div class="row2">
+    ${maly && !it.zamek ? `<div class="row2">
+      <div class="field"><label for="d-mw">Šířka (m)</label><input type="number" id="d-mw" min="0.1" max="3" step="0.05" value="${(it.rozmer||{w:0.4}).w}"></div>
+      <div class="field"><label for="d-mh">Hloubka (m)</label><input type="number" id="d-mh" min="0.1" max="3" step="0.05" value="${(it.rozmer||{h:0.4}).h}"></div>
+    </div><p class="note" style="margin-top:0">Klidně pod metr — truhlík bývá 0,8 × 0,25 m, kýbl 0,4 × 0,4 m.</p>`
+    : obdelnik && !it.zamek ? `<div class="row2">
       <div class="field"><label for="d-w">Šířka (m)</label><input type="number" id="d-w" min="1" step="1" value="${b.w}"></div>
       <div class="field"><label for="d-h">Délka (m)</label><input type="number" id="d-h" min="1" step="1" value="${b.h}"></div>
     </div>` : `<p class="note" style="margin-top:0">${it.zamek ? 'Rozměry jsou zamčené.' : 'Tvar je ze čtverečků. Měň ho na plánu kreslením a gumou.'}</p>`}
@@ -4412,6 +4533,10 @@ function dialogPrvku(id) {
   }
   q('#d-ulozit').onclick = () => {
     it.nazev = q('#d-nazev').value || it.nazev;
+    if (maly && q('#d-mw')) {
+      const w = parseFloat(q('#d-mw').value), hh = parseFloat(q('#d-mh').value);
+      if (w > 0 && hh > 0) it.rozmer = { w: Math.min(3, w), h: Math.min(3, hh) };
+    }
     if (obdelnik && q('#d-w')) {
       const w = parseInt(q('#d-w').value,10), hh = parseInt(q('#d-h').value,10);
       if (w>0 && hh>0 && (w!==b.w || hh!==b.h)) reshapeRect(it, w, hh);
@@ -4543,6 +4668,14 @@ function dialogPlodiny(cropId) {
             <span style="font-weight:800;font-size:15px;color:var(--danger)">−${m2[x]}</span></div>`).join('')}
         </div>`;
     })()}
+    <div class="sec-h"><h2>Ikona na plánu zahrady</h2></div>
+    <p class="note" style="margin-top:0">Tímhle se plodina kreslí na plánu i v seznamech.</p>
+    <div class="emovolba">
+      <button class="${!cropIkona(c.id)?'on':''}" data-ikona="">${c.emoji}<i>výchozí</i></button>
+      ${fo.length ? `<button class="${cropIkona(c.id)==='foto'?'on':''}" data-ikona="foto">
+        <img src="${fo[0]}" alt=""><i>fotka</i></button>` : ''}
+      <button id="p-vlastni-emo">＋<i>jiné</i></button>
+    </div>
     <div class="sec-h"><h2>Kde koupit</h2></div>
     <div class="field"><input id="p-odruda" value="${esc(p.odruda)}" placeholder="Odrůda, kterou chci"></div>
     <div class="chips" style="margin-bottom:16px">
@@ -4560,6 +4693,11 @@ function dialogPlodiny(cropId) {
     </div>`);
   d.querySelector('#p-hero').onclick = () => addCropFoto(c.id, () => dialogPlodiny(c.id));
   d.querySelector('#p-foto').onclick = () => addCropFoto(c.id, () => dialogPlodiny(c.id));
+  d.querySelectorAll('[data-ikona]').forEach(b => b.onclick = () => {
+    nastavIkonu(c.id, b.dataset.ikona || null);
+    dialogPlodiny(c.id); kresliPlodiny(); kresliZahonky(); kresliMapu();
+  });
+  d.querySelector('#p-vlastni-emo').onclick = () => dialogEmoji(c.id);
   d.querySelectorAll('[data-chlavni]').forEach(b => b.onclick = (e) => {
     e.stopPropagation();
     const a = cropFotky(c.id).slice(), i = Number(b.dataset.chlavni);
