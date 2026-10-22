@@ -582,6 +582,27 @@ body { font-size: 17px; }
 .dlg .lead { font-size: 15.5px; }
 .toast { font-size: 15px; }
 
+/* vlastní fotky plodin */
+.art-foto { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cfoto { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 2px 0 10px; }
+.cfoto::-webkit-scrollbar { display: none; }
+.cfoto figure {
+  position: relative; flex: none; width: 92px; height: 70px; margin: 0;
+  border-radius: 12px; overflow: hidden; border: 2px solid var(--line);
+}
+.cfoto figure.hlavni { border-color: var(--acc); box-shadow: 0 0 0 2px var(--acc-soft); }
+.cfoto figure img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cfoto figcaption {
+  position: absolute; left: 0; right: 0; bottom: 0; background: var(--acc); color: var(--acc-ink);
+  font-size: 11px; font-weight: 700; text-align: center; padding: 3px 0;
+}
+.cfoto figure > button {
+  position: absolute; width: 26px; height: 26px; border-radius: 9px; display: grid; place-items: center;
+  background: color-mix(in srgb, var(--card) 90%, transparent); color: var(--ink); padding: 5px;
+  left: 4px; bottom: 4px;
+}
+.cfoto figure > button.x { left: auto; right: 4px; top: 4px; bottom: auto; font-size: 17px; font-weight: 700; padding: 0; }
+
 /* ---------- nástroje na plán: svislá lišta u kraje, jen ikony ---------- */
 .mrail {
   position: absolute; left: 12px; z-index: 6;
@@ -633,7 +654,7 @@ body { font-size: 17px; }
 
 <script>
 
-const VERZE = 'v1.5 · 22. 10. 2026';
+const VERZE = 'v1.6 · 22. 10. 2026';
 const LOGO_KOZEL = `<svg viewBox="0 0 32 32" aria-hidden="true">
   <path d="M11.2 9.4C9.6 6.6 7.4 4.6 4.6 3.9c-.5-.1-.9.3-.8.8.5 2.9 1.9 5.4 4.1 7.2.7.6 1.5 1 2.4 1.3z" fill="#fff" opacity=".95"/>
   <path d="M20.8 9.4c1.6-2.8 3.8-4.8 6.6-5.5.5-.1.9.3.8.8-.5 2.9-1.9 5.4-4.1 7.2-.7.6-1.5 1-2.4 1.3z" fill="#fff" opacity=".95"/>
@@ -1202,7 +1223,11 @@ const PLOD = {
 const KONEV = ik('konev');
 const HNOJ_IKONA = ik('hnojivo');
 const FOTO_IKONA = ik('foto');
-const cropArt = (c) => PLOD[c.id] ? PLOD[c.id] : `<span class="art-emoji">${c.emoji}</span>`;
+const cropArt = (c) => {
+  const f = cropFotky(c.id)[0];
+  if (f) return `<img class="art-foto" src="${f}" alt="">`;
+  return PLOD[c.id] ? PLOD[c.id] : `<span class="art-emoji">${c.emoji}</span>`;
+};
 /* Tytéž tvary do velkého SVG plánu */
 function artInto(id, x, y, size) {
   const src = PLOD[id] || IK[id];
@@ -3425,8 +3450,15 @@ function dialogPlodiny(cropId) {
     <div style="aspect-ratio:16/9;border-radius:var(--r);background:var(--acc-soft);overflow:hidden;margin-bottom:16px;padding:14px;position:relative" id="p-hero">
       ${fo.length ? `<img src="${fo[0]}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" alt="">`
         : `<div style="width:100%;height:100%">${cropArt(c)}</div>`}
-      <span class="cam" style="position:absolute;right:10px;bottom:10px;width:34px;height:34px;border-radius:11px;background:color-mix(in srgb,var(--card) 88%,transparent);display:grid;place-items:center;padding:6px">${ik('foto')}</span>
+      <span class="cam" style="position:absolute;right:10px;bottom:10px;width:40px;height:40px;border-radius:13px;background:var(--card);box-shadow:var(--sh);display:grid;place-items:center;padding:9px">${ik('foto')}</span>
     </div>
+    <button class="btn sm sec wide" id="p-foto" style="margin-bottom:8px">${ik('foto')}${fo.length ? 'Přidat další fotku' : 'Vyfotit nebo vybrat vlastní fotku'}</button>
+    ${fo.length ? `<div class="cfoto">${fo.map((f,i)=>`<figure class="${i===0?'hlavni':''}">
+        <img src="${f}" alt="">
+        ${i===0 ? '<figcaption>hlavní</figcaption>' : `<button data-chlavni="${i}" aria-label="Nastavit jako hlavní">${ik('plus')}</button>`}
+        <button class="x" data-cdel="${i}" aria-label="Smazat fotku">&times;</button>
+      </figure>`).join('')}</div>
+      <p class="note" style="margin-top:0">Hlavní fotka nahradí kresbu u záhonků, v kalendáři i na plánu zahrady.</p>` : ''}
     <h2>${esc(c.nazev)}</h2>
     <p class="lead">${esc(c.lat)} · ${esc(c.kat)}</p>
     ${moje.length ? `<div class="info" style="margin-bottom:16px;background:var(--acc-soft);color:var(--acc-dark)">Pěstuješ na: ${moje.map(b=>esc(b.nazev)).join(', ')}</div>` : ''}
@@ -3456,6 +3488,20 @@ function dialogPlodiny(cropId) {
       <button class="btn" id="p-ok">Zavřít</button>
     </div>`);
   d.querySelector('#p-hero').onclick = () => addCropFoto(c.id, () => dialogPlodiny(c.id));
+  d.querySelector('#p-foto').onclick = () => addCropFoto(c.id, () => dialogPlodiny(c.id));
+  d.querySelectorAll('[data-chlavni]').forEach(b => b.onclick = (e) => {
+    e.stopPropagation();
+    const a = cropFotky(c.id).slice(), i = Number(b.dataset.chlavni);
+    a.unshift(a.splice(i,1)[0]);
+    state.cropFoto[c.id] = a; save(); dialogPlodiny(c.id); kresliPlodiny(); kresliZahonky();
+    toast('Hlavní fotka nastavena');
+  });
+  d.querySelectorAll('[data-cdel]').forEach(b => b.onclick = (e) => {
+    e.stopPropagation();
+    const a = cropFotky(c.id).slice();
+    a.splice(Number(b.dataset.cdel), 1);
+    state.cropFoto[c.id] = a; save(); dialogPlodiny(c.id); kresliPlodiny(); kresliZahonky();
+  });
   const od = d.querySelector('#p-odruda');
   d.querySelectorAll('[data-shop]').forEach(b => b.onclick = () => {
     const cur = planOf(c.id).shops.slice();
