@@ -427,6 +427,8 @@ h1,h2,h3,h4 { margin: 0; font-weight: 800; letter-spacing: -.02em; }
 .cal .cday .dots i.hnuj { background: var(--earth); }
 .cal .cday .dots i.vysadba { background: var(--acc); }
 .cal .cday .dots i.sklizen { background: var(--sun); }
+.cal .cday .dots i.uhyn { background: var(--danger); }
+.cal .cday .dots i.dosadba { background: var(--acc); }
 .cal .cday.mam { background: var(--card); border-color: var(--line); }
 .callegend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 12px; font-size: 11.5px; font-weight: 700; color: var(--ink3); }
 .callegend span { display: flex; align-items: center; gap: 5px; }
@@ -623,6 +625,7 @@ body { font-size: 17px; }
 .ukol .ui.zalij { background: #dceaf4; color: #276692; }
 .ukol .ui.hnoj { background: var(--earth-soft); color: #8a5230; }
 .ukol .ui.sklid { background: var(--acc-soft); color: var(--acc-dark); }
+.ukol .ui.dosad { background: #f7e3e0; color: var(--danger); }
 .ukol .um { display: block; flex: 1; min-width: 0; }
 .ukol .um b { display: block; font-size: 16px; font-weight: 800; letter-spacing: -.01em; }
 .ukol .um span { display: block; font-size: 14px; font-weight: 500; color: var(--ink2); line-height: 1.45; margin-top: 2px; }
@@ -644,6 +647,20 @@ body { font-size: 17px; }
 .krok.zalij { background: #dceaf4; } .krok.zalij .ki { color: #276692; }
 .krok.hnoj { background: var(--earth-soft); } .krok.hnoj .ki { color: #8a5230; }
 .krok.sklid { background: var(--acc-soft); } .krok.sklid .ki { color: var(--acc-dark); }
+.krok.dosad { background: #f7e3e0; } .krok.dosad .ki { color: var(--danger); }
+
+.porost { display: flex; gap: 8px; align-items: stretch; padding: 0 13px 10px; }
+.porost button {
+  flex: 1; min-width: 0; height: 52px; border-radius: 14px; border: 1.5px solid var(--line);
+  background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 1px; font-size: 11.5px; font-weight: 700; color: var(--ink2);
+}
+.porost button .ik { width: 21px; height: 21px; }
+.porost button:active { background: var(--bg2); }
+.porost button[data-uhyn]:active { background: #f7e3e0; border-color: var(--danger); color: var(--danger); }
+.porost .pc { flex: 1.1; border-style: dashed; border-color: var(--line2); gap: 0; }
+.porost .pc b { font-size: 21px; font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; line-height: 1.1; }
+.porost .pc span { font-size: 10.5px; font-weight: 700; color: var(--ink3); text-transform: uppercase; letter-spacing: .04em; }
 
 .akce { display: flex; gap: 8px; padding: 0 13px 12px; }
 .akce button {
@@ -714,7 +731,7 @@ body { font-size: 17px; }
 
 <script>
 
-const VERZE = 'v2.0 · 22. 10. 2026';
+const VERZE = 'v2.1 · 22. 10. 2026';
 const LOGO_KOZEL = `<svg viewBox="0 0 32 32" aria-hidden="true">
   <path d="M11.2 9.4C9.6 6.6 7.4 4.6 4.6 3.9c-.5-.1-.9.3-.8.8.5 2.9 1.9 5.4 4.1 7.2.7.6 1.5 1 2.4 1.3z" fill="#fff" opacity=".95"/>
   <path d="M20.8 9.4c1.6-2.8 3.8-4.8 6.6-5.5.5-.1.9.3.8.8-.5 2.9-1.9 5.4-4.1 7.2-.7.6-1.5 1-2.4 1.3z" fill="#fff" opacity=".95"/>
@@ -795,6 +812,7 @@ function load() {
           if (i.zamek === undefined) i.zamek = false;
           if (!Array.isArray(i.sklizen)) i.sklizen = [];
           if (!Array.isArray(i.historie)) i.historie = [];
+          if (!Array.isArray(i.udalosti)) i.udalosti = [];
           if (!PRVKY[i.typ]) i.typ = 'bed';
           if (i.thumb !== undefined) delete i.thumb;
           i.fotky = (i.fotky || []).map(f => typeof f === 'string' ? { data:f, datum:'' } : f);
@@ -1265,6 +1283,7 @@ const IK = {
   dnes:     S('<path d="M4 12.5 9 17.5l11-11"/>'),
   hotovo:   S('<circle cx="12" cy="12" r="9"/><path d="M8 12.2l2.8 2.8L16 9.8"/>'),
   vaha:     S('<path d="M12 4.5v15M7 19.5h10"/><path d="M12 7 4.5 9.5 7 15h10l2.5-5.5z"/>'),
+  uhyn:     S('<path d="M11 21c-.5-4.5-2.5-7.5-6-9"/><path d="M11 14c-.4-3 1-5.6 4-7.6-.4 3.3-1.8 5.8-4 7.6z"/><path d="M11 16.5c-2.6-1.2-4-3.4-4-6.6 2.6 1.2 4 3.4 4 6.6z"/><path d="M16 17.5l4 4M20 17.5l-4 4"/>'),
 };
 const ik = (id) => IK[id] || pixSvg(id);
 
@@ -1389,7 +1408,7 @@ function novyPrvek(typ, keys) {
   const id = 'p' + state.nextId++;
   const n = items().filter(i => i.typ === typ).length + 1;
   const it = state.items[id] = { id, typ, cells:[], nazev: PRVKY[typ].nazev + ' ' + n,
-    cropId:null, datumVysadby:'', poznamka:'', fotky:[], hnojeni:[], zalivka:[], sklizen:[], historie:[], rostliny:null, zamek:false };
+    cropId:null, datumVysadby:'', poznamka:'', fotky:[], hnojeni:[], zalivka:[], sklizen:[], historie:[], udalosti:[], rostliny:null, zamek:false };
   addCells(it, keys);
   return it;
 }
@@ -1748,6 +1767,66 @@ function pocetRostlin(it) {
   if (it.rostliny != null) return it.rostliny;
   return odhadRostlin(it);
 }
+/* ============ STAV POROSTU ============
+   Rostliny v sezoně ubývají i přibývají. Nezapisuje se proto jen číslo,
+   ale událost: kolik a hlavně proč. Z důvodů se pak dá vyčíst, co
+   zahradníka na konkrétní plodině roky po sobě připravuje o úrodu. */
+const DUVODY_UHYNU = ['Slimáci','Mráz','Sucho','Příliš vody','Choroba','Škůdci','Přesazení neuneslo','Ptáci nebo zvěř','Neujalo se','Jiné'];
+const udalosti = (it) => (it.udalosti || []).slice().sort((a,b) => a.datum < b.datum ? 1 : -1);
+function uhynLetos(it) {
+  const rok = new Date().getFullYear();
+  return (it.udalosti || []).filter(u => u.typ === 'uhyn' && Number(String(u.datum).slice(0,4)) === rok)
+    .reduce((a,u) => a + (Number(u.pocet)||0), 0);
+}
+function nejcastejsiDuvod(it) {
+  const m = {};
+  (it.udalosti || []).forEach(u => { if (u.typ === 'uhyn' && u.duvod) m[u.duvod] = (m[u.duvod]||0) + (Number(u.pocet)||0); });
+  const k = Object.keys(m).sort((a,b) => m[b] - m[a])[0];
+  return k || null;
+}
+/* Zapise udalost a rovnou posune pocet rostlin */
+function zapisUdalost(it, typ, pocet, duvod, datum) {
+  const n = Math.max(1, Math.round(Number(pocet) || 1));
+  it.udalosti = it.udalosti || [];
+  it.udalosti.push({ datum: datum || todayISO(), typ, pocet: n, duvod: duvod || '' });
+  const zaklad = pocetRostlin(it);
+  if (zaklad != null) it.rostliny = Math.max(0, zaklad + (typ === 'uhyn' ? -n : n));
+  save();
+}
+function dialogPorostu(id, typ) {
+  const it = state.items[id]; if (!it) return;
+  const c = crop(it.cropId);
+  const uhyn = typ === 'uhyn';
+  const teď = pocetRostlin(it);
+  let n = 1, duvod = DUVODY_UHYNU[0];
+  const kresli = () => {
+    const d = dialog(`<h2>${uhyn ? 'Co uhynulo' : 'Kolik jsi dosadil'}</h2>
+      <p class="lead">${esc(it.nazev)}${c ? ' · ' + esc(c.nazev) : ''}${teď != null ? ' · teď ' + teď + ' ' + rostlinSlovo(teď) : ''}</p>
+      <div class="count" style="padding:0 0 16px">
+        <button id="u-min" aria-label="Méně">−</button>
+        <span class="cv" style="border:0"><b>${n}</b><span>${rostlinSlovo(n)}</span></span>
+        <button id="u-plus" aria-label="Více">+</button>
+      </div>
+      ${uhyn ? `<div class="sec-h"><h2>Proč</h2></div>
+        <div class="chips" style="flex-wrap:wrap;margin-bottom:16px">
+          ${DUVODY_UHYNU.map(x=>`<button class="chip ${x===duvod?'on':''}" data-duv="${esc(x)}">${esc(x)}</button>`).join('')}
+        </div>
+        <p class="note" style="margin-top:0">Důvod si appka pamatuje. Za pár sezón uvidíš, co ti na téhle plodině dělá největší škodu.</p>` : ''}
+      <div class="dacts"><button class="btn sec" id="u-zrus">Zrušit</button>
+      <button class="btn" id="u-ok" ${uhyn?'style="background:var(--danger)"':''}>${uhyn ? 'Zapsat úhyn' : 'Zapsat dosadbu'}</button></div>`);
+    d.querySelector('#u-min').onclick = () => { if (n > 1) { n--; kresli(); } };
+    d.querySelector('#u-plus').onclick = () => { n++; kresli(); };
+    d.querySelectorAll('[data-duv]').forEach(b => b.onclick = () => { duvod = b.dataset.duv; kresli(); });
+    d.querySelector('#u-zrus').onclick = zavri;
+    d.querySelector('#u-ok').onclick = () => {
+      zapisUdalost(it, uhyn ? 'uhyn' : 'dosadba', n, uhyn ? duvod : '');
+      zavri(); kresliZahonky(); kresliMapu();
+      toast(uhyn ? `Zapsáno: −${n} (${duvod})` : `Zapsáno: +${n} dosazeno`);
+    };
+  };
+  kresli();
+}
+
 /* Po jedne. Kdo ma sto rostlin, napise cislo rovnou — klepnutim na pocet. */
 function zmenRostliny(id, delta) {
   const it = state.items[id]; if (!it) return;
@@ -1864,6 +1943,17 @@ function dalsiKrok(b) {
     return { ik:'kosik', t:'Sklízet', akce:'sklid',
       s: ls ? `Sklizeň běží, naposledy ${relDays(ls.datum)}. Zapiš, kolik jsi odnesl.`
             : `${MESICE[m-1].charAt(0).toUpperCase()+MESICE[m-1].slice(1)} je sklizňový měsíc: ${c.nazev}. Zapiš, kolik toho záhon dal.` };
+  }
+
+  // velké ztráty v porostu: nabídnout dosadbu, dokud je čas
+  const ztr = uhynLetos(b), stav = pocetRostlin(b);
+  if (ztr >= 3 && stav != null && (m >= 3 && m <= 8)) {
+    const duv = nejcastejsiDuvod(b);
+    const dosit = (c.sow || []).includes(m) || (c.plant || []).includes(m);
+    return { ik:'uhyn', t: dosit ? 'Dosadit, co uhynulo' : 'Ztráty v porostu', akce: dosit ? 'dosad' : null,
+      s:`Letos tu uhynulo ${ztr} ${rostlinSlovo(ztr)}${duv ? ', nejčastěji ' + duv.toLowerCase() : ''}. `
+        + (dosit ? `${MESICE[m-1].charAt(0).toUpperCase()+MESICE[m-1].slice(1)} se ještě dá dosít nebo dosadit.`
+                 : 'Na dosadbu už je pozdě, poznamenej si to na příští rok.') };
   }
 
   // zálivka: jen v sezóně, jen když nemá pršet
@@ -2426,7 +2516,7 @@ function ukolyDnes() {
     if (!k.akce || k.akce === 'edit') return;
     out.push({ b, k });
   });
-  const vaha = { sklid:0, zalij:1, hnoj:2 };
+  const vaha = { sklid:0, zalij:1, dosad:2, hnoj:3 };
   out.sort((x,y) => (vaha[x.k.akce] ?? 9) - (vaha[y.k.akce] ?? 9));
   return out;
 }
@@ -2518,6 +2608,7 @@ function kresliDnes() {
     if (akce === 'zalij') { quickWater(id); kresliDnes(); }
     else if (akce === 'hnoj') { quickFert(id); kresliDnes(); }
     else if (akce === 'sklid') dialogSklizne(id, () => kresliDnes());
+    else if (akce === 'dosad') dialogPorostu(id, 'dosadba');
   });
 }
 function pozdrav() {
@@ -3245,6 +3336,7 @@ function kartaZahonu(b, m) {
   const krok = dalsiKrok(b);
   const sez = soucetText(sklizenSoucet(b, new Date().getFullYear()));
   const varovani = c ? postupVarovani(b, c.id) : null;
+  const uhyn = uhynLetos(b), duv = uhyn ? nejcastejsiDuvod(b) : null;
   return `<div class="card">
     ${fs.length ? `<div class="photo-strip">
       ${fs.map((f,i)=>`<figure data-foto="${b.id}|${i}"><img class="photo" src="${f.data}" alt="">
@@ -3261,6 +3353,12 @@ function kartaZahonu(b, m) {
       <span class="km"><b>${esc(krok.t)}</b><span>${esc(krok.s)}</span></span>
     </div>
 
+    ${pr != null ? `<div class="porost">
+      <button data-uhyn="${b.id}">${ik('uhyn')}<span>Uhynulo</span></button>
+      <button class="pc" data-pocet="${b.id}"><b>${pr}</b><span>${rostlinSlovo(pr)}</span></button>
+      <button data-dosad="${b.id}">${ik('sazenice')}<span>Dosadil</span></button>
+    </div>` : ''}
+
     ${c ? `<div class="akce">
       <button data-zalij="${b.id}" class="${dnes?'done':''}">${ik('konev')}<span>${dnes?'Zalito':'Zalít'}</span></button>
       <button data-hnoj="${b.id}">${ik('hnojivo')}<span>Pohnojit</span></button>
@@ -3273,7 +3371,7 @@ function kartaZahonu(b, m) {
       ${lf ? `<span class="tag">${ik('hnojivo')}${esc(relDays(lf.datum))}</span>` : ''}
       ${b.zamek ? `<span class="tag">${ik('zamek')}zamčeno</span>` : ''}
       ${!itemInside(b) ? `<span class="tag warn">mimo zahradu</span>` : ''}
-      ${pr != null ? `<button class="tag" data-pocet="${b.id}">${pr} ${rostlinSlovo(pr)}</button>` : ''}
+      ${uhyn ? `<span class="tag warn">${ik('uhyn')}letos −${uhyn}${duv ? ' · ' + esc(duv.toLowerCase()) : ''}</span>` : ''}
       <button class="tag" data-upravit="${b.id}">Upravit</button>
       ${c ? `<button class="tag" data-plodina="${c.id}">O plodině</button>` : ''}
     </div>
@@ -3287,6 +3385,8 @@ function napojZahonky(s) {
   s.querySelectorAll('[data-hnoj]').forEach(b => b.onclick = () => { quickFert(b.dataset.hnoj); kresliZahonky(); });
   s.querySelectorAll('[data-pocet]').forEach(b => b.onclick = () => dialogPoctu(b.dataset.pocet));
   s.querySelectorAll('[data-sklid]').forEach(b => b.onclick = () => dialogSklizne(b.dataset.sklid, () => kresliZahonky()));
+  s.querySelectorAll('[data-uhyn]').forEach(b => b.onclick = () => dialogPorostu(b.dataset.uhyn, 'uhyn'));
+  s.querySelectorAll('[data-dosad]').forEach(b => b.onclick = () => dialogPorostu(b.dataset.dosad, 'dosadba'));
   s.querySelectorAll('[data-upravit]').forEach(b => b.onclick = () => dialogPrvku(b.dataset.upravit));
   s.querySelectorAll('[data-plodina]').forEach(b => b.onclick = () => dialogPlodiny(b.dataset.plodina));
   s.querySelectorAll('[data-addfoto]').forEach(b => b.onclick = () => pridejFotku(b.dataset.addfoto));
@@ -3409,8 +3509,8 @@ function kresliNakup(s) {
 /* ============ OBRAZOVKA: KALENDÁŘ ============ */
 const DNY_ZKR = ['Po','Út','St','Čt','Pá','So','Ne'];
 const UKON_PIX = { soil:'ryc', sow:'semeno', plant:'sazenice', care:'pece', harvest:'kosik' };
-const ZAPIS_PIX = { voda:'konev', hnuj:'hnojivo', vysadba:'sazenice', sklizen:'kosik' };
-const ZAPIS_NAZEV = { voda:'Zalito', hnuj:'Pohnojeno', vysadba:'Vyseto nebo vysazeno', sklizen:'Sklizeno' };
+const ZAPIS_PIX = { voda:'konev', hnuj:'hnojivo', vysadba:'sazenice', sklizen:'kosik', uhyn:'uhyn', dosadba:'sazenice' };
+const ZAPIS_NAZEV = { voda:'Zalito', hnuj:'Pohnojeno', vysadba:'Vyseto nebo vysazeno', sklizen:'Sklizeno', uhyn:'Úhyn rostlin', dosadba:'Dosazeno' };
 
 /* Vsechno, co je v zahrade zapsane na konkretni den: zalivka, hnojeni, vysadba */
 function zapisyPoDnech() {
@@ -3421,6 +3521,8 @@ function zapisyPoDnech() {
     (b.hnojeni || []).forEach(h => pridej(h.datum, { typ:'hnuj', b, co:h.co }));
     if (b.datumVysadby) pridej(b.datumVysadby, { typ:'vysadba', b });
     (b.sklizen || []).forEach(s => pridej(s.datum, { typ:'sklizen', b, co: fmtN(s.mnozstvi) + ' ' + (s.jednotka||'kg') }));
+    (b.udalosti || []).forEach(u => pridej(u.datum, { typ:u.typ, b,
+      co: (u.typ === 'uhyn' ? '−' : '+') + u.pocet + (u.duvod ? ', ' + u.duvod.toLowerCase() : '') }));
   });
   return map;
 }
@@ -3480,6 +3582,7 @@ function kresliKalendar() {
         <span><i style="background:var(--earth)"></i>hnojeno</span>
         <span><i style="background:var(--acc)"></i>výsev či výsadba</span>
         <span><i style="background:var(--sun)"></i>sklizeň</span>
+        <span><i style="background:var(--danger)"></i>úhyn</span>
       </div>
       ${mi !== dnes.getMonth() || rok !== dnes.getFullYear()
         ? `<button class="btn sm sec wide" id="c-dnes" style="margin-top:14px">Zpátky na dnešek</button>` : ''}
@@ -3864,6 +3967,21 @@ function dialogPlodiny(cropId) {
       ${c.hloubka ? 'Hloubka: <b>'+esc(c.hloubka)+'</b><br>' : ''}
       ${c.slunce ? 'Stanoviště: <b>'+esc(c.slunce)+'</b><br>' : ''}
       Na m²: <b>${c.hustota >= 1 ? Math.round(c.hustota)+' rostlin' : fmtN(1/c.hustota)+' m² na rostlinu'}</b></p>
+    ${(() => {
+      const m2 = {}; let cel = 0;
+      beds().forEach(b2 => { if (b2.cropId !== c.id) return;
+        (b2.udalosti||[]).forEach(u => { if (u.typ !== 'uhyn' || !u.duvod) return;
+          m2[u.duvod] = (m2[u.duvod]||0) + (Number(u.pocet)||0); cel += (Number(u.pocet)||0); }); });
+      const k = Object.keys(m2).sort((x,y)=>m2[y]-m2[x]);
+      if (!k.length) return '';
+      return `<div class="sec-h"><h2>Co ti ji bere</h2></div>
+        <p style="margin:0 0 8px;font-size:14.5px;line-height:1.55">Celkem jsi zapsal ztrátu ${cel} ${rostlinSlovo(cel)}.</p>
+        <div class="list" style="gap:6px;margin-bottom:16px">
+          ${k.slice(0,5).map(x=>`<div class="card row" style="padding:10px 12px">
+            <span class="mid"><b style="font-size:15px">${esc(x)}</b></span>
+            <span style="font-weight:800;font-size:15px;color:var(--danger)">−${m2[x]}</span></div>`).join('')}
+        </div>`;
+    })()}
     <div class="sec-h"><h2>Kde koupit</h2></div>
     <div class="field"><input id="p-odruda" value="${esc(p.odruda)}" placeholder="Odrůda, kterou chci"></div>
     <div class="chips" style="margin-bottom:16px">
