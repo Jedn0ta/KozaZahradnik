@@ -1,7 +1,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="claude:viewport-fit-sides" content="cover">
 <title>Koza Zahradník</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
 <style>
 /* Layout: pevná aplikační slupka — horní lišta, jedna rolovací plocha,
    dolní navigace. Plán zahrady je mapa přes celou plochu s plovoucím
@@ -195,7 +195,7 @@ h1,h2,h3,h4 { margin: 0; font-weight: 800; letter-spacing: -.02em; }
 #svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 
 .m-search {
-  position: absolute; top: 12px; left: 12px; right: 12px; z-index: 4;
+  position: absolute; top: 12px; left: 78px; right: 12px; z-index: 4;
   display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 8px 0 16px;
   background: var(--card); border-radius: 26px; box-shadow: var(--sh-lift);
   font-size: 15px; font-weight: 700; color: var(--ink); text-align: left;
@@ -222,8 +222,8 @@ h1,h2,h3,h4 { margin: 0; font-weight: 800; letter-spacing: -.02em; }
 .m-zoom button svg { width: 19px; height: 19px; }
 
 .m-scale {
-  position: absolute; left: 14px; z-index: 3; pointer-events: none;
-  display: flex; align-items: flex-end; gap: 7px;
+  position: absolute; left: 78px; z-index: 3; pointer-events: none;
+  display: flex; align-items: flex-end; gap: 10px;
   font-size: 11px; font-weight: 800; color: var(--ink2);
 }
 .m-scale .b { height: 6px; border: 1.5px solid var(--ink2); border-top: none; }
@@ -259,7 +259,7 @@ h1,h2,h3,h4 { margin: 0; font-weight: 800; letter-spacing: -.02em; }
 
 /* režim kreslení: jasně napsané, co se právě děje */
 .m-mode {
-  position: absolute; top: 12px; left: 12px; right: 12px; z-index: 5;
+  position: absolute; top: 12px; left: 78px; right: 12px; z-index: 5;
   display: flex; align-items: center; gap: 10px; padding: 9px 10px 9px 12px;
   background: var(--acc-dark); color: #fff; border-radius: 18px; box-shadow: var(--sh-lift);
 }
@@ -351,7 +351,7 @@ h1,h2,h3,h4 { margin: 0; font-weight: 800; letter-spacing: -.02em; }
   height: 54px; border-bottom: 1px solid var(--line2); color: var(--ink2);
   font-size: 14px; font-weight: 700; background: var(--bg2);
 }
-.addphoto .pix { width: 22px; height: 22px; }
+.addphoto .pix, .addphoto .ik { width: 22px; height: 22px; flex: none; }
 
 .count {
   display: flex; align-items: center; gap: 12px; padding: 0 13px 13px;
@@ -500,217 +500,106 @@ h1,h2,h3,h4 { margin: 0; font-weight: 800; letter-spacing: -.02em; }
 
 <style>
 /* ========================================================================
-   PIXELART — celé rozhraní, ne jen obrázky.
-   Pravidla: žádné kulaté rohy, žádné rozmazané stíny, jen plné barvy,
-   silné linky a tvrdý odsazený stín. Tlačítko se při stisku "zamáčkne".
+   ČITELNOST — větší písmo, klidné tvary, vysoký kontrast.
+   Aplikaci má zvládnout dítě i senior, takže nic drobného a nic ozdobného.
    ===================================================================== */
-:root {
-  --ui: "Pixelify Sans", "Silkscreen", ui-monospace, "Courier New", monospace;
-  --bg: #f6f3e6;
-  --bg2: #e9e4cf;
-  --card: #fffdf2;
-  --paper: #f1eedf;
-  --ink: #1c2a1c;
-  --ink2: #4c5c48;
-  --ink3: #7b8a72;
-  --line: #1c2a1c;
-  --line2: #cbc6ae;
-  --acc: #2f8f3f;
-  --acc-dark: #195c27;
-  --acc-soft: #cfe9cf;
-  --acc-ink: #ffffff;
-  --earth: #a9663a;
-  --earth-soft: #e9d6c0;
-  --sun: #d99a1f;
-  --sky: #3f86b8;
-  --danger: #c0392b;
-  --dot: #bcc7b4;
-  --grid: #dfe3d2;
-  --house: #7e8a92;
-  --house-soft: #d6dbdd;
-  --stin: 4px 4px 0 var(--line);
-  --stin-s: 3px 3px 0 var(--line);
-  --sh: 3px 3px 0 var(--line);
-  --sh-lift: 4px 4px 0 var(--line);
-  --r: 0px; --r-s: 0px;
+:root { --ik: 1; }
+body { font-size: 17px; }
+
+/* ikony rozhraní */
+.ik { display: block; width: 100%; height: 100%; }
+.ik.art { stroke: none; }
+.pix { image-rendering: pixelated; }
+
+/* horní lišta */
+#bar h1 { font-size: 20px; letter-spacing: -.02em; }
+#bar .sub { font-size: 12px; }
+
+/* tlačítka: vyšší, větší písmo, text přesně na střed */
+.btn { height: 54px; font-size: 17px; line-height: 1; padding: 0 22px; }
+.btn.sm { height: 46px; font-size: 15.5px; padding: 0 16px; }
+.btn .ik { width: 22px; height: 22px; flex: none; }
+.btn > * { display: inline-flex; align-items: center; }
+
+/* nadpisy sekcí */
+.sec-h h2 { font-size: 14px; letter-spacing: .05em; }
+.sec-h .n { font-size: 13px; }
+
+/* seznamy a karty */
+.row { padding: 14px; gap: 13px; }
+.row .thumb { width: 52px; height: 52px; padding: 7px; }
+.row .mid b { font-size: 17px; }
+.row .mid span { font-size: 14.5px; }
+.row .act { width: 54px; height: 54px; padding: 11px; }
+.tag { height: 38px; font-size: 14px; padding: 0 13px; gap: 7px; }
+.tag .ik, .tag .pix { width: 18px; height: 18px; }
+.note { font-size: 14.5px; line-height: 1.6; }
+.info { font-size: 14.5px; line-height: 1.6; }
+.empty h3 { font-size: 20px; }
+.empty p { font-size: 16px; line-height: 1.6; }
+.empty .ei { width: 64px; height: 64px; color: var(--ink3); }
+
+/* formuláře */
+.field label { font-size: 13.5px; }
+.field input, .field select, .field textarea { height: 54px; font-size: 17px; }
+.chip { height: 42px; font-size: 15px; padding: 0 18px; }
+.seg button { height: 42px; font-size: 15px; }
+
+/* počty rostlin */
+.count button { width: 54px; height: 54px; font-size: 28px; }
+.count .cv b { font-size: 26px; }
+.count .cv span { font-size: 12.5px; }
+
+/* dlaždice plodin */
+.tile .nm b { font-size: 16px; }
+
+/* dolní navigace */
+#nav button { font-size: 11.5px; padding: 8px 2px 6px; }
+#nav button .ni { width: 58px; height: 34px; }
+#nav button .ni .ik, #nav button .ni .pix { width: 25px; height: 25px; }
+
+/* kalendář */
+.cal .cday { font-size: 16px; }
+.cal .wd { font-size: 12px; }
+.calhead .nm b { font-size: 20px; }
+.callegend { font-size: 13px; }
+.task { padding: 14px; }
+.task .ti2 { width: 46px; height: 46px; padding: 9px; }
+.task .tm b { font-size: 16.5px; }
+.task .tm span { font-size: 14px; line-height: 1.5; }
+
+/* počasí */
+.wday .dd { font-size: 12px; }
+.wday .mx { font-size: 14.5px; }
+.wday .mn { font-size: 11.5px; }
+.watch .wi { width: 38px; height: 38px; color: var(--acc-dark); }
+.watch.alert .wi { color: var(--danger); }
+.watch .wb b { font-size: 16.5px; }
+.watch .wb span { font-size: 14.5px; line-height: 1.6; }
+
+/* dialogy */
+.dlg h2 { font-size: 21px; }
+.dlg .lead { font-size: 15.5px; }
+.toast { font-size: 15px; }
+
+/* ---------- nástroje na plán: svislá lišta u kraje, jen ikony ---------- */
+.mrail {
+  position: absolute; left: 12px; z-index: 6;
+  display: flex; flex-direction: column; gap: 9px;
 }
-:root[data-theme="dark"], :root:not([data-theme="light"]) {
-  color-scheme: light;
+.mrail button {
+  width: 54px; height: 54px; border-radius: 17px; background: var(--card);
+  border: 1.5px solid var(--line); box-shadow: var(--sh-lift);
+  display: grid; place-items: center; padding: 14px; color: var(--ink2);
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #161c14; --bg2: #212a1e; --card: #1d251b; --paper: #141a12;
-    --ink: #eef3e4; --ink2: #aebaa2; --ink3: #7d8a74;
-    --line: #eef3e4; --line2: #39452f;
-    --acc: #5fc46a; --acc-dark: #3f9d4c; --acc-soft: #2b3d29; --acc-ink: #11180f;
-    --dot: #3a4733; --grid: #273020;
-    --earth-soft: #3a2b1e; --house-soft: #2b3238;
-  }
-}
-:root[data-theme="dark"] {
-  --bg: #161c14; --bg2: #212a1e; --card: #1d251b; --paper: #141a12;
-  --ink: #eef3e4; --ink2: #aebaa2; --ink3: #7d8a74;
-  --line: #eef3e4; --line2: #39452f;
-  --acc: #5fc46a; --acc-dark: #3f9d4c; --acc-soft: #2b3d29; --acc-ink: #11180f;
-  --dot: #3a4733; --grid: #273020;
-  --earth-soft: #3a2b1e; --house-soft: #2b3238;
-}
+.mrail button .ik { width: 26px; height: 26px; }
+.mrail button.on { background: var(--acc-soft); border-color: var(--acc); color: var(--acc-dark); }
+.mrail button.go { background: var(--acc); border-color: var(--acc-dark); color: var(--acc-ink); padding: 12px; }
+.mrail button:active { transform: scale(.94); }
+.mrail .del { height: 1px; background: var(--line); margin: 2px 8px; border: 0; box-shadow: none; }
 
-/* --- nic není kulaté, nic není rozmazané --- */
-*, *::before, *::after { border-radius: 0 !important; }
-body { font-family: var(--ui); -webkit-font-smoothing: none; font-smooth: never; }
-img, .pix, svg { image-rendering: pixelated; }
-.m-search, .msheet, .mbar, .dlg, .toast, .m-panel, .m-mode { backdrop-filter: none !important; }
-
-/* --- horní lišta --- */
-#bar { border-bottom: 3px solid var(--line); background: var(--card); }
-#bar h1 { font-size: 19px; font-weight: 600; letter-spacing: 0; }
-#bar .sub { font-size: 11px; font-weight: 400; letter-spacing: 0; }
-.bar-mark { border: 3px solid var(--line); box-shadow: var(--stin-s); width: 34px; height: 34px; }
-.bar-btn { border: 3px solid var(--line); background: var(--bg2); width: 42px; height: 42px; box-shadow: var(--stin-s); }
-.bar-btn:active { transform: translate(3px,3px); box-shadow: none; }
-
-/* --- tlačítka --- */
-.btn {
-  border: 3px solid var(--line); box-shadow: var(--stin);
-  font-weight: 600; letter-spacing: 0; height: 52px; font-size: 16px;
-}
-.btn:active { transform: translate(4px,4px); box-shadow: none; background: var(--acc); }
-.btn.sec { background: var(--bg2); }
-.btn.sec:active { transform: translate(4px,4px); box-shadow: none; background: var(--bg2); }
-.btn.sm { height: 42px; font-size: 14px; border-width: 2px; box-shadow: var(--stin-s); }
-.btn.sm:active { transform: translate(3px,3px); box-shadow: none; }
-.btn[disabled] { opacity: .35; box-shadow: none; transform: translate(4px,4px); }
-
-/* --- pole, chipy, přepínač --- */
-.field label { font-weight: 500; font-size: 12.5px; }
-.field input, .field select, .field textarea {
-  border: 3px solid var(--line); background: var(--card); font-family: var(--ui);
-  font-weight: 500; box-shadow: inset 2px 2px 0 rgba(0,0,0,.06);
-}
-.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--acc); background: var(--bg); }
-.chip { border: 2px solid var(--line); font-weight: 500; box-shadow: 2px 2px 0 var(--line); }
-.chip:active { transform: translate(2px,2px); box-shadow: none; }
-.chip.on { box-shadow: 2px 2px 0 var(--line); }
-.seg { border: 3px solid var(--line); background: var(--bg2); padding: 3px; gap: 3px; }
-.seg button { font-weight: 500; }
-.seg button.on { background: var(--acc); color: var(--acc-ink); box-shadow: none; }
-
-/* --- karty a seznamy --- */
-.card { border: 3px solid var(--line); box-shadow: var(--stin-s); background: var(--card); }
-.sec-h h2 { font-weight: 600; letter-spacing: .02em; color: var(--ink); }
-.sec-h .n { font-weight: 500; }
-.row .thumb { border: 2px solid var(--line); background: var(--bg2); }
-.row .mid b { font-weight: 600; letter-spacing: 0; }
-.row .mid span { font-weight: 400; color: var(--ink2); }
-.row .act { border: 3px solid var(--line); box-shadow: var(--stin-s); background: var(--bg2); }
-.row .act:active { transform: translate(3px,3px); box-shadow: none; }
-.row .act.done { background: var(--acc-soft); }
-.tag { border: 2px solid var(--line); font-weight: 500; background: var(--bg2); }
-.tag:active { background: var(--acc-soft); }
-.note { font-weight: 400; font-size: 13px; line-height: 1.55; }
-.info { border: 3px solid var(--line); background: var(--bg2); font-weight: 400; line-height: 1.55; }
-.photo-strip figure { border: 2px solid var(--line); }
-.photo-strip figcaption { font-weight: 500; }
-.addphoto { border: 3px dashed var(--line); background: var(--bg2); font-weight: 500; }
-
-/* --- počty rostlin --- */
-.count button { border: 3px solid var(--line); box-shadow: var(--stin-s); background: var(--bg2); font-weight: 600; }
-.count button:active { transform: translate(3px,3px); box-shadow: none; }
-.count .cv { border: 2px dashed var(--line2); box-shadow: none; background: transparent; }
-.count .cv b { font-weight: 600; font-size: 24px; }
-.count .cv span { font-weight: 400; letter-spacing: 0; }
-
-/* --- dlaždice plodin --- */
-.tile { border: 3px solid var(--line); box-shadow: var(--stin-s); background: var(--card); }
-.tile:active { transform: translate(3px,3px); box-shadow: none; }
-.tile .top { border-bottom: 3px solid var(--line); background: var(--bg2); }
-.tile .nm b { font-weight: 600; }
-.tile .cam { border: 2px solid var(--line); background: var(--card); }
-.tile .mine { border: 2px solid var(--line); font-weight: 500; }
-.months i { border: 1px solid var(--line2); }
-
-/* --- dolní navigace --- */
-#nav { border-top: 3px solid var(--line); background: var(--card); }
-#nav button { font-weight: 500; font-size: 10px; letter-spacing: 0; }
-#nav button .ni { border: 2px solid transparent; }
-#nav button.on .ni { border-color: var(--line); background: var(--acc-soft); box-shadow: 2px 2px 0 var(--line); }
-#nav button.on { color: var(--ink); font-weight: 600; }
-
-/* --- mapa --- */
-#cv { background-color: var(--paper); }
-.m-search { border: 3px solid var(--line); box-shadow: var(--stin); font-weight: 500; background: var(--card); }
-.m-search:active { transform: translate(4px,4px); box-shadow: none; }
-.m-search .sx { border: 2px solid var(--line); background: var(--bg2); }
-.m-zoom button { border: 3px solid var(--line); box-shadow: var(--stin-s); background: var(--card); font-weight: 600; }
-.m-zoom button:active { transform: translate(3px,3px); box-shadow: none; }
-.m-scale { font-weight: 500; }
-.m-scale .b { border: 2px solid var(--ink); border-top: none; }
-.m-load { border: 3px solid var(--line); box-shadow: var(--stin); background: var(--card); font-weight: 500; }
-.m-panel { border: 3px solid var(--line); box-shadow: var(--stin); background: var(--card); }
-.m-mode { border: 3px solid var(--line); box-shadow: var(--stin); background: var(--acc-dark); }
-.m-mode .mt b { font-weight: 600; }
-.m-mode .mt span { font-weight: 400; opacity: .92; }
-.m-mode button { border: 2px solid #fff; background: transparent; font-weight: 600; }
-.m-mode button:active { background: rgba(255,255,255,.25); }
-.mbar { background: var(--card); border-top: 3px solid var(--line); }
-.mbtn { border: 3px solid var(--line); box-shadow: var(--stin-s); font-weight: 500; font-size: 9.5px; }
-.mbtn:active { transform: translate(3px,3px); box-shadow: none; }
-.mbtn.on { background: var(--acc-soft); }
-.msheet { border-top: 3px solid var(--line); background: var(--card); box-shadow: none; }
-.msheet h3 { font-weight: 600; color: var(--ink); }
-.selbar { border: 3px solid var(--line); background: var(--acc-soft); }
-.selbar .si { border: 2px solid var(--line); }
-.selbar .sn b { font-weight: 600; }
-.parcel { border: 3px solid var(--line); box-shadow: 2px 2px 0 var(--line); }
-.parcel .pn { font-weight: 600; }
-.parcel .pm { font-weight: 400; }
-.pick button { border: 3px solid var(--line); box-shadow: var(--stin-s); font-weight: 500; }
-.pick button:active { transform: translate(3px,3px); box-shadow: none; }
-
-/* --- kalendář --- */
-.calhead .nm b { font-weight: 600; font-size: 19px; }
-.calhead .nm span { font-weight: 400; }
-.calhead .ar { border: 3px solid var(--line); box-shadow: var(--stin-s); background: var(--card); }
-.calhead .ar:active { transform: translate(3px,3px); box-shadow: none; }
-.cal { gap: 3px; }
-.cal .wd { font-weight: 500; font-size: 10px; }
-.cal .cday { border: 2px solid var(--line2); font-weight: 500; }
-.cal .cday.out { border-color: transparent; }
-.cal .cday.mam { border-color: var(--line); box-shadow: 2px 2px 0 var(--line); }
-.cal .cday.dnes { border-color: var(--line); background: var(--acc); color: var(--acc-ink); box-shadow: 2px 2px 0 var(--line); font-weight: 600; }
-.cal .cday .dots i { border-radius: 0 !important; width: 5px; height: 5px; }
-.callegend { font-weight: 400; }
-.callegend i { border: 1px solid var(--line); }
-.task .ti2 { border: 2px solid var(--line); }
-.task .tm b { font-weight: 600; }
-.task .tm span { font-weight: 400; line-height: 1.5; }
-
-/* --- počasí --- */
-.wnow { border: 3px solid var(--line); box-shadow: var(--stin); background: var(--acc-dark); color: #fff; }
-.wnow .t { font-weight: 600; letter-spacing: 0; color: #fff; }
-.wnow .d, .wnow .l { font-weight: 400; color: #fff; }
-.wday { border: 2px solid rgba(255,255,255,.35); background: rgba(255,255,255,.1); color: #fff; }
-.wday .dd { font-weight: 600; }
-.wday .mx, .wday .mn { font-weight: 500; }
-.watch { border: 3px solid var(--line); box-shadow: var(--stin-s); }
-.watch.alert { background: var(--acc-soft); }
-.watch .wb b { font-weight: 600; }
-.watch .wb span { font-weight: 400; line-height: 1.55; }
-
-/* --- dialogy, toast --- */
-.ov { background: rgba(28,42,28,.55); }
-.dlg { border: 4px solid var(--line); box-shadow: 0 -6px 0 var(--line); background: var(--card); }
-.dlg .dh i { background: var(--line); height: 5px; }
-.dlg h2 { font-weight: 600; letter-spacing: 0; }
-.dlg .lead { font-weight: 400; }
-.toast { border: 3px solid var(--line); box-shadow: var(--stin); font-weight: 500; background: var(--ink); color: var(--bg); }
-.empty h3 { font-weight: 600; }
-.empty p { font-weight: 400; line-height: 1.6; }
-.spin { border: 4px solid var(--line2); border-top-color: var(--acc); }
-
-/* dlouhé odstavce o kousek větší, ať se pixelové písmo dobře čte */
-.note, .info, .empty p, .task .tm span, .watch .wb span, .dlg .lead { font-size: 13.5px; }
+.m-zoom button { width: 48px; height: 48px; padding: 13px; }
+.m-zoom button .ik { width: 22px; height: 22px; }
 </style>
 
 <div id="app">
@@ -744,7 +633,7 @@ img, .pix, svg { image-rendering: pixelated; }
 
 <script>
 
-const VERZE = 'v1.4 · 22. 10. 2026';
+const VERZE = 'v1.5 · 22. 10. 2026';
 const LOGO_KOZEL = `<svg viewBox="0 0 32 32" aria-hidden="true">
   <path d="M11.2 9.4C9.6 6.6 7.4 4.6 4.6 3.9c-.5-.1-.9.3-.8.8.5 2.9 1.9 5.4 4.1 7.2.7.6 1.5 1 2.4 1.3z" fill="#fff" opacity=".95"/>
   <path d="M20.8 9.4c1.6-2.8 3.8-4.8 6.6-5.5.5-.1.9.3.8.8-.5 2.9-1.9 5.4-4.1 7.2-.7.6-1.5 1-2.4 1.3z" fill="#fff" opacity=".95"/>
@@ -790,6 +679,7 @@ let state = {
   tab: 'garden',
   cropFilter: 'Vše',
   theme: null,
+  uiVerze: 5,
 };
 let view = { ox: -3, oy: -3, scale: 11 };   // ox/oy = levy horni roh v metrech, scale = px na metr
 let snapStep = 1;
@@ -815,6 +705,8 @@ function load() {
         if (typeof state.zamek !== 'boolean') state.zamek = false;
         if (!PRVKY[state.tool] && ['pan','outline','erase'].indexOf(state.tool) < 0) state.tool = 'pan';
         if (!state.calRok) state.calRok = new Date().getFullYear();
+        // po přestavbě rozhraní se pohled na plán jednou srovná znovu
+        if (state.uiVerze !== 5) { state.uiVerze = 5; state.view = null; }
         items().forEach(i => {
           if (!i.hnojeni) i.hnojeni = [];
           if (!i.zalivka) i.zalivka = [];
@@ -1068,7 +960,7 @@ const PRVKY = {
   paved:  { nazev:'Zpevněná plocha', pix:'cesta',    fill:'#d8d3c6', line:'#a8a194' },
 };
 const roste = (it) => !!(it && PRVKY[it.typ] && PRVKY[it.typ].roste);
-const prvekPix = (typ) => pixSvg((PRVKY[typ] || PRVKY.bed).pix);
+const prvekPix = (typ) => ik((PRVKY[typ] || PRVKY.bed).pix);
 
 /* Vychozi seznam ceskych obchodu s osivem. Uzivatel je muze mazat i doplnovat. */
 const OBCHODY_ZAKLAD = [
@@ -1248,10 +1140,77 @@ function pixInto(id, x, y, size) {
   return `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)})" shape-rendering="crispEdges">${r}</g>`;
 }
 const cropPixId = (c) => (c && PIX[c.id]) ? c.id : null;
-const KONEV = pixSvg('konev');
-const HNOJ_IKONA = pixSvg('hnojivo');
-const FOTO_IKONA = pixSvg('foto');
-const cropArt = (c) => PIX[c.id] ? pixSvg(c.id) : `<span class="art-emoji">${c.emoji}</span>`;
+
+/* ============ IKONY ROZHRANÍ ============
+   Obyčejné, silné a jednoduché. Zelenina zůstává jako obrázek, ale
+   ovládání appky má čisté ikony, aby bylo čitelné i pro starší oči. */
+const S = (d, fill) => `<svg class="ik" viewBox="0 0 24 24" fill="${fill?'currentColor':'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const IK = {
+  mapa:     S('<path d="M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20z"/><path d="M9 4v13.5M15 6.5V20"/>'),
+  zahon:    S('<rect x="2.5" y="9" width="19" height="11" rx="2"/><path d="M2.5 14h19M8 20v-6M16 20v-6"/><path d="M6 9V6M12 9V5M18 9V6"/>'),
+  vyvyseny: S('<rect x="2.5" y="10" width="19" height="10" rx="1.5"/><path d="M2.5 14h19"/><path d="M6 10V7M12 10V5.5M18 10V7"/>'),
+  truhlik:  S('<path d="M3.5 10h17l-2 9h-13z"/><path d="M6 10V7.5M12 10V6M18 10V7.5"/>'),
+  kvetinac: S('<path d="M5 10h14l-1.6 10H6.6z"/><path d="M4 7h16v3H4z"/><path d="M12 7V4.5M12 4.5c1.8 0 3-1 3-2.5-1.8 0-3 1-3 2.5zM12 4.5C10.2 4.5 9 3.5 9 2c1.8 0 3 1 3 2.5z"/>'),
+  dum:      S('<path d="M3 10.5 12 4l9 6.5V20H3z"/><path d="M9.5 20v-5.5h5V20"/>'),
+  cesta:    S('<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9.5h18M3 14.5h18M9 4v5.5M15 9.5v5M9 14.5V20"/>'),
+  listek:   S('<path d="M12 21v-8"/><path d="M12 13c0-4 3-7 8-7 0 4-3 7-8 7z"/><path d="M12 15c0-3.4-2.6-6-6-6 0 3.4 2.6 6 6 6z"/>'),
+  kalendar: S('<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>'),
+  slunce:   S('<circle cx="12" cy="12" r="4.4"/><path d="M12 2.2v2.4M12 19.4v2.4M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2.2 12h2.4M19.4 12h2.4M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"/>'),
+  oblaka:   S('<circle cx="8.5" cy="8" r="3.2"/><path d="M8.5 2.6v1.2M3.1 8H4.3M4.7 4.2l.8.8M12.3 4.2l-.8.8"/><path d="M17.5 19.5a3.8 3.8 0 0 0 0-7.6 4.9 4.9 0 0 0-9.4-1.3A3.4 3.4 0 0 0 8.5 19.5z"/>'),
+  dest:     S('<path d="M17 15.5a3.8 3.8 0 0 0 0-7.6 4.9 4.9 0 0 0-9.4-1.3A3.4 3.4 0 0 0 8 15.5"/><path d="M8.5 18.5 7.5 21M12.5 18.5 11.5 21M16.5 18.5 15.5 21"/>'),
+  snih:     S('<path d="M17 15.5a3.8 3.8 0 0 0 0-7.6 4.9 4.9 0 0 0-9.4-1.3A3.4 3.4 0 0 0 8 15.5"/><path d="M8.5 19h.01M12.5 19h.01M16.5 19h.01M10.5 21.5h.01M14.5 21.5h.01"/>'),
+  mraz:     S('<path d="M12 2.5v19M3.8 7.2l16.4 9.6M20.2 7.2 3.8 16.8"/><path d="M9.5 4.6 12 7l2.5-2.4M9.5 19.4 12 17l2.5 2.4"/>'),
+  teplomer: S('<path d="M14 14.8V5a2 2 0 1 0-4 0v9.8a4.2 4.2 0 1 0 4 0z"/><path d="M12 9v6"/>'),
+  konev:    S('<path d="M4.5 10.5h8.5v7.5a2.5 2.5 0 0 1-2.5 2.5H7a2.5 2.5 0 0 1-2.5-2.5z"/><path d="M6.5 10.5V9a2.2 2.2 0 0 1 2.2-2.2h.4A2.2 2.2 0 0 1 11.3 9v1.5"/><path d="M13 11.8 18.5 8l2 1.4"/><path d="M20.5 9.4v2.4"/><path d="M13 14.5h1.6"/>'),
+  hnojivo:  S('<path d="M5 8h14l-1.4 11.2a2 2 0 0 1-2 1.8H8.4a2 2 0 0 1-2-1.8z"/><path d="M4 4.5h16V8H4z"/><path d="M10 13h4M12 11v4"/>'),
+  foto:     S('<path d="M3 8.5h3.6L8.3 6h7.4l1.7 2.5H21V20H3z"/><circle cx="12" cy="13.8" r="3.6"/>'),
+  zamek:    S('<rect x="4" y="10.5" width="16" height="10.5" rx="2"/><path d="M8 10.5V7.2a4 4 0 0 1 8 0v3.3"/><path d="M12 14.5v2.5"/>'),
+  odemek:   S('<rect x="4" y="10.5" width="16" height="10.5" rx="2"/><path d="M8 10.5V7.2a4 4 0 0 1 7.6-1.8"/><path d="M12 14.5v2.5"/>'),
+  obchod:   S('<path d="M4 9.5h16V20H4z"/><path d="M3 4.5h18L20 9.5H4z"/><path d="M10 20v-5.5h4V20"/>'),
+  ryc:      S('<path d="M12 3v11"/><path d="M8.5 6.5 12 3l3.5 3.5"/><path d="M8 14h8l-1.5 5.5a2.5 2.5 0 0 1-5 0z"/>'),
+  semeno:   S('<rect x="4.5" y="3.5" width="15" height="17" rx="1.5"/><path d="M4.5 8h15M4.5 16h15"/><path d="M12 10c0 1.6 1.2 2.8 2.8 2.8C14.8 11.2 13.6 10 12 10zM12 10c0 1.6-1.2 2.8-2.8 2.8C9.2 11.2 10.4 10 12 10z"/>'),
+  sazenice: S('<path d="M12 21v-8"/><path d="M12 13c0-2.8 2.2-5 5-5 0 2.8-2.2 5-5 5z"/><path d="M12 13c0-2.8-2.2-5-5-5 0 2.8 2.2 5 5 5z"/><path d="M5 17h14l-1 4H6z"/>'),
+  pece:     S('<circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="18" r="2.5"/><path d="M8.3 16.2 19 4M15.7 16.2 5 4"/>'),
+  kosik:    S('<path d="M3 9.5h18l-1.6 9.2a2 2 0 0 1-2 1.8H6.6a2 2 0 0 1-2-1.8z"/><path d="M8 9.5 10.5 4M16 9.5 13.5 4"/>'),
+  klid:     S('<circle cx="12" cy="12" r="9"/><path d="M8.5 14.5s1.3 1.5 3.5 1.5 3.5-1.5 3.5-1.5"/><path d="M9 9.5h.01M15 9.5h.01"/>'),
+  pozor:    S('<path d="M12 3.5 22 20.5H2z"/><path d="M12 10v4.5M12 17.5h.01"/>'),
+  ruka:     S('<path d="M18 11V7.5a1.8 1.8 0 0 0-3.6 0M14.4 10V5.5a1.8 1.8 0 0 0-3.6 0V11M10.8 11V6.5a1.8 1.8 0 0 0-3.6 0v8.8a5.7 5.7 0 0 0 5.7 5.7h1.5a5.7 5.7 0 0 0 5.7-5.7v-3.6a1.8 1.8 0 0 0-3.6 0"/>'),
+  obrys:    S('<path d="M5 6.5 19 9v8l-7 3.5L5 17z"/><circle cx="5" cy="6.5" r="2" fill="currentColor"/><circle cx="19" cy="9" r="2" fill="currentColor"/><circle cx="12" cy="20.5" r="2" fill="currentColor"/>'),
+  guma:     S('<path d="M4.5 16 10 10.5l7 7-3.5 3.5H8z"/><path d="M10 10.5 15 5.5l7 7-5 5"/><path d="M3 21h18"/>'),
+  plus:     S('<path d="M12 5v14M5 12h14"/>'),
+  adresa:   S('<circle cx="12" cy="10.5" r="3"/><path d="M12 21s7-5.6 7-10.5a7 7 0 1 0-14 0C5 15.4 12 21 12 21z"/>'),
+};
+const ik = (id) => IK[id] || pixSvg(id);
+
+/* Plodiny: ploché vektorové ilustrace, jedna pro každou plodinu.
+   Kreslí se plnými tvary, takže zůstanou ostré v jakékoli velikosti. */
+const P = (d) => `<svg class="ik art" viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`;
+const PLOD = {
+  rajce: P('<path d="M12 6.2c-3.6 0-6.2 2.6-6.2 6S8.4 20 12 20s6.2-2.4 6.2-7.8-2.6-6-6.2-6z" fill="#d94a3d"/><path d="M12 6.2c-1.9 0-3.5.7-4.6 2 1.1 1 2.7 1.6 4.6 1.6s3.5-.6 4.6-1.6c-1.1-1.3-2.7-2-4.6-2z" fill="#e8705f"/><path d="M12 7.4c-1.6 0-2.6-.5-3.6-1.4-.5-.5-1.2-.8-2-.9.5 1 1.3 1.8 2.3 2.2-1 .2-2 0-2.9-.5.6 1.4 2 2.3 3.6 2.4h5.2c1.6-.1 3-1 3.6-2.4-.9.5-1.9.7-2.9.5 1-.4 1.8-1.2 2.3-2.2-.8.1-1.5.4-2 .9-1 .9-2 1.4-3.6 1.4z" fill="#3f8c3f"/><path d="M12 3.2v3" stroke="#2f6b2f" stroke-width="1.6" stroke-linecap="round"/>'),
+  mrkev: P('<path d="M11 10.5h2l-1 10.8z" fill="#e27b26"/><path d="M9.6 10.5h4.8l-1.1 6.4h-2.6z" fill="#e8933f"/><path d="M9.6 10.5h4.8c.4 0 .7-.4.5-.8-.6-1.3-1.7-2-2.9-2s-2.3.7-2.9 2c-.2.4.1.8.5.8z" fill="#cf6a18"/><path d="M12 7.7V3.5M12 6.2 8.6 4.1M12 6.2l3.4-2.1" stroke="#3f8c3f" stroke-width="2" stroke-linecap="round"/>'),
+  salat: P('<path d="M4.5 13.8c0 4 3.4 6.4 7.5 6.4s7.5-2.4 7.5-6.4z" fill="#3f8c3f"/><path d="M12 5.4c-4.1 0-7.5 3.4-7.5 8.4h15c0-5-3.4-8.4-7.5-8.4z" fill="#62ab4e"/><path d="M12 5.4c-2.3 0-4.2 2.2-4.2 5.4 0 1 .2 2 .5 2.8h7.4c.3-.8.5-1.8.5-2.8 0-3.2-1.9-5.4-4.2-5.4z" fill="#8ac96a"/>'),
+  cesnek: P('<path d="M12 7.6c-3 0-5 2.7-5 6.2 0 3.4 2.2 5.6 5 5.6s5-2.2 5-5.6c0-3.5-2-6.2-5-6.2z" fill="#efe9dc"/><path d="M12 7.6c-1.3 0-2.2 2.7-2.2 6.2 0 2.3.4 4.3 1 5.4a4 4 0 0 0 2.4 0c.6-1.1 1-3.1 1-5.4 0-3.5-.9-6.2-2.2-6.2z" fill="#fff"/><path d="M12 7.6V5M12 5c1.2-.5 2-1.4 2.2-2.6-1.3.1-2.2.9-2.2 2.6zM12 5c-1.2-.5-2-1.4-2.2-2.6 1.3.1 2.2.9 2.2 2.6z" fill="#6ca34f" stroke="#6ca34f" stroke-width="1.4" stroke-linecap="round"/>'),
+  cuketa: P('<path d="M18.6 8.6c1.3 1.3 1 3.8-.9 5.8l-3.6 3.6c-2 2-4.5 2.2-5.8.9s-1-3.8.9-5.8l3.6-3.6c2-2 4.5-2.2 5.8-.9z" fill="#2f7a35"/><path d="M16.8 10.4c.7.7.4 2.2-.9 3.5l-3.1 3.1c-1.3 1.3-2.8 1.6-3.5.9z" fill="#4e9b48"/><path d="M18.6 8.6 20.4 6.8" stroke="#6ca34f" stroke-width="2" stroke-linecap="round"/><path d="M20.4 6.8c0-1 .3-1.8 1-2.4.3 1.2.1 2.1-1 2.4z" fill="#e0b73a"/>'),
+  redkvicka: P('<path d="M12 9.4c-3 0-5.2 2.2-5.2 5.1 0 3 2.5 5.7 5.2 5.7s5.2-2.7 5.2-5.7c0-2.9-2.2-5.1-5.2-5.1z" fill="#d6404f"/><path d="M12 9.4c-1.6 0-2.9 2.2-2.9 5.1 0 2.4.9 4.4 2 5.3q.5.2 1.8 0c1.1-.9 2-2.9 2-5.3 0-2.9-1.3-5.1-2.9-5.1z" fill="#e8737e"/><path d="M12 17.6v3.2" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/><path d="M12 9.4V5.8M12 7.4 8.4 5.2M12 7.4l3.6-2.2" stroke="#3f8c3f" stroke-width="2" stroke-linecap="round"/>'),
+  fazole: P('<path d="M7 4.5c-1.6 3-1.8 8.4-.4 15 .1.6 1.3.6 1.4 0 1.4-6.6 1.2-12-.4-15-.1-.3-.5-.3-.6 0zM16.4 4.5c-1.6 3-1.8 8.4-.4 15 .1.6 1.3.6 1.4 0 1.4-6.6 1.2-12-.4-15-.1-.3-.5-.3-.6 0z" fill="#3f8c3f"/><path d="M11.7 6.5c-1.6 3-1.8 8.4-.4 15 .1.6 1.3.6 1.4 0 1.4-6.6 1.2-12-.4-15-.1-.3-.5-.3-.6 0z" fill="#62ab4e"/>'),
+  dyne: P('<path d="M12 8c-4.4 0-7.5 2.6-7.5 6.2S7.6 20.4 12 20.4s7.5-2.6 7.5-6.2S16.4 8 12 8z" fill="#e2762a"/><path d="M12 8c-1.9 0-3.2 2.6-3.2 6.2s1.3 6.2 3.2 6.2 3.2-2.6 3.2-6.2S13.9 8 12 8z" fill="#ef9340"/><path d="M12 8V5" stroke="#4e7a35" stroke-width="2" stroke-linecap="round"/><path d="M12 5c1.4-.9 2.9-.9 4.3 0-1.4.9-2.9.9-4.3 0z" fill="#62ab4e"/>'),
+  hrasek: P('<path d="M5.5 10.2c3-2 9.5-2 13 0 .6.4.6 1.5 0 1.9-3.5 2.3-10 2.3-13 0-.6-.4-.6-1.5 0-1.9z" fill="#4e9b48"/><circle cx="8.6" cy="11.2" r="1.7" fill="#8ac96a"/><circle cx="12" cy="11.4" r="1.7" fill="#8ac96a"/><circle cx="15.4" cy="11.2" r="1.7" fill="#8ac96a"/><path d="M5.5 10.2 3.6 6.8" stroke="#3f8c3f" stroke-width="2" stroke-linecap="round"/>'),
+  brambory: P('<path d="M8.6 7.4c3.6-1.4 8.4.3 9.6 3.6 1.2 3.4-1.2 6.8-4.8 7.6-3.6.8-7.6-1-8.6-4.2-1-3.2.2-5.6 3.8-7z" fill="#bb8a52"/><path d="M9.8 9.6c2.4-.9 5.4.2 6.2 2.3.8 2.2-.8 4.4-3.1 4.9-2.3.5-4.9-.6-5.5-2.7-.7-2.1.1-3.6 2.4-4.5z" fill="#d1a36a"/><circle cx="10" cy="12.4" r=".9" fill="#9a6d3a"/><circle cx="13.6" cy="14.2" r=".9" fill="#9a6d3a"/>'),
+  spenat: P('<path d="M12 20.5V9" stroke="#3f8c3f" stroke-width="2" stroke-linecap="round"/><path d="M12 13.5C12 8.9 15.4 5.3 20 5.3c0 4.6-3.4 8.2-8 8.2z" fill="#3f8c3f"/><path d="M12 15.8C12 11.8 9 8.8 5 8.8c0 4 3 7 7 7z" fill="#62ab4e"/>'),
+  jahody: P('<path d="M12 8.8c-3.4 0-5.8 1.9-5.8 4.4 0 3 3.3 7.4 5.8 7.4s5.8-4.4 5.8-7.4c0-2.5-2.4-4.4-5.8-4.4z" fill="#d94a3d"/><circle cx="10" cy="13" r=".8" fill="#ffe9a0"/><circle cx="14" cy="13.4" r=".8" fill="#ffe9a0"/><circle cx="12" cy="16" r=".8" fill="#ffe9a0"/><path d="M12 8.8c-2.3 0-4.1.6-5.1 1.6h10.2c-1-1-2.8-1.6-5.1-1.6z" fill="#3f8c3f"/><path d="M6.9 10.4c-1.3 0-2.4-.5-3.2-1.4 1.7-.6 3.3-.3 4.4.8M17.1 10.4c1.3 0 2.4-.5 3.2-1.4-1.7-.6-3.3-.3-4.4.8" fill="#3f8c3f"/><path d="M12 8.8V5.4" stroke="#3f8c3f" stroke-width="1.8" stroke-linecap="round"/>'),
+};
+const KONEV = ik('konev');
+const HNOJ_IKONA = ik('hnojivo');
+const FOTO_IKONA = ik('foto');
+const cropArt = (c) => PLOD[c.id] ? PLOD[c.id] : `<span class="art-emoji">${c.emoji}</span>`;
+/* Tytéž tvary do velkého SVG plánu */
+function artInto(id, x, y, size) {
+  const src = PLOD[id] || IK[id];
+  if (!src) return '';
+  const vn = src.replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '');
+  return `<svg x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${size.toFixed(1)}" height="${size.toFixed(1)}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${vn}</svg>`;
+}
+const cropArtId = (c) => (c && PLOD[c.id]) ? c.id : null;
 
 const HNOJIVA = ['Kompost','Zralý hnůj','Cererit (NPK)','Rohová moučka','Kostní moučka','Dřevěný popel','Kopřivová zálivka','Vermikompost','Vápnění dolomitem','Zelené hnojení','Jiné'];
 
@@ -1463,7 +1422,7 @@ function spriteDne(d) {
   if (min <= -1) return 'mraz';
   return 'slunce';
 }
-const ikonaDne = (d) => pixSvg(spriteDne(d));
+const ikonaDne = (d) => ik(spriteDne(d));
 function popisDne(d) {
   const s = spriteDne(d);
   if (s === 'snih') return 'Sn\u011b\u017een\u00ed';
@@ -1554,10 +1513,10 @@ function zalivkaStav() {
   if (sezonaZalivky) {
     const zitra = dny[1];
     if (zitra && (maMm ? zitra.mm >= 3 : zitra.p >= 60)) {
-      out.push({ alert:false, ic:pixSvg('dest'), title:'Z\u00e1livku odlo\u017e',
+      out.push({ alert:false, ic:ik('dest'), title:'Z\u00e1livku odlo\u017e',
         sub:`Z\u00edtra ${maMm ? 'spadne ' + fmtN(zitra.mm) + ' mm sr\u00e1\u017eek' : 'je ' + zitra.p + ' % \u0161ance na d\u00e9\u0161\u0165'}. Zal\u00e9vat dnes nem\u00e1 smysl, voda by jen protekla.` });
     } else if (sucho && (plnaSezona || teplo)) {
-      out.push({ alert:true, ic:pixSvg('konev'), title:'Zalij z\u00e1honky',
+      out.push({ alert:true, ic:ik('konev'), title:'Zalij z\u00e1honky',
         sub:`T\u0159i dny v \u0159ad\u011b bez v\u00fdrazn\u00e9ho de\u0161t\u011b, jen ${suchoDny.map(d=>maMm ? fmtN(d.mm)+' mm' : d.p+' %').join(', ')}. Zal\u00e9vej r\u00e1no ke koren\u016fm, ne na listy.` });
     }
     // nejdele nezality zahon, kdyz se neblizi dest
@@ -1568,7 +1527,7 @@ function zalivkaStav() {
       }).sort((x,y) => y.d - x.d);
       if (poradi.length && poradi[0].d >= 3) {
         const n = poradi[0];
-        out.push({ alert:true, ic:pixSvg('pozor'), title:`Nejd\u00e9le bez vody: ${n.b.nazev}`,
+        out.push({ alert:true, ic:ik('pozor'), title:`Nejd\u00e9le bez vody: ${n.b.nazev}`,
           sub: n.d > 900
             ? 'Z\u00e1livka tu nen\u00ed v\u016fbec zapsan\u00e1. Konv\u00ed u z\u00e1honku si to za\u010dne\u0161 hl\u00eddat.'
             : `Naposledy zalito p\u0159ed ${n.d} dny. Po zal\u00e9v\u00e1n\u00ed klepni na konev u z\u00e1honku.` });
@@ -1576,11 +1535,11 @@ function zalivkaStav() {
     }
     const dest = dny.slice(2).find(d => (d.mm != null && d.mm >= 2) || d.p >= 50);
     if (dest) {
-      out.push({ alert:false, ic:pixSvg('dest'), title:`D\u00e9\u0161\u0165 p\u0159ijde ${dest.d} ${dest.datum}`,
+      out.push({ alert:false, ic:ik('dest'), title:`D\u00e9\u0161\u0165 p\u0159ijde ${dest.d} ${dest.datum}`,
         sub:`${dest.mm != null && dest.mm > 0 ? fmtN(dest.mm) + ' mm' : dest.p + ' % \u0161ance'} sr\u00e1\u017eek. A\u017e do t\u00e9 doby po\u010d\u00edtej se zal\u00e9v\u00e1n\u00edm.` });
     }
   } else {
-    out.push({ alert:false, ic:pixSvg('klid'), title:'Zal\u00e9vat se te\u010f nemus\u00ed',
+    out.push({ alert:false, ic:ik('klid'), title:'Zal\u00e9vat se te\u010f nemus\u00ed',
       sub: m >= 10 || m <= 2
         ? `V ${MESICE[m-1]}u je venku z\u00e1livka zbyte\u010dn\u00e1 \u2014 p\u016fda dr\u017e\u00ed vlhkost a rostliny skoro nepij\u00ed. Hl\u00eddej m\u00edsto toho mrazy. Truhl\u00edky a kv\u011btin\u00e1\u010de u zdi domu se ale m\u016f\u017eou vysu\u0161it, ob\u010das se do nich pod\u00edvej.`
         : (osazene.length ? `V ${MESICE[m-1]}u je\u0161t\u011b sta\u010d\u00ed sr\u00e1\u017eky. Z\u00e1livku za\u010dni hl\u00eddat, a\u017e bude po n\u011bkolik dn\u00ed nad 18 \u00b0C a bez de\u0161t\u011b.`
@@ -1590,21 +1549,21 @@ function zalivkaStav() {
   const mraz = dny.filter(d => d.min <= 3);
   if (mraz.length) {
     const nej = mraz.reduce((x,y) => x.min < y.min ? x : y);
-    out.push({ alert:true, ic:pixSvg('mraz'), title:`Chladn\u00e9 noci, a\u017e ${fmtN(nej.min)} \u00b0C`,
+    out.push({ alert:true, ic:ik('mraz'), title:`Chladn\u00e9 noci, a\u017e ${fmtN(nej.min)} \u00b0C`,
       sub:`${mraz.map(d=>d.d).join(', ')} spadne no\u010dn\u00ed teplota k nule. Hroz\u00ed p\u0159\u00edzemn\u00ed mraz\u00edk \u2014 zakryj citliv\u00e9 plodiny netkanou textili\u00ed, truhl\u00edky a kv\u011btin\u00e1\u010de odnes ke zdi nebo do gar\u00e1\u017ee.` });
   }
   const skok = dny.length > 1 ? dny[0].max - dny[1].max : 0;
   if (skok >= 7) {
-    out.push({ alert:true, ic:pixSvg('teplomer'), title:`Z\u00edtra ochlazen\u00ed o ${Math.round(skok)} \u00b0C`,
+    out.push({ alert:true, ic:ik('teplomer'), title:`Z\u00edtra ochlazen\u00ed o ${Math.round(skok)} \u00b0C`,
       sub:`Dnes ${fmtN(dny[0].max)} \u00b0C, z\u00edtra u\u017e jen ${fmtN(dny[1].max)} \u00b0C. Co chce\u0161 sklidit v teple, sklid\u00ed dnes.` });
   }
   const sklizen = osazene.filter(x => { const c = crop(x.cropId); return c && c.harvest.includes(m); });
   if (sklizen.length) {
-    out.push({ alert:false, ic:pixSvg('kosik'), title:`${sklizen.length}\u00d7 plodina ke sklizni`,
+    out.push({ alert:false, ic:ik('kosik'), title:`${sklizen.length}\u00d7 plodina ke sklizni`,
       sub: [...new Set(sklizen.map(x=>crop(x.cropId).nazev))].join(', ') + ' \u2014 tento m\u011bs\u00edc je \u010das skl\u00edzet.' });
   }
   if (m === 10 || m === 11) {
-    out.push({ alert:false, ic:pixSvg('ryc'), title:'\u010cas zazimovat',
+    out.push({ alert:false, ic:ik('ryc'), title:'\u010cas zazimovat',
       sub:'Sklizen\u00e9 z\u00e1hony zaryj nebo zakryj kompostem a list\u00edm, hadice vypus\u0165 a konve ukli\u010f, aby nepopraskaly mrazem.' });
   }
   return out;
@@ -2263,7 +2222,7 @@ function kresliMapu() {
       <div id="cv"><svg id="svg" aria-label="Plán zahrady"></svg></div>
 
       ${prazdno && !state.panel ? `<div class="empty" style="position:absolute;inset:0;display:grid;place-content:center;z-index:2">
-        <div class="ei">${pixSvg('mapa')}</div>
+        <div class="ei">${ik('mapa')}</div>
         <h3>Zatím prázdná zahrada</h3>
         <p>Načti svou parcelu z katastru podle adresy,<br>nebo si obrys nakresli sám.</p>
       </div>` : ''}
@@ -2271,7 +2230,7 @@ function kresliMapu() {
       ${nacitam ? `<div class="m-load"><div class="spin"></div><span>${esc(katStav.text)}</span></div>` : ''}
 
       ${rezim ? `<div class="m-mode">
-        <span>${state.tool === 'outline' ? pixSvg('obrys') : (state.tool === 'erase' ? pixSvg('guma') : prvekPix(state.tool))}</span>
+        <span>${state.tool === 'outline' ? ik('obrys') : (state.tool === 'erase' ? ik('guma') : prvekPix(state.tool))}</span>
         <span class="mt"><b>${esc(rezim.t)}</b><span>${esc(rezim.s)}</span></span>
         <button id="m-hotovo">Hotovo</button>
       </div>` : ''}
@@ -2285,12 +2244,9 @@ function kresliMapu() {
       ${state.panel ? panelAdresy() : ''}
 
       <div class="m-zoom" id="m-zoom">
-        <button id="z-zamek" aria-label="${state.zamek?'Odemknout zahradu':'Zamknout zahradu'}"
-          style="${state.zamek?'background:var(--acc-soft);border-color:var(--acc)':''}">
-          <span style="width:21px;height:21px;display:block">${pixSvg(state.zamek?'zamek':'odemek')}</span></button>
-        <button id="z-in" aria-label="Přiblížit">+</button>
-        <button id="z-out" aria-label="Oddálit">−</button>
-        <button id="z-fit" aria-label="Celá zahrada"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+        <button id="z-in" aria-label="Přiblížit" title="Přiblížit">${ik('plus')}</button>
+        <button id="z-out" aria-label="Oddálit" title="Oddálit">${S('<path d="M5 12h14"/>')}</button>
+        <button id="z-fit" aria-label="Celá zahrada" title="Celá zahrada">${S('<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>')}</button>
       </div>
 
       <div class="m-scale" id="m-scale"><span class="b" id="sc-b"></span><span id="sc-t">5 m</span></div>
@@ -2315,12 +2271,14 @@ function kresliMapu() {
         </div>` : ''}
       </div>` : ''}
 
-      <div class="mbar" id="mbar">
-        <button class="mbtn go" id="t-pridat"><span class="pl">+</span>Přidat</button>
-        <button class="mbtn ${state.tool==='pan'?'on':''}" id="t-ruka">${pixSvg('ruka')}Posouvat</button>
-        <button class="mbtn ${state.tool==='outline'?'on':''}" id="t-obrys">${pixSvg('obrys')}Obrys</button>
-        <button class="mbtn ${state.tool==='erase'?'on':''}" id="t-guma">${pixSvg('guma')}Mazat</button>
-        <button class="mbtn" id="t-adresa">${pixSvg('mapa')}Adresa</button>
+      <div class="mrail" id="mrail">
+        <button class="go" id="t-pridat" aria-label="Přidat záhon nebo prvek" title="Přidat">${ik('plus')}</button>
+        <button class="${state.tool==='pan'?'on':''}" id="t-ruka" aria-label="Posouvat plán" title="Posouvat">${ik('ruka')}</button>
+        <button class="${state.tool==='outline'?'on':''}" id="t-obrys" aria-label="Upravit obrys zahrady" title="Obrys">${ik('obrys')}</button>
+        <button class="${state.tool==='erase'?'on':''}" id="t-guma" aria-label="Mazat" title="Mazat">${ik('guma')}</button>
+        <hr class="del">
+        <button id="t-adresa" aria-label="Najít parcelu podle adresy" title="Adresa">${ik('adresa')}</button>
+        <button class="${state.zamek?'on':''}" id="z-zamek" aria-label="${state.zamek?'Odemknout zahradu':'Zamknout zahradu'}" title="${state.zamek?'Odemknout':'Zamknout'}">${ik(state.zamek?'zamek':'odemek')}</button>
       </div>
     </div>
   `;
@@ -2397,7 +2355,7 @@ function dialogPridat() {
 function dialogZamek() {
   const d = dialog(`<h2>Zahrada je zamčená</h2>
     <p class="lead">Plán se nedá měnit, aby se s ním omylem nehýbalo. Zálivku, hnojení, fotky a počty rostlin to neblokuje.</p>
-    <div style="width:64px;height:64px;margin:4px auto 18px">${pixSvg('zamek')}</div>
+    <div style="width:64px;height:64px;margin:4px auto 18px">${ik('zamek')}</div>
     <div class="dacts"><button class="btn sec" id="zm-ne">Nechat zamčené</button>
     <button class="btn" id="zm-ano">Odemknout</button></div>`);
   d.querySelector('#zm-ne').onclick = zavri;
@@ -2412,7 +2370,7 @@ function vybranyPrvek(it) {
     <span class="si">${c ? cropArt(c) : prvekPix(it.typ)}</span>
     <span class="sn"><b>${esc(c ? c.nazev : it.nazev)}</b><span>${esc(PRVKY[it.typ].nazev)} · ${fmtA(itArea(it))} · ${fmtDim(b.w,b.h)}</span></span>
     <button class="btn sm sec" id="v-zamek" style="width:44px;padding:0" aria-label="${it.zamek?'Odemknout':'Zamknout'}">
-      <span style="width:22px;height:22px;display:block">${pixSvg(it.zamek?'zamek':'odemek')}</span></button>
+      <span style="width:22px;height:22px;display:block">${ik(it.zamek?'zamek':'odemek')}</span></button>
     <button class="btn sm" id="v-edit">Upravit</button>
     <button class="btn sm sec" id="v-off" style="width:44px;padding:0">×</button>
   </div>`;
@@ -2456,15 +2414,20 @@ function napojPanel() {
   };
 }
 
-/* Lišta je dole, kartička nad ní. Zoom a měřítko posadíme nad obojí. */
+/* Nástroje jsou vlevo, přiblížení vpravo, kartička dole. Spodek plánu
+   si drží volno jen podle toho, co je právě vysunuté. */
 function posadPanel() {
-  const bar = el('mbar'), sh = el('msheet'), zo = el('m-zoom'), sc = el('m-scale');
-  if (!bar) return;
-  const hb = bar.offsetHeight || 0;
+  const sh = el('msheet'), zo = el('m-zoom'), sc = el('m-scale'), ra = el('mrail');
   let hs = 0;
-  if (sh) { sh.style.bottom = hb + 'px'; hs = sh.offsetHeight || 0; }
-  if (zo) zo.style.bottom = (hb + hs + 14) + 'px';
-  if (sc) sc.style.bottom = (hb + hs + 20) + 'px';
+  if (sh) { sh.style.bottom = '0px'; hs = sh.offsetHeight || 0; }
+  if (zo) zo.style.bottom = (hs + 14) + 'px';
+  if (sc) sc.style.bottom = (hs + 18) + 'px';
+  if (ra) {
+    const cv = el('cv');
+    const misto = (cv ? cv.clientHeight : 400) - hs;
+    const vys = ra.offsetHeight || 0;
+    ra.style.top = Math.max(14, Math.round((misto - vys) / 2)) + 'px';
+  }
 }
 
 /* --- prepocty mezi metry a pixely --- */
@@ -2475,8 +2438,8 @@ function snapW(x, y) { return [ Math.round(x/snapStep)*snapStep, Math.round(y/sn
 function cellAt(px, py) { const w = s2w(px, py); return ck(Math.floor(w[0]), Math.floor(w[1])); }
 
 function panelVyska() {
-  const bar = el('mbar'), sh = el('msheet');
-  return (bar ? bar.offsetHeight : 0) + (sh ? sh.offsetHeight : 0);
+  const sh = el('msheet');
+  return sh ? sh.offsetHeight : 0;
 }
 function fitView() {
   let pts = [];
@@ -2503,10 +2466,13 @@ function fitView() {
   const shora = (el('otevri-adresu') || el('p-zavri') || el('m-hotovo')) ? 80 : 14;
   const zdola = panelVyska();
   const uzitna = Math.max(120, r.height - zdola - shora);
+  // vlevo svislá lišta nástrojů, vpravo přiblížení
+  const zleva = el('mrail') ? 78 : 12, zprava = 72;
+  const siroka = Math.max(140, r.width - zleva - zprava);
   const pad = 3;
   const w = Math.max(b.x1-b.x0, 4) + pad*2, h = Math.max(b.y1-b.y0, 4) + pad*2;
-  view.scale = clamp(Math.min(r.width/w, uzitna/h), 1.2, 60);
-  view.ox = (b.x0+b.x1)/2 - r.width/(2*view.scale);
+  view.scale = clamp(Math.min(siroka/w, uzitna/h), 1.2, 60);
+  view.ox = (b.x0+b.x1)/2 - (zleva + siroka/2)/view.scale;
   view.oy = (b.y0+b.y1)/2 - (shora + uzitna/2)/view.scale;
   save(); kresliPlatno();
 }
@@ -2601,7 +2567,7 @@ function kresliPlatno() {
       if ((cc[0] + cc[1]) % 2) sach += d2;   // sachovnice: plocha vypada jako dlazdice
     });
     parts.push(`<path d="${fp}" fill="${fill}" fill-opacity="${roste(it)?0.92:0.95}"/>`);
-    if (s >= 6) parts.push(`<path d="${sach}" fill="#000" fill-opacity="0.08"/>`);
+
     let ep = '';
     edgeSegments(it).forEach(g => {
       const a = w2s(g[0], g[1]), b2 = w2s(g[2], g[3]);
@@ -2612,20 +2578,21 @@ function kresliPlatno() {
     const b = itBBox(it);
     const sp0 = w2s(b.x0, b.y0), bw = b.w*s, bh = b.h*s;
     // pixelartovy obrazek: plodina, kdyz tam neco roste, jinak obrazek prvku
-    const znak = cropPixId(c) || (!c ? d.pix : null);
+    const znak = cropArtId(c) || (!c ? d.pix : null);
     const vel = Math.min(bw * 0.72, bh * 0.72, 56);
     if (bw > 20 && bh > 18 && znak && vel >= 11) {
-      parts.push(pixInto(znak, sp0[0] + (bw - vel)/2, sp0[1] + (bh - vel)/2 - (bh > 48 ? 5 : 0), vel));
+      parts.push(`<g color="${roste(it) ? '#ffffff' : 'var(--ink2)'}">` + artInto(znak, sp0[0] + (bw - vel)/2, sp0[1] + (bh - vel)/2 - (bh > 48 ? 6 : 0), vel) + `</g>`);
     } else if (bw > 30 && bh > 26 && c) {
       parts.push(`<text x="${(sp0[0]+bw/2).toFixed(1)}" y="${(sp0[1]+bh/2).toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="${Math.min(24, bh*0.5).toFixed(0)}">${c.emoji}</text>`);
     }
-    if (bw > 52 && bh > 16) {
+    if (bw > 44 && bh > 12) {
       const col = roste(it) ? '#ffffff' : 'var(--ink)';
-      const ty = (bh > 48 && znak) ? sp0[1] + bh - 7 : sp0[1] + bh/2 + 4;
-      parts.push(`<text x="${(sp0[0]+bw/2).toFixed(1)}" y="${ty.toFixed(1)}" text-anchor="middle" font-size="10.5" font-weight="800" fill="${col}" style="paint-order:stroke" stroke="${roste(it)?'rgba(0,0,0,.3)':'rgba(255,255,255,.45)'}" stroke-width="2.2">${esc(c ? c.nazev : it.nazev)}</text>`);
+      const fs = Math.min(13, Math.max(9.5, bh * 0.55));
+      const ty = (bh > 48 && znak) ? sp0[1] + bh - 8 : sp0[1] + bh/2 + fs*0.36;
+      parts.push(`<text x="${(sp0[0]+bw/2).toFixed(1)}" y="${ty.toFixed(1)}" text-anchor="middle" font-size="${fs.toFixed(1)}" font-weight="700" fill="${col}" style="paint-order:stroke" stroke="${roste(it)?'rgba(0,0,0,.28)':'rgba(255,255,255,.5)'}" stroke-width="2.4">${esc(c ? c.nazev : it.nazev)}</text>`);
     }
     // zamek v rohu
-    if (it.zamek && bw > 26 && bh > 26) parts.push(pixInto('zamek', sp0[0] + bw - 19, sp0[1] + 3, 16));
+    if (it.zamek && bw > 26 && bh > 26) parts.push(`<g color="${roste(it) ? 'rgba(255,255,255,.85)' : 'var(--ink2)'}">` + artInto('zamek', sp0[0] + bw - 20, sp0[1] + 4, 16) + `</g>`);
   });
   // vybrany prvek: ramec a uchyty
   const sel = state.sel ? state.items[state.sel] : null;
@@ -2906,7 +2873,7 @@ function kresliZahonky() {
   const s = el('s-beds');
   if (!bs.length) {
     s.innerHTML = `<div class="scroll"><div class="empty">
-      <div class="ei">${pixSvg('zahon')}</div>
+      <div class="ei">${ik('zahon')}</div>
       <h3>Žádné záhonky</h3>
       <p>Na plánu zahrady klepni na <b>Přidat</b><br>a vyber záhon, truhlík nebo květináč.</p>
       <button class="btn" id="go-map">Otevřít plán</button>
@@ -2937,12 +2904,12 @@ function kartaZahonu(b, m) {
     ${fs.length ? `<div class="photo-strip">
       ${fs.map((f,i)=>`<figure data-foto="${b.id}|${i}"><img class="photo" src="${f.data}" alt="">
         <figcaption>${esc(relDays(f.datum))}</figcaption></figure>`).join('')}
-    </div>` : `<button class="addphoto" data-addfoto="${b.id}">${pixSvg('foto')}Vyfotit ${esc(PRVKY[b.typ].nazev.toLowerCase())}</button>`}
+    </div>` : `<button class="addphoto" data-addfoto="${b.id}">${ik('foto')}Vyfotit ${esc(PRVKY[b.typ].nazev.toLowerCase())}</button>`}
 
     <div class="row">
       <span class="thumb">${c ? cropArt(c) : prvekPix(b.typ)}</span>
       <span class="mid"><b>${esc(c ? c.nazev : b.nazev)}</b><span>${esc(b.nazev)} · ${fmtA(itArea(b))}</span></span>
-      <button class="act ${dnes?'done':''}" data-zalij="${b.id}" aria-label="Zalít">${pixSvg('konev')}</button>
+      <button class="act ${dnes?'done':''}" data-zalij="${b.id}" aria-label="Zalít">${ik('konev')}</button>
     </div>
 
     ${pr != null ? `<div class="count">
@@ -2952,11 +2919,11 @@ function kartaZahonu(b, m) {
     </div>` : ''}
 
     <div class="tags">
-      ${lw ? `<span class="tag">${pixSvg('konev')}${esc(relDays(lw))}</span>` : ''}
-      ${lf ? `<span class="tag">${pixSvg('hnojivo')}${esc(relDays(lf.datum))}</span>` : ''}
-      ${b.zamek ? `<span class="tag">${pixSvg('zamek')}zamčeno</span>` : ''}
+      ${lw ? `<span class="tag">${ik('konev')}${esc(relDays(lw))}</span>` : ''}
+      ${lf ? `<span class="tag">${ik('hnojivo')}${esc(relDays(lf.datum))}</span>` : ''}
+      ${b.zamek ? `<span class="tag">${ik('zamek')}zamčeno</span>` : ''}
       ${!itemInside(b) ? `<span class="tag warn">mimo zahradu</span>` : ''}
-      <button class="tag" data-hnoj="${b.id}">${pixSvg('hnojivo')}Pohnojit</button>
+      <button class="tag" data-hnoj="${b.id}">${ik('hnojivo')}Pohnojit</button>
       <button class="tag" data-upravit="${b.id}">Upravit</button>
       ${c ? `<button class="tag" data-plodina="${c.id}">O plodině</button>` : ''}
     </div>
@@ -3001,7 +2968,7 @@ function kresliPlodiny() {
             <span class="top">
               ${jeVlastni(c.id) ? '<span class="mine">moje</span>' : ''}
               ${fo.length ? `<img src="${fo[0]}" alt="">` : cropArt(c)}
-              <span class="cam" data-cfoto="${c.id}">${pixSvg('foto')}</span>
+              <span class="cam" data-cfoto="${c.id}">${ik('foto')}</span>
             </span>
             <span class="nm"><b>${esc(c.nazev)}</b>
               <span class="months">${Array.from({length:12},(_,i)=>{
@@ -3056,7 +3023,7 @@ function kresliNakup(s) {
       <div class="list">
         ${sh.map(o=>`<div class="card">
           <div class="row">
-            <span class="thumb">${pixSvg('obchod')}</span>
+            <span class="thumb">${ik('obchod')}</span>
             <span class="mid"><b>${esc(o.nazev)}</b>
               <span>${esc((o.url||'').replace(/^https?:\/\//,'').slice(0,42))}</span></span>
           </div>
@@ -3167,7 +3134,7 @@ function kresliKalendar() {
       <div class="sec-h" style="margin-top:26px"><h2>Co dělat v ${esc(MESICE[mi])}u</h2><span class="n">${ukMoje.length}</span></div>
       <div class="list">
         ${ukMoje.length ? ukMoje.map(u => radekUkonu(u, true)).join('')
-          : `<div class="card"><div class="task"><span class="ti2" style="background:var(--bg2)">${pixSvg('klid')}</span>
+          : `<div class="card"><div class="task"><span class="ti2" style="background:var(--bg2)">${ik('klid')}</span>
              <span class="tm"><b>V ${esc(MESICE[mi])}u nic nečeká</b><span>Na tvých plodinách není tenhle měsíc žádný úkon.</span></span></div></div>`}
       </div>
       ${ukOst.length ? `<div class="sec-h" style="margin-top:24px"><h2>Co se dá dělat navíc</h2><span class="n">${ukOst.length}</span></div>
@@ -3202,13 +3169,13 @@ function dialogDne(iso) {
     <p class="lead">${esc(DNY_ZKR[(new Date(iso+'T12:00:00').getDay()+6)%7])} · ${esc(relDays(iso)) || 'dnes'}</p>
     ${zapisy.length ? `<div class="list" style="margin-bottom:16px">
       ${zapisy.map(e=>`<div class="card row" style="padding:11px 12px">
-        <span class="thumb" style="width:38px;height:38px;padding:5px">${pixSvg(ZAPIS_PIX[e.typ])}</span>
+        <span class="thumb" style="width:38px;height:38px;padding:5px">${ik(ZAPIS_PIX[e.typ])}</span>
         <span class="mid"><b style="font-size:14.5px">${esc(ZAPIS_NAZEV[e.typ])}${e.co ? ' — ' + esc(e.co) : ''}</b>
           <span>${esc(e.b.nazev)}</span></span></div>`).join('')}
     </div>` : `<p class="note" style="margin-top:0">Na tenhle den nic zapsaného není.</p>`}
     ${uk.length ? `<div class="sec-h"><h2>Úkony měsíce</h2></div>
       <div class="list">${uk.slice(0,6).map(u=>`<div class="card task ${u.typ}">
-        <span class="ti2">${pixSvg(UKON_PIX[u.typ])}</span>
+        <span class="ti2">${ik(UKON_PIX[u.typ])}</span>
         <span class="tm"><b>${esc(u.t)}</b><span>${esc(u.c.nazev)} · ${esc(u.b.nazev)}</span></span></div>`).join('')}</div>` : ''}
     <div class="dacts"><button class="btn wide" id="dn-ok">Zavřít</button></div>`);
   d.querySelector('#dn-ok').onclick = zavri;
@@ -3216,7 +3183,7 @@ function dialogDne(iso) {
 
 function radekUkonu(u, moje) {
   return `<button class="card task ${u.typ}" data-crop="${u.c.id}" style="width:100%;text-align:left">
-    <span class="ti2">${pixSvg(UKON_PIX[u.typ] || 'listek')}</span>
+    <span class="ti2">${ik(UKON_PIX[u.typ] || 'listek')}</span>
     <span class="tm"><b>${esc(u.t)}</b>
       <span>${esc(u.c.nazev)}${moje && u.b ? ' · ' + esc(u.b.nazev) : ''} · ${esc(TYP_LABEL[u.typ])}</span></span>
   </button>`;
@@ -3310,7 +3277,7 @@ function dialogPrvku(id) {
     <p class="lead">${fmtA(itArea(it))} · ${itArea(it)} čtverečků · ${obdelnik ? fmtDim(b.w,b.h) : 'nepravidelný tvar'}</p>
     ${!itemInside(it) ? `<div class="info" style="margin-bottom:16px">Tenhle prvek přesahuje obrys zahrady.</div>` : ''}
     <button class="btn sm sec wide" id="d-zamek" style="margin-bottom:16px">
-      <span style="width:22px;height:22px;flex:none">${pixSvg(it.zamek?'zamek':'odemek')}</span>
+      <span style="width:22px;height:22px;flex:none">${ik(it.zamek?'zamek':'odemek')}</span>
       ${it.zamek ? 'Odemknout — teď se s ním nedá hýbat' : 'Zamknout, aby se s ním nehýbalo'}</button>
     <div class="field"><label for="d-nazev">Název</label><input id="d-nazev" value="${esc(it.nazev)}"></div>
     ${obdelnik && !it.zamek ? `<div class="row2">
@@ -3458,7 +3425,7 @@ function dialogPlodiny(cropId) {
     <div style="aspect-ratio:16/9;border-radius:var(--r);background:var(--acc-soft);overflow:hidden;margin-bottom:16px;padding:14px;position:relative" id="p-hero">
       ${fo.length ? `<img src="${fo[0]}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" alt="">`
         : `<div style="width:100%;height:100%">${cropArt(c)}</div>`}
-      <span class="cam" style="position:absolute;right:10px;bottom:10px;width:34px;height:34px;border-radius:11px;background:color-mix(in srgb,var(--card) 88%,transparent);display:grid;place-items:center;padding:6px">${pixSvg('foto')}</span>
+      <span class="cam" style="position:absolute;right:10px;bottom:10px;width:34px;height:34px;border-radius:11px;background:color-mix(in srgb,var(--card) 88%,transparent);display:grid;place-items:center;padding:6px">${ik('foto')}</span>
     </div>
     <h2>${esc(c.nazev)}</h2>
     <p class="lead">${esc(c.lat)} · ${esc(c.kat)}</p>
@@ -3672,7 +3639,7 @@ el('bar-theme').onclick = () => {
   if (state.tab === 'map') kresliPlatno();
 };
 if (state.theme) document.documentElement.setAttribute('data-theme', state.theme);
-document.querySelectorAll('[data-pix]').forEach(x => { x.innerHTML = pixSvg(x.dataset.pix); });
+document.querySelectorAll('[data-pix]').forEach(x => { x.innerHTML = ik(x.dataset.pix); });
 document.querySelectorAll('#nav button').forEach(b => b.onclick = () => prepni(b.dataset.tab));
 document.addEventListener('keydown', e => { if (e.key === 'Escape') zavri(); });
 window.addEventListener('resize', () => { if (state.tab === 'map') { posadPanel(); scheduleRender(); } });
