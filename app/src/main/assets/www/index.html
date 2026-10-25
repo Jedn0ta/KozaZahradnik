@@ -820,30 +820,34 @@ body { font-size: 17px; }
 
 /* ---------- nástroje na plán: svislá lišta u kraje, jen ikony ---------- */
 .mrail {
-  position: absolute; left: 10px; z-index: 6;
-  display: flex; flex-direction: column; gap: 6px; align-items: center;
-  max-height: calc(100% - 24px); overflow-y: auto; overscroll-behavior: contain;
+  position: absolute; left: 12px; z-index: 6;
+  display: flex; flex-direction: column; gap: 8px; align-items: center;
+  max-height: calc(100% - 20px); overflow-y: auto; overscroll-behavior: contain;
   scrollbar-width: none; padding: 2px 0;
-  background: color-mix(in srgb, var(--card) 86%, transparent);
-  border: 1.5px solid var(--line); border-radius: 22px; box-shadow: var(--sh-lift);
 }
 .mrail::-webkit-scrollbar { display: none; }
 .mrail button {
-  flex: none; width: 46px; height: 46px; border-radius: 14px; background: transparent;
-  display: grid; place-items: center; padding: 11px; color: var(--ink2);
+  flex: none; width: 54px; height: 54px; border-radius: 18px;
+  background: var(--card); border: 1.5px solid var(--line); box-shadow: var(--sh-lift);
+  display: grid; place-items: center; padding: 13px; color: var(--ink2);
 }
-.mrail button .ik { width: 24px; height: 24px; }
-.mrail button .emo { font-size: 23px; }
+.mrail button .ik { width: 28px; height: 28px; }
+.mrail button[disabled] { opacity: .4; box-shadow: var(--sh); }
 .mrail.pryc { display: none; }
-.mrail button.on { background: var(--acc-soft); color: var(--acc-dark); box-shadow: inset 0 0 0 1.5px var(--acc); }
-.mrail button:active { transform: scale(.92); }
-.mrail-ukaz {
-  position: absolute; left: 10px; z-index: 6;
-  width: 46px; height: 46px; border-radius: 14px; background: var(--card);
-  border: 1.5px solid var(--line); box-shadow: var(--sh-lift);
-  display: grid; place-items: center; padding: 11px; color: var(--ink2);
+.mrail button.on {
+  background: var(--acc); border-color: var(--acc-dark); color: var(--acc-ink);
+  box-shadow: var(--sh-lift), 0 0 0 3px var(--acc-soft);
 }
-.mrail-ukaz .ik { width: 24px; height: 24px; }
+.mrail button:active { transform: scale(.93); }
+.mrail .del { width: 30px; height: 2px; background: var(--line2); border-radius: 2px; margin: 2px 0; border: 0; flex: none; }
+
+.mrail-ukaz {
+  position: absolute; left: 12px; z-index: 6;
+  width: 54px; height: 54px; border-radius: 18px; background: var(--card);
+  border: 1.5px solid var(--line); box-shadow: var(--sh-lift);
+  display: grid; place-items: center; padding: 13px; color: var(--ink2);
+}
+.mrail-ukaz .ik { width: 28px; height: 28px; }
 .mrail-ukaz:active { transform: scale(.92); }
 .mrail .del { width: 26px; height: 1px; background: var(--line); margin: 1px 0; border: 0; flex: none; }
 
@@ -885,7 +889,7 @@ body { font-size: 17px; }
 
 <script>
 
-const VERZE = 'v2.8 · 25. 10. 2026';
+const VERZE = 'v2.9 · 25. 10. 2026';
 const LOGO_KOZEL = `<svg viewBox="0 0 32 32" aria-hidden="true">
   <path d="M11.2 9.4C9.6 6.6 7.4 4.6 4.6 3.9c-.5-.1-.9.3-.8.8.5 2.9 1.9 5.4 4.1 7.2.7.6 1.5 1 2.4 1.3z" fill="#fff" opacity=".95"/>
   <path d="M20.8 9.4c1.6-2.8 3.8-4.8 6.6-5.5.5-.1.9.3.8.8-.5 2.9-1.9 5.4-4.1 7.2-.7.6-1.5 1-2.4 1.3z" fill="#fff" opacity=".95"/>
@@ -1627,6 +1631,100 @@ const PIX = {
     '................','................','................','.....bbbbbb.....','.....bbbbbb.....','.bbbbbbbbbbbbbb.','.bbbbbbdddbbbbb.','.bbbbbddlddbwbb.','.bbbbddlllddbbb.','.bbbbdllllldbbb.','.bbbbddlllddbbb.','.bbbbbddlddbbbb.','.bbbbbbdddbbbbb.','.bbbbbbbbbbbbbb.','................','................'
   ] },
 };
+/* ============ DLAŽDICE ZAHRADY ============
+   Pixelartové textury po vzoru hospodářských her: jeden metr je mřížka
+   16 × 16 pixelů, takže se s plánem posouvají i přibližují. */
+const DLAZDICE = {
+  trava: { p:{'a':'#6cb04a','b':'#5e9e3e','c':'#81c25c','d':'#4e8a34'}, d:[
+    'abbabcaaabaaacbb',
+    'abaaabaabaaaaada',
+    'aaacaaaaacaaaddd',
+    'aaaadaaacaaaaaac',
+    'aaadddaaaaaacaaa',
+    'aaabbbacaaabaaaa',
+    'aaaaaaaabbaaabac',
+    'aaacaaabaaaaaaaa',
+    'aaaaacaaaaadaaaa',
+    'aaaaaaaaaadddaaa',
+    'abaaaaaaaaabaaaa',
+    'aaaaaaaaaabaaaaa',
+    'aabbaaadaaaaaaaa',
+    'caaaaadddcaaabaa',
+    'aaaaabaaaaaaaaaa',
+    'aaaaaaaaaaaaabaa'
+  ] },
+  hlina: { p:{'e':'#7a5230','f':'#8c6038','g':'#613f23','h':'#4d3119','i':'#9c7146'}, d:[
+    'ffffffffffffffff',
+    'eeeeeeeeeeeeeeee',
+    'gggggggggggggggg',
+    'hhhhhhhihihhhhhh',
+    'ffffffffffffffff',
+    'eeeeeeeeeeeeeeee',
+    'ggiggggggggggggg',
+    'hhhhhihhhhhhhhhh',
+    'ffffifffffffffff',
+    'eeeeeeeeeeeeeeee',
+    'gggggggggggggggg',
+    'hhhhihhhhhhhhhhh',
+    'ffffffffffffffff',
+    'eeeeeieieeeeeeee',
+    'ggggiggggggggggg',
+    'hhhhhhhhhhhhihhh'
+  ] },
+  dlazba: { p:{'j':'#b5ac9a','k':'#9a9080','l':'#6f6758'}, d:[
+    'kjjjjkklkjjjjkkl',
+    'jjjjkjkljjjjkjkl',
+    'jjjkjjkljjjkjjkl',
+    'jjkjjjkljjkjjjkl',
+    'jkjjjjkljkjjjjkl',
+    'kjjjjkklkjjjjkkl',
+    'jjjjkjkljjjjkjkl',
+    'llllllllllllllll',
+    'kjjjjkklkjjjjkkl',
+    'jjjjkjkljjjjkjkl',
+    'jjjkjjkljjjkjjkl',
+    'jjkjjjkljjkjjjkl',
+    'jkjjjjkljkjjjjkl',
+    'kjjjjkklkjjjjkkl',
+    'jjjjkjkljjjjkjkl',
+    'llllllllllllllll'
+  ] },
+  drevo: { p:{'m':'#a9763f','n':'#bd8c51','o':'#7a5126'}, d:[
+    'nnnnnnnnnnnnnnnn',
+    'mmmmmmmmmmmmmmmm',
+    'mmmmmmmmmmmmmmmm',
+    'mmmmmmmmmmmmmmmm',
+    'oooooooooooooooo',
+    'nnnnnnnnnnnnnnnn',
+    'mmmmmmmmmmmmmnmm',
+    'mmmmmmmmmmmmmmmm',
+    'mmmmmmmmmmmmmmmm',
+    'oooooooooooooooo',
+    'nnnnnnnnnnnnnnnn',
+    'mmnmmmmmmmmmmmmm',
+    'mmmmmmmmmmmmmmmm',
+    'mmmmmmmmmmmmmmmm',
+    'oooooooooooooooo',
+    'nnnnnnnnnnnnnnnn'
+  ] },
+};
+
+/* Z dlaždice udělá SVG vzor ukotvený ke světu: metr = 16 pixelů. */
+function vzorDlazdice(id, nazev, s, ox, oy) {
+  const t = DLAZDICE[id];
+  if (!t) return '';
+  const px = s / 16;
+  let r = '';
+  for (let y = 0; y < 16; y++) {
+    const row = t.d[y];
+    for (let x = 0; x < 16; x++) {
+      const c = t.p[row[x]];
+      if (c) r += `<rect x="${(x*px).toFixed(3)}" y="${(y*px).toFixed(3)}" width="${(px*1.02).toFixed(3)}" height="${(px*1.02).toFixed(3)}" fill="${c}"/>`;
+    }
+  }
+  return `<pattern id="${nazev}" width="${s.toFixed(2)}" height="${s.toFixed(2)}" patternUnits="userSpaceOnUse" patternTransform="translate(${ox} ${oy})">${r}</pattern>`;
+}
+
 function pixSvg(id) {
   const s = PIX[id];
   if (!s) return '';
@@ -1696,6 +1794,7 @@ const IK = {
   plus:     S('<path d="M12 5v14M5 12h14"/>'),
   adresa:   S('<circle cx="12" cy="10.5" r="3"/><path d="M12 21s7-5.6 7-10.5a7 7 0 1 0-14 0C5 15.4 12 21 12 21z"/>'),
   zpet:     S('<path d="M4 10h11a5 5 0 0 1 0 10h-5"/><path d="M8.5 5.5 4 10l4.5 4.5"/>'),
+  zavrit:   S('<path d="M6 6l12 12M18 6 6 18"/>'),
   schovat:  S('<path d="M14.5 5.5 8 12l6.5 6.5"/>'),
   nastroje: S('<path d="M9.5 18.5 16 12 9.5 5.5"/><path d="M4.5 6v12"/>'),
   poznamka: S('<path d="M5 4.5h14v15H5z"/><path d="M8.5 9h7M8.5 13h7M8.5 16.5h4"/>'),
@@ -3518,9 +3617,8 @@ function kresliMapu() {
       ${rezim ? `<div class="m-mode">
         <span class="mi">${state.tool === 'outline' ? ik('obrys') : (state.tool === 'erase' ? ik('guma') : ik('p_' + state.tool))}</span>
         <span class="mt"><b>${rozdel ? esc(rozdel.nazev) : esc(rezim.t)}</b>
-          <span>${rozdel ? fmtA(itArea(rozdel)) + ' · dokresluj dál, nebo tvar potvrď' : esc(rezim.s)}</span></span>
-        ${rozdel ? `<button id="m-potvrdit">Potvrdit</button>` : ''}
-        <button id="m-hotovo">${rozdel ? '✕' : 'Hotovo'}</button>
+          <span>${rozdel ? fmtA(itArea(rozdel)) + ' · zelenou fajfkou tvar potvrdíš' : esc(rezim.s)}</span></span>
+        <button id="m-hotovo" aria-label="Konec kreslení">${ik('zavrit')}</button>
       </div>` : ''}
 
       ${nabidniAdresu ? `<button class="m-search plain" id="otevri-adresu">
@@ -3620,12 +3718,6 @@ function kresliMapu() {
   const ta = el('t-adresa');
   if (ta) ta.onclick = () => { state.panel = true; state.tool = 'pan'; save(); kresliMapu(); };
   const mh = el('m-hotovo'); if (mh) mh.onclick = () => { state.rozdelano = null; nastav('pan'); };
-  const mp = el('m-potvrdit');
-  if (mp) mp.onclick = () => {
-    const t = state.items[state.rozdelano];
-    state.rozdelano = null; save(); kresliMapu();
-    toast((t ? t.nazev : 'Tvar') + ' potvrzen — další kreslení začne nový');
-  };
 
   s.querySelectorAll('[data-parcela]').forEach(b => b.onclick = () => prepniParcelu(Number(b.dataset.parcela)));
   const ko = el('kat-ok');
@@ -3803,7 +3895,7 @@ function fitView() {
   const zdola = panelVyska();
   const uzitna = Math.max(120, r.height - zdola - shora);
   // vlevo svislá lišta nástrojů, vpravo přiblížení
-  const zleva = el('mrail') ? 72 : 14, zprava = 72;
+  const zleva = el('mrail') ? 82 : 14, zprava = 74;
   const siroka = Math.max(140, r.width - zleva - zprava);
   const pad = 3;
   const w = Math.max(b.x1-b.x0, 4) + pad*2, h = Math.max(b.y1-b.y0, 4) + pad*2;
@@ -3843,6 +3935,7 @@ function handlesOf(it) {
 
 /* --- kresleni --- */
 let preview = null;
+let potvrdBod = null;      // kde na plátně sedí potvrzovací fajfka
 let rafId = null;
 function scheduleRender() { if (rafId) return; rafId = requestAnimationFrame(() => { rafId = null; kresliPlatno(); }); }
 
@@ -3875,44 +3968,16 @@ function kresliPlatno() {
      Dokud se kreslí, zůstává plán plochý, ať je dobře vidět, co dělám. */
   const hezky = !!state.zamek;
   if (hezky) {
-    /* Vzory jsou ukotvené ke světu, ne k obrazovce: dlaždice má přesně
-       jeden metr, takže se tráva i hlína posouvají a přibližují spolu
-       s plánem místo aby stály na místě. */
-    const T = Math.max(10, view.scale);           // jeden metr v pixelech
+    /* Dlaždice je přesně jeden metr, takže textury neplavou po obrazovce,
+       ale drží se zahrady — posouvají se i přibližují spolu s plánem. */
+    const T = Math.max(12, view.scale);
     const ox = (-view.ox * view.scale).toFixed(2), oy = (-view.oy * view.scale).toFixed(2);
-    const u = (n) => (n * T).toFixed(2);
-    parts.push(`<defs>
-      <pattern id="vz-trava" width="${u(1)}" height="${u(1)}" patternUnits="userSpaceOnUse" patternTransform="translate(${ox} ${oy})">
-        <rect width="${u(1)}" height="${u(1)}" fill="#7fb956"/>
-        <rect x="${u(0)}" y="${u(0)}" width="${u(.5)}" height="${u(.5)}" fill="#86c05c"/>
-        <rect x="${u(.5)}" y="${u(.5)}" width="${u(.5)}" height="${u(.5)}" fill="#86c05c"/>
-        <path d="M${u(.14)} ${u(.4)}q${u(.04)} -${u(.13)} ${u(.1)} -${u(.2)}M${u(.62)} ${u(.86)}q${u(.05)} -${u(.14)} ${u(.11)} -${u(.22)}M${u(.8)} ${u(.3)}q${u(.04)} -${u(.1)} ${u(.09)} -${u(.17)}M${u(.33)} ${u(.74)}q${u(.04)} -${u(.1)} ${u(.09)} -${u(.17)}"
-          stroke="#6aa344" stroke-width="${u(.035)}" fill="none" stroke-linecap="round"/>
-        <path d="M${u(.45)} ${u(.26)}q${u(.04)} -${u(.1)} ${u(.09)} -${u(.16)}M${u(.1)} ${u(.92)}q${u(.04)} -${u(.1)} ${u(.09)} -${u(.16)}"
-          stroke="#9ad06e" stroke-width="${u(.03)}" fill="none" stroke-linecap="round"/>
-      </pattern>
-      <pattern id="vz-hlina" width="${u(1)}" height="${u(.5)}" patternUnits="userSpaceOnUse" patternTransform="translate(${ox} ${oy})">
-        <rect width="${u(1)}" height="${u(.5)}" fill="#8a5f3a"/>
-        <rect y="${u(.03)}" width="${u(1)}" height="${u(.17)}" fill="#9b6e45"/>
-        <rect y="${u(.3)}" width="${u(1)}" height="${u(.14)}" fill="#7a5130"/>
-        <circle cx="${u(.2)}" cy="${u(.12)}" r="${u(.022)}" fill="#6d4728"/>
-        <circle cx="${u(.66)}" cy="${u(.09)}" r="${u(.018)}" fill="#6d4728"/>
-        <circle cx="${u(.42)}" cy="${u(.38)}" r="${u(.02)}" fill="#a87c50"/>
-        <circle cx="${u(.86)}" cy="${u(.36)}" r="${u(.018)}" fill="#a87c50"/>
-      </pattern>
-      <pattern id="vz-dlazba" width="${u(1)}" height="${u(1)}" patternUnits="userSpaceOnUse" patternTransform="translate(${ox} ${oy})">
-        <rect width="${u(1)}" height="${u(1)}" fill="#a9a393"/>
-        <rect x="${u(.04)}" y="${u(.04)}" width="${u(.44)}" height="${u(.42)}" rx="${u(.06)}" fill="#c6bfad"/>
-        <rect x="${u(.54)}" y="${u(.06)}" width="${u(.4)}" height="${u(.4)}" rx="${u(.06)}" fill="#bdb6a4"/>
-        <rect x="${u(.06)}" y="${u(.54)}" width="${u(.4)}" height="${u(.4)}" rx="${u(.06)}" fill="#bdb6a4"/>
-        <rect x="${u(.52)}" y="${u(.52)}" width="${u(.44)}" height="${u(.42)}" rx="${u(.06)}" fill="#c6bfad"/>
-      </pattern>
-      <pattern id="vz-drevo" width="${u(1)}" height="${u(.34)}" patternUnits="userSpaceOnUse" patternTransform="translate(${ox} ${oy})">
-        <rect width="${u(1)}" height="${u(.34)}" fill="#a9763f"/>
-        <rect y="${u(.02)}" width="${u(1)}" height="${u(.12)}" fill="#bb8a4f"/>
-        <path d="M0 ${u(.33)}h${u(1)}" stroke="#7d5428" stroke-width="${u(.03)}"/>
-      </pattern>
-    </defs>`);
+    parts.push(`<defs>`
+      + vzorDlazdice('trava', 'vz-trava', T, ox, oy)
+      + vzorDlazdice('hlina', 'vz-hlina', T, ox, oy)
+      + vzorDlazdice('dlazba', 'vz-dlazba', T, ox, oy)
+      + vzorDlazdice('drevo', 'vz-drevo', T, ox, oy)
+      + `</defs>`);
   }
   // dalsi vybrane parcely pod hlavnim obrysem
   (state.vedlejsi || []).forEach(poly => {
@@ -4014,13 +4079,16 @@ function kresliPlatno() {
       const krok = rozestup * s;
       const sloupcu = Math.floor((bw - krok*0.35) / krok), rad = Math.floor((bh - krok*0.35) / krok);
       if (sloupcu >= 1 && rad >= 1 && krok >= 7 && sloupcu * rad <= 180) {
-        const zn2 = plodinaZnak(c);
+        const zn2 = (PIX[c.id] && !cropIkona(c.id) && !cropFotky(c.id).length)
+          ? { typ:'pixel', v:c.id } : plodinaZnak(c);
         const vel2 = Math.min(krok * 0.78, 26);
         const okX = sp0[0] + (bw - sloupcu*krok)/2 + krok/2;
         const okY = sp0[1] + (bh - rad*krok)/2 + krok/2;
         for (let ry = 0; ry < rad; ry++) for (let rx = 0; rx < sloupcu; rx++) {
           const cx2 = okX + rx*krok, cy2 = okY + ry*krok;
-          if (zn2.typ === 'msym') {
+          if (zn2.typ === 'pixel') {
+            parts.push(pixInto(zn2.v, cx2 - vel2/2, cy2 - vel2/2, vel2));
+          } else if (zn2.typ === 'msym') {
             parts.push(`<text x="${cx2.toFixed(1)}" y="${cy2.toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="${vel2.toFixed(1)}" font-family="${SADY[zn2.sada].font}" fill="#2f6b2f">${esc(zn2.v)}</text>`);
           } else if (zn2.typ === 'emoji') {
             parts.push(`<text x="${cx2.toFixed(1)}" y="${cy2.toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="${vel2.toFixed(1)}">${zn2.v}</text>`);
@@ -4088,6 +4156,20 @@ function kresliPlatno() {
       parts.push(`<g color="var(--ink2)">` + artInto('zamek', sp0[0] + bw - 20, sp0[1] + 4, 16) + `</g>`);
     }
   });
+  // potvrzovací fajfka visí rovnou u rozdělaného tvaru
+  potvrdBod = null;
+  if (state.rozdelano && state.items[state.rozdelano] && state.tool !== 'pan') {
+    const it2 = state.items[state.rozdelano];
+    const rb = rectOf(it2), rp = w2s(rb.x1, rb.y0);
+    const rr = 23;
+    const cx = clamp(rp[0], rr + 6, W - rr - 6);
+    const cy = clamp(rp[1], rr + 6, H - rr - 6);
+    potvrdBod = { x:cx, y:cy, r:rr + 8 };
+    parts.push(`<circle cx="${cx.toFixed(1)}" cy="${(cy+2).toFixed(1)}" r="${rr}" fill="rgba(21,96,48,.28)"/>`);
+    parts.push(`<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${rr}" fill="#1e7a3c" stroke="#ffffff" stroke-width="3"/>`);
+    parts.push(`<path d="M${(cx-10).toFixed(1)} ${cy.toFixed(1)}l${7} ${7.5} ${13} -${14}" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`);
+  }
+
   // vybrany prvek: ramec a uchyty
   const sel = state.sel ? state.items[state.sel] : null;
   if (sel && state.tool === 'pan') {
@@ -4131,6 +4213,7 @@ function kresliPlatno() {
     parts.push(`<text x="${(sp[0] + preview.w*s/2).toFixed(1)}" y="${(sp[1] - 7).toFixed(1)}" text-anchor="middle" font-size="11.5" font-weight="800" fill="var(--ink)">${preview.w} × ${preview.h} m</text>`);
   }
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('shape-rendering', hezky ? 'crispEdges' : 'auto');
   svg.innerHTML = parts.join('');
 }
 
@@ -4242,6 +4325,14 @@ function napojPlatno() {
     cv.setPointerCapture(e.pointerId);
     const p = local(e);
     ptrs.set(e.pointerId, p);
+    // fajfka má přednost před kreslením, ať se jí dá trefit
+    if (ptrs.size === 1 && potvrdBod && Math.hypot(p.x - potvrdBod.x, p.y - potvrdBod.y) <= potvrdBod.r) {
+      const t = state.items[state.rozdelano];
+      state.rozdelano = null; gest = null; ptrs.clear();
+      save(); kresliMapu();
+      toast((t ? t.nazev : 'Tvar') + ' hotový — další kreslení začne nový');
+      return;
+    }
     if (ptrs.size === 1 && state.tool !== 'pan' && !state.zamek) zapamatuj();
 
     if (ptrs.size === 2) {
