@@ -837,6 +837,14 @@ body { font-size: 17px; }
 .mrail.pryc { display: none; }
 .mrail button.on { background: var(--acc-soft); color: var(--acc-dark); box-shadow: inset 0 0 0 1.5px var(--acc); }
 .mrail button:active { transform: scale(.92); }
+.mrail-ukaz {
+  position: absolute; left: 10px; z-index: 6;
+  width: 46px; height: 46px; border-radius: 14px; background: var(--card);
+  border: 1.5px solid var(--line); box-shadow: var(--sh-lift);
+  display: grid; place-items: center; padding: 11px; color: var(--ink2);
+}
+.mrail-ukaz .ik { width: 24px; height: 24px; }
+.mrail-ukaz:active { transform: scale(.92); }
 .mrail .del { width: 26px; height: 1px; background: var(--line); margin: 1px 0; border: 0; flex: none; }
 
 .m-zoom button { width: 48px; height: 48px; padding: 13px; }
@@ -877,7 +885,7 @@ body { font-size: 17px; }
 
 <script>
 
-const VERZE = 'v2.6 · 22. 10. 2026';
+const VERZE = 'v2.7 · 25. 10. 2026';
 const LOGO_KOZEL = `<svg viewBox="0 0 32 32" aria-hidden="true">
   <path d="M11.2 9.4C9.6 6.6 7.4 4.6 4.6 3.9c-.5-.1-.9.3-.8.8.5 2.9 1.9 5.4 4.1 7.2.7.6 1.5 1 2.4 1.3z" fill="#fff" opacity=".95"/>
   <path d="M20.8 9.4c1.6-2.8 3.8-4.8 6.6-5.5.5-.1.9.3.8.8-.5 2.9-1.9 5.4-4.1 7.2-.7.6-1.5 1-2.4 1.3z" fill="#fff" opacity=".95"/>
@@ -1610,8 +1618,8 @@ function bbox(pts) {
 const ck = (x, y) => x + ',' + y;
 const cxy = (k) => { const p = k.split(','); return [ +p[0], +p[1] ]; };
 const cellsOf = (it) => (it && it.cells) || [];
-const itArea = (it) => (PRVKY[it.typ] && PRVKY[it.typ].maly && it.rozmer)
-  ? (it.rozmer.w * it.rozmer.h * cellsOf(it).length)
+const itArea = (it) => (PRVKY[it.typ] && PRVKY[it.typ].maly)
+  ? ((it.rozmer || PRVKY[it.typ].rozmer).w * (it.rozmer || PRVKY[it.typ].rozmer).h)
   : cellsOf(it).length;
 const itRozmer = (it) => (PRVKY[it.typ] && PRVKY[it.typ].maly && it.rozmer)
   ? { w: it.rozmer.w, h: it.rozmer.h } : null;
@@ -1635,9 +1643,33 @@ function rectKeys(x0, y0, x1, y1) {
     for (let x = Math.min(x0,x1); x < Math.max(x0,x1); x++) out.push(ck(x,y));
   return out;
 }
+const jeMaly = (it) => !!(it && PRVKY[it.typ] && PRVKY[it.typ].maly);
+/* Obdelnik prvku v metrech. Male prvky maji vlastni pozici i rozmer,
+   takze se jich do jednoho metru vejde kolik je potreba. */
+function rectOf(it) {
+  if (jeMaly(it) && it.m) {
+    const rz = it.rozmer || PRVKY[it.typ].rozmer;
+    return { x0:it.m.x, y0:it.m.y, x1:it.m.x+rz.w, y1:it.m.y+rz.h, w:rz.w, h:rz.h };
+  }
+  const b = itBBox(it);
+  if (jeMaly(it) && it.rozmer) {
+    return { x0:b.x0, y0:b.y0, x1:b.x0+it.rozmer.w, y1:b.y0+it.rozmer.h, w:it.rozmer.w, h:it.rozmer.h };
+  }
+  return b;
+}
+/* Velke prvky si ctverecek drzi vyhradne, male ne */
 function ownerAt(key) {
-  for (const i of items()) if ((i.cells||[]).indexOf(key) >= 0) return i;
+  for (const i of items()) if (!jeMaly(i) && (i.cells||[]).indexOf(key) >= 0) return i;
   return null;
+}
+/* Presny zasah: nejdriv male prvky podle skutecneho obdelniku, pak velke */
+function prvekNaBode(wx, wy) {
+  const male = items().filter(jeMaly).reverse();
+  for (const i of male) {
+    const r = rectOf(i);
+    if (wx >= r.x0 && wx <= r.x1 && wy >= r.y0 && wy <= r.y1) return i;
+  }
+  return ownerAt(ck(Math.floor(wx), Math.floor(wy)));
 }
 function pruneEmpty() {
   Object.keys(state.items).forEach(id => {
@@ -1648,12 +1680,15 @@ function pruneEmpty() {
     }
   });
 }
-/* Pridani ctverecku jednomu prvku. Co patrilo jinemu, se mu odebere. */
+/* Pridani ctverecku jednomu prvku. Co patrilo jinemu velkemu, se mu odebere.
+   Maly prvek nikomu nic nebere, jen si poznamena, nad kterym metrem stoji. */
 function addCells(it, keys) {
   const mine = new Set(it.cells || []);
   keys.forEach(k => {
-    const o = ownerAt(k);
-    if (o && o.id !== it.id) o.cells = o.cells.filter(x => x !== k);
+    if (!jeMaly(it)) {
+      const o = ownerAt(k);
+      if (o && o.id !== it.id) o.cells = o.cells.filter(x => x !== k);
+    }
     mine.add(k);
   });
   it.cells = [...mine];
@@ -1674,6 +1709,11 @@ function novyPrvek(typ, keys) {
   return it;
 }
 function moveItemBy(it, dx, dy) {
+  if (jeMaly(it) && it.m) {
+    it.m = { x: Math.round((it.m.x + dx) * 20) / 20, y: Math.round((it.m.y + dy) * 20) / 20 };
+    it.cells = [ck(Math.floor(it.m.x), Math.floor(it.m.y))];
+    return;
+  }
   const keys = cellsOf(it).map(k => { const c = cxy(k); return ck(c[0]+dx, c[1]+dy); });
   it.cells = [];
   addCells(it, keys);
@@ -3224,12 +3264,12 @@ const PRIDAT = ['bed','raised','trough','pot','paved','house'];
 const RADY = {
   outline:  { t:'Kreslíš obrys zahrady', s:'Klepej po obvodu. Vrcholy se dají tahat, kroužkem na hraně vložíš nový.' },
   erase:    { t:'Mažeš', s:'Táhni prstem přes to, co má zmizet.' },
-  bed:      { t:'Kreslíš záhon', s:'Táhni prstem obdélník. Rohy a hrany dolaď potom.' },
-  raised:   { t:'Kreslíš vyvýšený záhon', s:'Táhni prstem obdélník — třeba 1 × 3 m.' },
-  trough:   { t:'Kladeš truhlík', s:'Klepni, kam ho dáš. Tažením udělej delší.' },
-  pot:      { t:'Kladeš květináče', s:'Každé klepnutí = jeden kýbl nebo květináč.' },
-  house:    { t:'Kreslíš dům', s:'Táhni obdélník domu, garáže nebo skleníku.' },
-  paved:    { t:'Kreslíš cestu', s:'Táhni prstem dlážděnou plochu nebo terasu.' },
+  bed:      { t:'Maluješ záhon', s:'Táhni prstem po zahradě, maluje se po čtverečcích.' },
+  raised:   { t:'Maluješ vyvýšený záhon', s:'Táhni prstem, kudy má vést dřevěný rám.' },
+  trough:   { t:'Kladeš truhlíky', s:'Klepni nebo táhni. Do jednoho metru se jich vejde víc.' },
+  pot:      { t:'Kladeš květináče', s:'Klepni nebo táhni. Do jednoho metru se jich vejde víc.' },
+  house:    { t:'Maluješ dům', s:'Táhni prstem půdorys domu, garáže nebo skleníku.' },
+  paved:    { t:'Maluješ cestu', s:'Táhni prstem, kudy cesta vede.' },
 };
 
 function kresliMapu() {
@@ -3247,10 +3287,10 @@ function kresliMapu() {
     <div class="map">
       <div id="cv"><svg id="svg" aria-label="Plán zahrady"></svg></div>
 
-      ${prazdno && !state.panel ? `<div class="empty" style="position:absolute;inset:0;display:grid;place-content:center;z-index:2">
+      ${prazdno && !state.panel ? `<div class="empty" style="position:absolute;inset:0;display:grid;place-content:center;z-index:2;pointer-events:none">
         <div class="ei">${ik('mapa')}</div>
         <h3>Zatím prázdná zahrada</h3>
-        <p>Načti svou parcelu z katastru podle adresy,<br>nebo si obrys nakresli sám.</p>
+        <p>Vlevo si vyber, co kreslit, a táhni prstem.<br>Nebo si načti parcelu z katastru podle adresy.</p>
       </div>` : ''}
 
       ${nacitam ? `<div class="m-load"><div class="spin"></div><span>${esc(katStav.text)}</span></div>` : ''}
@@ -3342,13 +3382,16 @@ function kresliMapu() {
   const ru = el('r-ukaz'); if (ru) ru.onclick = () => {
     state.panelSkryt = false; state.sel = null; save(); kresliMapu();
   };
-  el('z-zamek').onclick = () => {
+  // lišta může být sbalená, proto se na každé tlačítko sáhne jen když existuje
+  const zz = el('z-zamek');
+  if (zz) zz.onclick = () => {
     if (!state.zamek) {
       state.zamek = true; state.tool = 'pan'; state.selVert = null;
       save(); kresliMapu(); toast('Zamčeno — zahrada se ukáže v plné parádě');
     } else dialogZamek();
   };
-  el('t-adresa').onclick = () => { state.panel = true; state.tool = 'pan'; save(); kresliMapu(); };
+  const ta = el('t-adresa');
+  if (ta) ta.onclick = () => { state.panel = true; state.tool = 'pan'; save(); kresliMapu(); };
   const mh = el('m-hotovo'); if (mh) mh.onclick = () => nastav('pan');
 
   s.querySelectorAll('[data-parcela]').forEach(b => b.onclick = () => prepniParcelu(Number(b.dataset.parcela)));
@@ -3375,7 +3418,7 @@ function kresliMapu() {
     save(); kresliMapu();
   };
 
-  el('z-in').onclick  = () => { const r = cvRect(); zoomAt(1.3, r.width/2, r.height/2); };
+  if (el('z-in')) el('z-in').onclick  = () => { const r = cvRect(); zoomAt(1.3, r.width/2, r.height/2); };
   el('z-out').onclick = () => { const r = cvRect(); zoomAt(1/1.3, r.width/2, r.height/2); };
   el('z-fit').onclick = () => fitView();
 
@@ -3473,11 +3516,12 @@ function posadPanel() {
   if (sh) { sh.style.bottom = '0px'; hs = sh.offsetHeight || 0; }
   if (zo) zo.style.bottom = (hs + 14) + 'px';
   if (sc) sc.style.bottom = (hs + 18) + 'px';
-  if (ra) {
+  const lista = ra || el('r-ukaz');
+  if (lista) {
     const cv = el('cv');
     const misto = (cv ? cv.clientHeight : 400) - hs;
-    const vys = ra.offsetHeight || 0;
-    ra.style.top = Math.max(14, Math.round((misto - vys) / 2)) + 'px';
+    const vys = lista.offsetHeight || 0;
+    lista.style.top = Math.max(14, Math.round((misto - vys) / 2)) + 'px';
   }
 }
 
@@ -3589,21 +3633,46 @@ function kresliPlatno() {
   /* Zamčená zahrada se přepne do hezkého režimu: tráva, hlína, dlažba.
      Dokud se kreslí, zůstává plán plochý, ať je dobře vidět, co dělám. */
   const hezky = !!state.zamek;
-  if (hezky) parts.push(`<defs>
-    <pattern id="vz-trava" width="16" height="16" patternUnits="userSpaceOnUse">
-      <rect width="16" height="16" fill="#d7e9c7"/>
-      <path d="M3 13c0-3 .6-4.6 1.4-6M8 15c0-3.6.8-5.6 2-7.4M12.5 13c0-2.6.5-4 1.2-5.4" stroke="#b7d3a0" stroke-width="1.3" fill="none" stroke-linecap="round"/>
-    </pattern>
-    <pattern id="vz-hlina" width="10" height="10" patternUnits="userSpaceOnUse">
-      <rect width="10" height="10" fill="#9a6f47"/>
-      <circle cx="2.5" cy="3" r="1" fill="#875f3b"/><circle cx="7.5" cy="7.5" r="1.2" fill="#ad8057"/>
-      <circle cx="6" cy="2" r=".8" fill="#875f3b"/><circle cx="2" cy="8" r=".9" fill="#ad8057"/>
-    </pattern>
-    <pattern id="vz-dlazba" width="18" height="18" patternUnits="userSpaceOnUse">
-      <rect width="18" height="18" fill="#ded8c8"/>
-      <path d="M0 9h18M9 0v9M4.5 9v9M13.5 9v9" stroke="#c3bba6" stroke-width="1.4"/>
-    </pattern>
-  </defs>`);
+  if (hezky) {
+    /* Vzory jsou ukotvené ke světu, ne k obrazovce: dlaždice má přesně
+       jeden metr, takže se tráva i hlína posouvají a přibližují spolu
+       s plánem místo aby stály na místě. */
+    const T = Math.max(10, view.scale);           // jeden metr v pixelech
+    const ox = (-view.ox * view.scale).toFixed(2), oy = (-view.oy * view.scale).toFixed(2);
+    const u = (n) => (n * T).toFixed(2);
+    parts.push(`<defs>
+      <pattern id="vz-trava" width="${u(1)}" height="${u(1)}" patternUnits="userSpaceOnUse" patternTransform="translate(${ox} ${oy})">
+        <rect width="${u(1)}" height="${u(1)}" fill="#7fb956"/>
+        <rect x="${u(0)}" y="${u(0)}" width="${u(.5)}" height="${u(.5)}" fill="#86c05c"/>
+        <rect x="${u(.5)}" y="${u(.5)}" width="${u(.5)}" height="${u(.5)}" fill="#86c05c"/>
+        <path d="M${u(.14)} ${u(.4)}q${u(.04)} -${u(.13)} ${u(.1)} -${u(.2)}M${u(.62)} ${u(.86)}q${u(.05)} -${u(.14)} ${u(.11)} -${u(.22)}M${u(.8)} ${u(.3)}q${u(.04)} -${u(.1)} ${u(.09)} -${u(.17)}M${u(.33)} ${u(.74)}q${u(.04)} -${u(.1)} ${u(.09)} -${u(.17)}"
+          stroke="#6aa344" stroke-width="${u(.035)}" fill="none" stroke-linecap="round"/>
+        <path d="M${u(.45)} ${u(.26)}q${u(.04)} -${u(.1)} ${u(.09)} -${u(.16)}M${u(.1)} ${u(.92)}q${u(.04)} -${u(.1)} ${u(.09)} -${u(.16)}"
+          stroke="#9ad06e" stroke-width="${u(.03)}" fill="none" stroke-linecap="round"/>
+      </pattern>
+      <pattern id="vz-hlina" width="${u(1)}" height="${u(.5)}" patternUnits="userSpaceOnUse" patternTransform="translate(${ox} ${oy})">
+        <rect width="${u(1)}" height="${u(.5)}" fill="#8a5f3a"/>
+        <rect y="${u(.03)}" width="${u(1)}" height="${u(.17)}" fill="#9b6e45"/>
+        <rect y="${u(.3)}" width="${u(1)}" height="${u(.14)}" fill="#7a5130"/>
+        <circle cx="${u(.2)}" cy="${u(.12)}" r="${u(.022)}" fill="#6d4728"/>
+        <circle cx="${u(.66)}" cy="${u(.09)}" r="${u(.018)}" fill="#6d4728"/>
+        <circle cx="${u(.42)}" cy="${u(.38)}" r="${u(.02)}" fill="#a87c50"/>
+        <circle cx="${u(.86)}" cy="${u(.36)}" r="${u(.018)}" fill="#a87c50"/>
+      </pattern>
+      <pattern id="vz-dlazba" width="${u(1)}" height="${u(1)}" patternUnits="userSpaceOnUse" patternTransform="translate(${ox} ${oy})">
+        <rect width="${u(1)}" height="${u(1)}" fill="#a9a393"/>
+        <rect x="${u(.04)}" y="${u(.04)}" width="${u(.44)}" height="${u(.42)}" rx="${u(.06)}" fill="#c6bfad"/>
+        <rect x="${u(.54)}" y="${u(.06)}" width="${u(.4)}" height="${u(.4)}" rx="${u(.06)}" fill="#bdb6a4"/>
+        <rect x="${u(.06)}" y="${u(.54)}" width="${u(.4)}" height="${u(.4)}" rx="${u(.06)}" fill="#bdb6a4"/>
+        <rect x="${u(.52)}" y="${u(.52)}" width="${u(.44)}" height="${u(.42)}" rx="${u(.06)}" fill="#c6bfad"/>
+      </pattern>
+      <pattern id="vz-drevo" width="${u(1)}" height="${u(.34)}" patternUnits="userSpaceOnUse" patternTransform="translate(${ox} ${oy})">
+        <rect width="${u(1)}" height="${u(.34)}" fill="#a9763f"/>
+        <rect y="${u(.02)}" width="${u(1)}" height="${u(.12)}" fill="#bb8a4f"/>
+        <path d="M0 ${u(.33)}h${u(1)}" stroke="#7d5428" stroke-width="${u(.03)}"/>
+      </pattern>
+    </defs>`);
+  }
   // dalsi vybrane parcely pod hlavnim obrysem
   (state.vedlejsi || []).forEach(poly => {
     if (poly.length < 3) return;
@@ -3628,19 +3697,14 @@ function kresliPlatno() {
     const d = PRVKY[it.typ] || PRVKY.bed;
     const c = crop(it.cropId);
     const out = !itemInside(it);
-    let b = itBBox(it);
-    // malé prvky mají vlastní rozměr v metrech, klidně pod jeden metr
-    if (PRVKY[it.typ].maly && it.rozmer) {
-      b = { x0:b.x0, y0:b.y0, x1:b.x0 + it.rozmer.w, y1:b.y0 + it.rozmer.h,
-            w:it.rozmer.w, h:it.rozmer.h };
-    }
+    const b = rectOf(it);
     const sp0 = w2s(b.x0, b.y0), bw = b.w*s, bh = b.h*s;
     const r = Math.min(7, Math.max(2, Math.min(bw,bh)*0.22));
 
     /* Obdelnikove prvky kreslime jako jeden zakulaceny tvar — plan tak
        vypada jako zahrada, ne jako milimetrovy papir. Nepravidelne
        tvary zustavaji po ctverecich. */
-    const jednoduchy = isRect(it) || !!(PRVKY[it.typ].maly && it.rozmer);
+    const jednoduchy = isRect(it) || jeMaly(it);
     const telo = (vypln, opacita, posunX, posunY, uzsi) => {
       if (jednoduchy) {
         return `<rect x="${(sp0[0]+(posunX||0)).toFixed(1)}" y="${(sp0[1]+(posunY||0)).toFixed(1)}" width="${Math.max(1,bw-(uzsi||0)*2).toFixed(1)}" height="${Math.max(1,bh-(uzsi||0)*2).toFixed(1)}" rx="${r.toFixed(1)}" fill="${vypln}" fill-opacity="${opacita}"/>`;
@@ -3659,7 +3723,8 @@ function kresliPlatno() {
 
     const vypln = !hezky ? d.fill
       : (it.typ === 'paved' ? 'url(#vz-dlazba)'
-      : (roste(it) ? 'url(#vz-hlina)' : d.fill));
+      : (it.typ === 'raised' || it.typ === 'trough' ? 'url(#vz-drevo)'
+      : (roste(it) ? 'url(#vz-hlina)' : d.fill)));
     parts.push(telo(vypln, 1));
     // hlína v záhonu: jemné řádky, ne šachovnice
     if (roste(it) && s >= 7 && jednoduchy && !hezky) {
@@ -3672,6 +3737,10 @@ function kresliPlatno() {
     }
     // osázený záhon má zelený nádech
     if (roste(it) && c) parts.push(telo('#3f8c3f', hezky ? 0.22 : 0.3));
+    if (hezky && jednoduchy && (it.typ === 'raised' || it.typ === 'trough') && bw > 16 && bh > 16) {
+      const ram = Math.max(2.5, Math.min(bw, bh) * 0.13);
+      parts.push(`<rect x="${(sp0[0]+ram).toFixed(1)}" y="${(sp0[1]+ram).toFixed(1)}" width="${(bw-ram*2).toFixed(1)}" height="${(bh-ram*2).toFixed(1)}" rx="${Math.max(1,r-2).toFixed(1)}" fill="url(#vz-hlina)"/>`);
+    }
     // v hezkém režimu dostane vyvýšený záhon a truhlík dřevěný bok
     if (hezky && jednoduchy && (it.typ === 'raised' || it.typ === 'trough' || it.typ === 'pot') && bh > 14) {
       const bok = Math.min(7, bh * 0.22);
@@ -3694,6 +3763,34 @@ function kresliPlatno() {
       parts.push(`<path d="${ep}" fill="none" stroke="${out?'var(--danger)':d.line}" stroke-width="${out?2.6:2}" stroke-linejoin="round" stroke-linecap="round" ${out?'stroke-dasharray="6 4"':''}/>`);
     }
 
+    /* V zamčené zahradě nejsou plodiny jen ikonka uprostřed, ale
+       rozsazené v řádcích podle svého rozestupu — záhon tak vypadá
+       opravdu osázený. */
+    let radky = false;
+    if (hezky && roste(it) && c && s >= 14) {
+      const hust = c.hustota || 4;
+      const rozestup = clamp(1 / Math.sqrt(hust), 0.25, 0.9);
+      const krok = rozestup * s;
+      const sloupcu = Math.floor((bw - krok*0.35) / krok), rad = Math.floor((bh - krok*0.35) / krok);
+      if (sloupcu >= 1 && rad >= 1 && krok >= 7 && sloupcu * rad <= 180) {
+        const zn2 = plodinaZnak(c);
+        const vel2 = Math.min(krok * 0.78, 26);
+        const okX = sp0[0] + (bw - sloupcu*krok)/2 + krok/2;
+        const okY = sp0[1] + (bh - rad*krok)/2 + krok/2;
+        for (let ry = 0; ry < rad; ry++) for (let rx = 0; rx < sloupcu; rx++) {
+          const cx2 = okX + rx*krok, cy2 = okY + ry*krok;
+          if (zn2.typ === 'msym') {
+            parts.push(`<text x="${cx2.toFixed(1)}" y="${cy2.toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="${vel2.toFixed(1)}" font-family="${SADY[zn2.sada].font}" fill="#2f6b2f">${esc(zn2.v)}</text>`);
+          } else if (zn2.typ === 'emoji') {
+            parts.push(`<text x="${cx2.toFixed(1)}" y="${cy2.toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="${vel2.toFixed(1)}">${zn2.v}</text>`);
+          } else {
+            parts.push(`<circle cx="${cx2.toFixed(1)}" cy="${cy2.toFixed(1)}" r="${(vel2*0.34).toFixed(1)}" fill="#4e9b48"/>`);
+          }
+        }
+        radky = true;
+      }
+    }
+
     /* Obrázek a jméno vedle sebe, bez podkladu. Cesty a zpevněné plochy
        žádnou ikonu nedostanou, jen popisek. */
     const zn = (it.typ === 'paved') ? null
@@ -3702,7 +3799,7 @@ function kresliPlatno() {
     const fs = Math.min(13, Math.max(9, bh * 0.36));
     const velI = Math.min(bh * 0.62, bw * 0.5, 30);
     const siroky = bw > 54 && bh > 13;
-    const maIkonu = !!(zn && zn.v) && velI >= 12 && bh > 16;
+    const maIkonu = !!(zn && zn.v) && velI >= 12 && bh > 16 && !radky;
     const sirkaTxt = (siroky && it.typ !== 'paved') ? txt.length * fs * 0.53 : 0;
     const mezera = (maIkonu && siroky) ? 5 : 0;
     const cel = (maIkonu ? velI : 0) + mezera + sirkaTxt;
@@ -3728,7 +3825,13 @@ function kresliPlatno() {
       bx += velI + mezera;
     }
     if (siroky && sirkaTxt > 0 && it.typ !== 'paved') {
-      parts.push(`<text x="${bx.toFixed(1)}" y="${by.toFixed(1)}" dominant-baseline="central" font-size="${fs.toFixed(1)}" font-weight="700" fill="${barva}" style="paint-order:stroke" stroke="${halo}" stroke-width="2.8">${esc(txt)}</text>`);
+      if (radky) {
+        const pw = sirkaTxt + 12, ph = fs * 1.7;
+        parts.push(`<rect x="${(sp0[0] + bw/2 - pw/2).toFixed(1)}" y="${(by - ph/2).toFixed(1)}" width="${pw.toFixed(1)}" height="${ph.toFixed(1)}" rx="${(ph/2).toFixed(1)}" fill="rgba(28,42,28,.62)"/>`);
+        parts.push(`<text x="${(sp0[0] + bw/2).toFixed(1)}" y="${by.toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="${fs.toFixed(1)}" font-weight="700" fill="#ffffff">${esc(txt)}</text>`);
+      } else {
+        parts.push(`<text x="${bx.toFixed(1)}" y="${by.toFixed(1)}" dominant-baseline="central" font-size="${fs.toFixed(1)}" font-weight="700" fill="${barva}" style="paint-order:stroke" stroke="${halo}" stroke-width="2.8">${esc(txt)}</text>`);
+      }
     }
 
     // stavove odznaky v rohu: co tenhle zahon prave potrebuje
@@ -3790,6 +3893,77 @@ function kresliPlatno() {
   svg.innerHTML = parts.join('');
 }
 
+/* ============ ŠTĚTEC ============
+   Prst maluje, co je pod ním. Velké prvky po čtverečcích a slepují se
+   se sousedem stejného druhu, malé se kladou jeden vedle druhého, takže
+   se jich do jednoho metru vejde několik. */
+function namaluj(g, wx, wy) {
+  const typ = g.prvek, d = PRVKY[typ];
+  if (d.maly) {
+    const rz = d.rozmer;
+    // razítkujeme po půlce rozměru, ať se při tažení nenaskládají na sebe
+    const krok = Math.max(0.2, Math.min(rz.w, rz.h) * 0.9);
+    const kl = Math.round(wx/krok) + ',' + Math.round(wy/krok);
+    if (g.done.has(kl)) return false;
+    g.done.add(kl);
+    const x = Math.round((wx - rz.w/2) * 20) / 20;
+    const y = Math.round((wy - rz.h/2) * 20) / 20;
+    const it = novyPrvek(typ, [ck(Math.floor(x), Math.floor(y))]);
+    it.m = { x, y };
+    return true;
+  }
+  const kx = Math.floor(wx), ky = Math.floor(wy), k = ck(kx, ky);
+  if (g.done.has(k)) return false;
+  g.done.add(k);
+  const stary = ownerAt(k);
+  if (stary && stary.zamek) { g.zamceno = true; return false; }
+  if (stary && stary.typ === typ) return false;
+  // slepit se sousedem stejného druhu, ať záhon zůstane jeden celek
+  let cil = g.cil ? state.items[g.cil] : null;
+  if (!cil) {
+    const sous = new Set();
+    [[1,0],[-1,0],[0,1],[0,-1]].forEach(dd => {
+      const o = ownerAt(ck(kx+dd[0], ky+dd[1]));
+      if (o && o.typ === typ && !o.zamek) sous.add(o.id);
+    });
+    const ids = [...sous];
+    if (ids.length) {
+      cil = state.items[ids[0]];
+      ids.slice(1).forEach(id => { const o = state.items[id]; if (o) addCells(cil, o.cells.slice()); });
+    }
+  }
+  if (!cil) {
+    // rovnou s prvním čtverečkem — prázdný prvek by se hned zahodil
+    cil = novyPrvek(typ, [k]);
+    g.cil = cil.id;
+    return true;
+  }
+  g.cil = cil.id;
+  addCells(cil, [k]);
+  return true;
+}
+/* Guma: malý prvek zmizí celý, velkému ubude čtvereček */
+function smazNaBode(g, wx, wy) {
+  const male = items().filter(jeMaly).reverse();
+  for (const i of male) {
+    const r = rectOf(i);
+    if (wx >= r.x0 && wx <= r.x1 && wy >= r.y0 && wy <= r.y1) {
+      if (i.zamek) { g.zamceno = true; return false; }
+      delete state.items[i.id];
+      if (state.sel === i.id) state.sel = null;
+      return true;
+    }
+  }
+  const k = ck(Math.floor(wx), Math.floor(wy));
+  if (g.done.has(k)) return false;
+  const o = ownerAt(k);
+  if (!o) return false;
+  if (o.zamek) { g.zamceno = true; return false; }
+  g.done.add(k);
+  removeCells([k]);
+  return true;
+}
+
 /* --- gesta --- */
 let ptrs = new Map(), gest = null;
 function napojPlatno() {
@@ -3835,15 +4009,16 @@ function napojPlatno() {
 
     if (state.tool === 'erase') {
       gest = { type:'erase', start:p, moved:false, done:new Set() };
-      const k = cellAt(p.x, p.y);
-      const o = ownerAt(k);
-      if (!o || !o.zamek) { gest.done.add(k); removeCells([k]); scheduleRender(); }
+      const w = s2w(p.x, p.y);
+      if (smazNaBode(gest, w[0], w[1])) scheduleRender();
       return;
     }
 
     if (PRVKY[state.tool]) {
+      gest = { type:'stetec', prvek: state.tool, start:p, moved:false, done:new Set() };
       const w = s2w(p.x, p.y);
-      gest = { type:'rect', prvek: state.tool, ax: Math.floor(w[0]), ay: Math.floor(w[1]), start:p, moved:false };
+      namaluj(gest, w[0], w[1]);
+      scheduleRender();
       return;
     }
 
@@ -3854,7 +4029,8 @@ function napojPlatno() {
       const h = handlesOf(sel).find(h => Math.hypot(h.p[0]-p.x, h.p[1]-p.y) <= 18);
       if (h) { gest = { type:'stretch', id:sel.id, side:h.side, start:p, applied:0, moved:false }; return; }
     }
-    const own = ownerAt(cellAt(p.x, p.y));
+    const wq = s2w(p.x, p.y);
+    const own = prvekNaBode(wq[0], wq[1]);
     if (own && state.sel === own.id && !own.zamek && !state.zamek) {
       gest = { type:'move', id:own.id, start:p, last:{dx:0,dy:0}, moved:false }; return;
     }
@@ -3883,17 +4059,14 @@ function napojPlatno() {
       scheduleRender(); return;
     }
     if (gest.type === 'erase') {
-      const k = cellAt(p.x, p.y);
-      const o = ownerAt(k);
-      if (!gest.done.has(k) && (!o || !o.zamek)) { gest.done.add(k); removeCells([k]); scheduleRender(); }
+      const w = s2w(p.x, p.y);
+      if (smazNaBode(gest, w[0], w[1])) scheduleRender();
       return;
     }
-    if (gest.type === 'rect') {
+    if (gest.type === 'stetec') {
       const w = s2w(p.x, p.y);
-      const bx = Math.floor(w[0]), by = Math.floor(w[1]);
-      const x0 = Math.min(gest.ax, bx), y0 = Math.min(gest.ay, by);
-      preview = { prvek:gest.prvek, x:x0, y:y0, w: Math.abs(bx-gest.ax)+1, h: Math.abs(by-gest.ay)+1 };
-      scheduleRender(); return;
+      if (namaluj(gest, w[0], w[1])) scheduleRender();
+      return;
     }
     if (gest.type === 'vertex' && gest.moved) {
       state.outline[gest.i] = snapW(...s2w(p.x, p.y));
@@ -3956,37 +4129,13 @@ function napojPlatno() {
       else { state.selVert = (state.selVert === g.i) ? null : g.i; save(); kresliMapu(); }
       return;
     }
-    if (g.type === 'erase') { save(); kresliMapu(); return; }
+    if (g.type === 'erase') {
+      if (g.zamceno) toast('Tahle část je zamčená');
+      save(); kresliMapu(); return;
+    }
 
-    if (g.type === 'rect') {
-      const pv = preview; preview = null;
-      const w = s2w(g.start.x, g.start.y);
-      const box = pv || { prvek:g.prvek, x:Math.floor(w[0]), y:Math.floor(w[1]), w:1, h:1 };
-      let keys = rectKeys(box.x, box.y, box.x+box.w, box.y+box.h);
-      // na zamcene prvky se kreslit neda
-      keys = keys.filter(k => { const o = ownerAt(k); return !o || !o.zamek; });
-      if (!keys.length) { toast('Tahle část je zamčená'); kresliMapu(); return; }
-      // ctverecky vedle sebe patri k jednomu prvku stejneho typu;
-      // kvetinace jsou kazdy sam za sebe, proto se nikdy nespojuji
-      const sousedi = new Set();
-      if (!PRVKY[box.prvek].samostatny) keys.forEach(k => {
-        const c = cxy(k);
-        [[1,0],[-1,0],[0,1],[0,-1]].forEach(dd => {
-          const o = ownerAt(ck(c[0]+dd[0], c[1]+dd[1]));
-          if (o && o.typ === box.prvek && !o.zamek) sousedi.add(o.id);
-        });
-      });
-      let target = null;
-      if (sousedi.size) {
-        const ids = [...sousedi];
-        target = state.items[ids[0]];
-        ids.slice(1).forEach(id => { const o = state.items[id]; if (o) { addCells(target, o.cells.slice()); } });
-        addCells(target, keys);
-      } else if (PRVKY[box.prvek].samostatny) {
-        keys.forEach(k => { target = novyPrvek(box.prvek, [k]); });
-      } else {
-        target = novyPrvek(box.prvek, keys);
-      }
+    if (g.type === 'stetec') {
+      if (g.zamceno) toast('Tahle část je zamčená');
       state.sel = null;
       save(); kresliMapu();
       return;
