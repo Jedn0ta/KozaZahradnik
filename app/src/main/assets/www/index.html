@@ -198,7 +198,7 @@ h1,h2,h3,h4 { margin: 0; font-weight: 800; letter-spacing: -.02em; }
 #svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 
 .m-search {
-  position: absolute; top: 60px; left: 78px; right: 12px; z-index: 4;
+  position: absolute; top: 60px; left: 70px; right: 12px; z-index: 4;
   display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 8px 0 16px;
   background: var(--card); border-radius: 26px; box-shadow: var(--sh-lift);
   font-size: 15px; font-weight: 700; color: var(--ink); text-align: left;
@@ -262,7 +262,7 @@ h1,h2,h3,h4 { margin: 0; font-weight: 800; letter-spacing: -.02em; }
 
 /* režim kreslení: jasně napsané, co se právě děje */
 .m-mode {
-  position: absolute; top: 12px; left: 78px; right: 12px; z-index: 5;
+  position: absolute; top: 12px; left: 12px; right: 12px; z-index: 5;
   display: flex; align-items: center; gap: 10px; padding: 9px 10px 9px 12px;
   background: var(--acc-dark); color: #fff; border-radius: 18px; box-shadow: var(--sh-lift);
 }
@@ -821,9 +821,52 @@ body { font-size: 17px; }
 }
 .varovani .ik { width: 20px; height: 20px; flex: none; margin-top: 1px; }
 
+/* malá tlačítka nástrojů vlevo nahoře */
+.mnastroje {
+  position: absolute; left: 12px; top: 60px; z-index: 6;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.mnastroje button {
+  width: 46px; height: 46px; border-radius: 15px; background: var(--card);
+  border: 1.5px solid var(--line); box-shadow: var(--sh-lift);
+  display: grid; place-items: center; padding: 11px; color: var(--ink2);
+}
+.mnastroje button .ik { width: 24px; height: 24px; }
+.mnastroje button[disabled] { opacity: .38; }
+.mnastroje button.on { background: var(--acc); border-color: var(--acc-dark); color: var(--acc-ink); }
+.mnastroje button:active { transform: scale(.93); }
+
+/* hlavní tlačítko Přidat */
+.fab {
+  position: absolute; right: 14px; z-index: 6;
+  display: flex; align-items: center; gap: 8px; height: 58px; padding: 0 22px 0 18px;
+  border-radius: 29px; background: var(--acc); color: var(--acc-ink);
+  border: 1.5px solid var(--acc-dark); box-shadow: var(--sh-lift);
+  font-size: 16.5px; font-weight: 800;
+}
+.fab .ik { width: 24px; height: 24px; }
+.fab:active { transform: scale(.95); background: var(--acc-dark); }
+
+/* lišta vybraného prvku */
+.selhlava { display: flex; align-items: center; gap: 11px; margin-bottom: 12px; }
+.selhlava .si { width: 44px; height: 44px; flex: none; border-radius: 13px; background: var(--bg2); padding: 8px; }
+.selhlava .sn { display: block; flex: 1; min-width: 0; }
+.selhlava .sn b { display: block; font-size: 17px; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.selhlava .sn span { display: block; font-size: 13.5px; font-weight: 600; color: var(--ink2); }
+.geo { display: flex; gap: 8px; margin-bottom: 14px; }
+.geo button {
+  flex: 1; min-width: 0; height: 56px; border-radius: 15px; border: 1.5px solid var(--line);
+  background: var(--bg); display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 3px; font-size: 12px; font-weight: 700; color: var(--ink2);
+}
+.geo button .ik { width: 22px; height: 22px; }
+.geo button:active { background: var(--acc-soft); border-color: var(--acc); }
+.geo button.cerv { color: var(--danger); }
+.geo button.cerv:active { background: #f7e3e0; border-color: var(--danger); }
+
 /* pás zahrad nahoře */
 .zpas {
-  position: absolute; top: 10px; left: 72px; right: 10px; z-index: 5;
+  position: absolute; top: 10px; left: 10px; right: 10px; z-index: 5;
   display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 2px;
 }
 .zpas::-webkit-scrollbar { display: none; }
@@ -910,7 +953,7 @@ body { font-size: 17px; }
 
 <script>
 
-const VERZE = 'v3.5 · 25. 10. 2026';
+const VERZE = 'v4.0 · 25. 10. 2026';
 const LOGO_KOZEL = `<svg viewBox="0 0 32 32" aria-hidden="true">
   <path d="M11.2 9.4C9.6 6.6 7.4 4.6 4.6 3.9c-.5-.1-.9.3-.8.8.5 2.9 1.9 5.4 4.1 7.2.7.6 1.5 1 2.4 1.3z" fill="#fff" opacity=".95"/>
   <path d="M20.8 9.4c1.6-2.8 3.8-4.8 6.6-5.5.5-.1.9.3.8.8-.5 2.9-1.9 5.4-4.1 7.2-.7.6-1.5 1-2.4 1.3z" fill="#fff" opacity=".95"/>
@@ -958,7 +1001,6 @@ let state = {
   theme: null,
   uiVerze: 5,
   panelSkryt: false,   // svisla lista nastroju na planu
-  rozdelano: null,     // tvar, ktery se prave kresli a jeste nebyl potvrzen
   ukoly: [],           // vlastni ukoly zahradnika v kalendari
   radyEdit: {},        // uzivatelske prepisy vestavenych rad
   vlastniRady: [],     // rady, ktere si zahradnik napsal sam
@@ -2000,6 +2042,9 @@ const IK = {
   schovat:  S('<path d="M14.5 5.5 8 12l6.5 6.5"/>'),
   nastroje: S('<path d="M9.5 18.5 16 12 9.5 5.5"/><path d="M4.5 6v12"/>'),
   vic:      S('<circle cx="5.5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="18.5" cy="12" r="1.6" fill="currentColor"/>'),
+  otocit:   S('<path d="M20 11.5A8 8 0 1 0 18 17"/><path d="M20 5v6.5h-6.5"/>'),
+  kopie:    S('<rect x="8.5" y="8.5" width="12" height="12" rx="2"/><path d="M15.5 5.5h-11a1 1 0 0 0-1 1v11"/>'),
+  kos:      S('<path d="M4.5 7h15"/><path d="M9.5 7V4.5h5V7"/><path d="M6.5 7l1 13h9l1-13"/><path d="M10.5 11v5M13.5 11v5"/>'),
   poznamka: S('<path d="M5 4.5h14v15H5z"/><path d="M8.5 9h7M8.5 13h7M8.5 16.5h4"/>'),
   /* Prvky plánu. Každý má jiný obrys, ať se nepletou ani v malém. */
   p_bed:    S('<path d="M2.5 13.5h19v7h-19z"/><path d="M2.5 17h19"/><path d="M7 13.5V9M7 10.5 5 9M7 10.5 9 9M12 13.5V7.5M12 9 9.5 7.5M12 9l2.5-1.5M17 13.5V9M17 10.5 15 9M17 10.5 19 9"/>'),
@@ -2258,7 +2303,8 @@ function novyPrvek(typ, keys) {
   const rz = PRVKY[typ].rozmer ? { w:PRVKY[typ].rozmer.w, h:PRVKY[typ].rozmer.h } : null;
   const it = state.items[id] = { id, typ, cells:[], rozmer: rz, nazev: PRVKY[typ].nazev + ' ' + n,
     cropId:null, datumVysadby:'', poznamka:'', fotky:[], hnojeni:[], zalivka:[], sklizen:[], historie:[], udalosti:[], zaznamy:[], poznamky:[], rostliny:null, zamek:false };
-  addCells(it, keys);
+  // prázdný prvek se nesmí hned uklidit, čtverečky mu dodá volající
+  if (keys && keys.length) addCells(it, keys);
   return it;
 }
 /* Truhlík roste jen do délky, květináč jen v průměru — a oba do limitu. */
@@ -3895,42 +3941,41 @@ function kresliMapu() {
   if (state.sel && !vyb) state.sel = null;
   const prazdno = !state.outline.length && !items().length;
   const nacitam = katStav.stav === 'hledam';
-  const rezim = state.tool !== 'pan' ? RADY[state.tool] : null;
-  const rozdel = (rezim && state.rozdelano && state.items[state.rozdelano]) ? state.items[state.rozdelano] : null;
+  const klade = !!PRVKY[state.tool];
+  const obrys = state.tool === 'outline';
   const vyberParcel = katStav.stav === 'vyber' && state.katParcely;
-  /* Adresu nabízíme jen dokud není zahrada. Potom už jen malým tlačítkem v liště. */
-  const nabidniAdresu = !state.panel && !rezim && !state.outline.length && !items().length;
 
   s.innerHTML = `
     <div class="map">
       <div id="cv"><svg id="svg" aria-label="Plán zahrady"></svg></div>
 
-      ${prazdno && !state.panel ? `<div class="empty" style="position:absolute;inset:0;display:grid;place-content:center;z-index:2;pointer-events:none">
-        <div class="ei">${ik('mapa')}</div>
+      ${prazdno && !state.panel && !klade ? `<div class="empty" style="position:absolute;inset:0;display:grid;place-content:center;z-index:2;pointer-events:none">
+        <div class="ei">${ik('zahon')}</div>
         <h3>Zatím prázdná zahrada</h3>
-        <p>Vlevo si vyber, co kreslit, a táhni prstem.<br>Nebo si načti parcelu z katastru podle adresy.</p>
+        <p>Klepni dole na <b>Přidat</b> a táhni prstem<br>od tečky k tečce. Nebo si načti parcelu.</p>
       </div>` : ''}
 
       ${nacitam ? `<div class="m-load"><div class="spin"></div><span>${esc(katStav.text)}</span></div>` : ''}
 
-      ${rezim ? `<div class="m-mode">
-        <span class="mi">${state.tool === 'outline' ? ik('obrys') : (state.tool === 'erase' ? ik('guma') : ik('p_' + state.tool))}</span>
-        <span class="mt"><b>${rozdel ? esc(rozdel.nazev) : esc(rezim.t)}</b>
-          <span>${rozdel ? fmtA(itArea(rozdel)) + ' · zelenou fajfkou tvar potvrdíš' : esc(rezim.s)}</span></span>
-        <button id="m-hotovo" aria-label="Konec kreslení">${ik('zavrit')}</button>
-      </div>` : ''}
-
-      ${!rezim && !state.panel ? `<div class="zpas" id="zpas">
+      ${!klade && !obrys && !state.panel && !vyb ? `<div class="zpas" id="zpas">
         ${zahrady.map(z=>`<button class="zchip ${z.id===aktivniZahrada?'on':''}" data-zahrada="${esc(z.id)}">
           ${ik(z.id===aktivniZahrada ? 'mapa' : 'zahon')}<span>${esc(z.nazev)}</span></button>`).join('')}
         <button class="zchip plus" id="z-nova" aria-label="Nová zahrada">+</button>
       </div>` : ''}
 
-      ${nabidniAdresu ? `<button class="m-search plain" id="otevri-adresu">
-        <span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="10.5" r="3"/><path d="M12 21s7-5.6 7-10.5a7 7 0 1 0-14 0C5 15.4 12 21 12 21z"/></svg></span>
-        <span class="st">Najít mou parcelu podle adresy</span>
-        <span class="sx"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span>
-      </button>` : ''}
+      ${klade || obrys ? `<div class="m-mode">
+        <span class="mi">${obrys ? ik('obrys') : ik('p_' + state.tool)}</span>
+        <span class="mt"><b>${obrys ? 'Obrys zahrady' : esc(PRVKY[state.tool].nazev)}</b>
+          <span>${obrys ? 'Klepej po tečkách kolem pozemku' : 'Táhni prstem od tečky k tečce'}</span></span>
+        <button id="m-hotovo" aria-label="Zpět na ruku">${ik('zavrit')}</button>
+      </div>` : ''}
+
+      ${!klade && !obrys && !vyb ? `<div class="mnastroje" id="mnastroje">
+        <button id="t-zpet" ${zpetZasobnik.length?'':'disabled'} aria-label="Krok zpět" title="Zpět">${ik('zpet')}</button>
+        <button id="t-obrys" aria-label="Obrys zahrady" title="Obrys">${ik('obrys')}</button>
+        <button id="t-adresa" aria-label="Najít parcelu" title="Adresa">${ik('adresa')}</button>
+        <button class="${state.zamek?'on':''}" id="z-zamek" aria-label="${state.zamek?'Odemknout':'Zamknout'}" title="${state.zamek?'Odemknout':'Zamknout'}">${ik(state.zamek?'zamek':'odemek')}</button>
+      </div>` : ''}
 
       ${state.panel ? panelAdresy() : ''}
 
@@ -3942,7 +3987,10 @@ function kresliMapu() {
 
       <div class="m-scale" id="m-scale"><span class="b" id="sc-b"></span><span id="sc-t">5 m</span></div>
 
-      ${vyberParcel || vyb || (state.tool === 'outline' && state.outline.length) ? `<div class="msheet" id="msheet">
+      ${!klade && !obrys && !state.zamek && !vyb ? `<button class="fab" id="m-pridat">
+        ${ik('plus')}<span>Přidat</span></button>` : ''}
+
+      ${vyberParcel || vyb || (obrys && state.outline.length) ? `<div class="msheet" id="msheet">
         ${vyberParcel ? `
           <h3>Co patří k zahradě</h3>
           <div class="parcels">
@@ -3954,45 +4002,34 @@ function kresliMapu() {
           <p class="note">${esc(state.katObec || '')} · klepnutím přidáš nebo odebereš${kontrolaText()}</p>
           <button class="btn sm wide" id="kat-ok" style="margin-top:12px">Takhle je to dobře</button>
         ` : ''}
-        ${vyb ? (roste(vyb) ? `
+
+        ${vyb ? `
           <div class="selhlava">
-            <b>${esc(vyb.nazev)}</b>
-            <button class="tag" id="v-upravit">Upravit</button>
-            <button class="tag" id="v-off">×</button>
+            <span class="si">${crop(vyb.cropId) ? cropArt(crop(vyb.cropId)) : ik('p_' + vyb.typ)}</span>
+            <span class="sn"><b>${esc(vyb.nazev)}</b>
+              <span>${esc(PRVKY[vyb.typ].nazev)} · ${fmtA(itArea(vyb))} · ${fmtDim(rectOf(vyb).w, rectOf(vyb).h)}</span></span>
+            <button class="tag" id="v-off">Hotovo</button>
           </div>
-          ${kartaZahonu(vyb, new Date().getMonth()+1)}
-        ` : vybranyPrvek(vyb)) : ''}
-        ${state.tool === 'outline' && state.outline.length ? `
-          <p class="note" style="margin:${vyberParcel||vyb?'12px':'0'} 0 10px">
-            ${state.outlineDone ? 'Vrcholy se dají tahat, tažením uvnitř posuneš celý obrys.' : 'Klepej po obvodu. Až budeš mít objeto, obrys uzavři.'}</p>
+          <div class="geo">
+            ${PRVKY[vyb.typ].maly && !PRVKY[vyb.typ].kulaty ? `<button data-geo="otoc">${ik('otocit')}Otočit</button>` : ''}
+            <button data-geo="kopie">${ik('kopie')}Zdvojit</button>
+            <button data-geo="uprav">${ik('poznamka')}Upravit</button>
+            <button data-geo="smaz" class="cerv">${ik('kos')}Smazat</button>
+          </div>
+          ${roste(vyb) ? kartaZahonu(vyb, new Date().getMonth()+1) : ''}
+        ` : ''}
+
+        ${obrys && state.outline.length ? `
+          <p class="note" style="margin:0 0 10px">${state.outlineDone
+            ? 'Vrcholy se dají tahat, tažením uvnitř posuneš celý obrys.'
+            : 'Klepej po obvodu. Až budeš mít objeto, obrys uzavři.'}</p>
           <div class="dacts">
-            ${!state.outlineDone && state.outline.length >= 3 ? `<button class="btn sm" id="o-close">Uzavřít obrys</button>` : ''}
+            ${!state.outlineDone && state.outline.length >= 3 ? `<button class="btn sm" id="o-close">Uzavřít</button>` : ''}
             ${state.selVert != null && state.outline.length > 3 ? `<button class="btn sm sec" id="o-del">Smazat vrchol</button>` : ''}
             <button class="btn sm sec" id="o-undo">Zpět</button>
             <button class="btn sm sec" id="o-smaz" style="color:var(--danger)">Smazat obrys</button>
           </div>` : ''}
       </div>` : ''}
-
-      ${state.panelSkryt || (vyb && roste(vyb)) ? `
-        <button class="mrail-ukaz" id="r-ukaz" aria-label="Ukázat nástroje" title="Nástroje">${ik('nastroje')}</button>
-      ` : `
-      <div class="mrail" id="mrail">
-        <button class="${state.tool==='pan'?'on':''}" data-nastroj="pan" aria-label="Posouvat plán" title="Posouvat">${ik('ruka')}</button>
-        <button id="r-zpet" aria-label="Krok zpět" title="Zpět" ${zpetZasobnik.length?'':'disabled'}>${ik('zpet')}</button>
-        <hr class="del">
-        ${PRIDAT.map(t=>`<button class="${state.tool===t?'on':''}" data-nastroj="${t}"
-          aria-label="${esc(PRVKY[t].nazev)}" title="${esc(PRVKY[t].nazev)}">${ik('p_' + t)}</button>`).join('')}
-        <button class="${PRVKY[state.tool] && PRIDAT.indexOf(state.tool) < 0 ? 'on' : ''}" id="t-vic"
-          aria-label="Další prvky" title="${PRVKY[state.tool] && PRIDAT.indexOf(state.tool) < 0 ? esc(PRVKY[state.tool].nazev) : 'Další prvky'}">
-          ${PRVKY[state.tool] && PRIDAT.indexOf(state.tool) < 0 ? ik('p_' + state.tool) : ik('vic')}</button>
-        <hr class="del">
-        <button class="${state.tool==='outline'?'on':''}" data-nastroj="outline" aria-label="Upravit obrys zahrady" title="Obrys zahrady">${ik('obrys')}</button>
-        <button class="${state.tool==='erase'?'on':''}" data-nastroj="erase" aria-label="Mazat" title="Mazat">${ik('guma')}</button>
-        <hr class="del">
-        <button id="t-adresa" aria-label="Najít parcelu podle adresy" title="Adresa">${ik('adresa')}</button>
-        <button class="${state.zamek?'on':''}" id="z-zamek" aria-label="${state.zamek?'Odemknout zahradu':'Zamknout zahradu'}" title="${state.zamek?'Odemknout':'Zamknout'}">${ik(state.zamek?'zamek':'odemek')}</button>
-        <button id="r-schovat" aria-label="Schovat nástroje" title="Schovat">${ik('schovat')}</button>
-      </div>`}
     </div>
   `;
 
@@ -4002,53 +4039,35 @@ function kresliMapu() {
   });
   const zn = el('z-nova'); if (zn) zn.onclick = () => dialogZahrady(null);
 
-  const oa = el('otevri-adresu');
-  if (oa) oa.onclick = () => { state.panel = true; save(); kresliMapu(); };
-  if (state.panel) napojPanel();
-
   const nastav = (t) => {
     if (state.zamek && t !== 'pan') { dialogZamek(); return; }
-    if (state.tool === t && t !== 'pan') t = 'pan';
-    if (t !== state.tool) state.rozdelano = null;
     state.tool = t;
     if (t !== 'outline') state.selVert = null;
     if (t !== 'pan') state.sel = null;
     save(); kresliMapu();
   };
-  s.querySelectorAll('[data-nastroj]').forEach(b => b.onclick = () => nastav(b.dataset.nastroj));
-  const tv = el('t-vic'); if (tv) tv.onclick = () => { if (state.zamek) { dialogZamek(); return; } dialogPridat(); };
-  const rz = el('r-zpet'); if (rz) rz.onclick = () => krokZpet();
-  const rs = el('r-schovat'); if (rs) rs.onclick = () => { state.panelSkryt = true; save(); kresliMapu(); };
-  const ru = el('r-ukaz'); if (ru) ru.onclick = () => {
-    state.panelSkryt = false; state.sel = null; save(); kresliMapu();
-  };
-  // lišta může být sbalená, proto se na každé tlačítko sáhne jen když existuje
+  const mp = el('m-pridat'); if (mp) mp.onclick = () => { if (state.zamek) { dialogZamek(); return; } dialogPridat(); };
+  const mh = el('m-hotovo'); if (mh) mh.onclick = () => nastav('pan');
+  const tz = el('t-zpet'); if (tz) tz.onclick = () => krokZpet();
+  const to = el('t-obrys'); if (to) to.onclick = () => nastav('outline');
+  const ta = el('t-adresa'); if (ta) ta.onclick = () => { state.panel = true; state.tool = 'pan'; save(); kresliMapu(); };
   const zz = el('z-zamek');
   if (zz) zz.onclick = () => {
     if (!state.zamek) {
-      state.zamek = true; state.tool = 'pan'; state.selVert = null;
+      state.zamek = true; state.tool = 'pan'; state.sel = null; state.selVert = null;
       save(); kresliMapu(); toast('Zamčeno — zahrada se ukáže v plné parádě');
     } else dialogZamek();
   };
-  const ta = el('t-adresa');
-  if (ta) ta.onclick = () => { state.panel = true; state.tool = 'pan'; save(); kresliMapu(); };
-  const mh = el('m-hotovo'); if (mh) mh.onclick = () => { state.rozdelano = null; nastav('pan'); };
+  if (state.panel) napojPanel();
 
   s.querySelectorAll('[data-parcela]').forEach(b => b.onclick = () => prepniParcelu(Number(b.dataset.parcela)));
   const ko = el('kat-ok');
   if (ko) ko.onclick = () => { katStav = { stav:'ok', text:'' }; save(); kresliMapu(); requestAnimationFrame(() => fitView()); };
 
-  if (vyb && roste(vyb)) {
-    napojZahonky(el('msheet'));
-    el('v-upravit').onclick = () => dialogPrvku(vyb.id);
+  if (vyb) {
     el('v-off').onclick = () => { state.sel = null; save(); kresliMapu(); };
-  } else if (vyb) {
-    el('v-edit').onclick = () => dialogPrvku(vyb.id);
-    el('v-off').onclick = () => { state.sel = null; save(); kresliMapu(); };
-    el('v-zamek').onclick = () => {
-      vyb.zamek = !vyb.zamek; save(); kresliMapu();
-      toast(vyb.zamek ? esc(vyb.nazev) + ' zamčený' : esc(vyb.nazev) + ' odemčený');
-    };
+    s.querySelectorAll('[data-geo]').forEach(b => b.onclick = () => geoAkce(vyb.id, b.dataset.geo));
+    if (roste(vyb)) napojZahonky(el('msheet'));
   }
   const oc = el('o-close'); if (oc) oc.onclick = () => { state.outlineDone = true; save(); kresliMapu(); toast('Obrys uzavřen'); };
   const od = el('o-del'); if (od) od.onclick = () => { state.outline.splice(state.selVert,1); state.selVert = null; save(); kresliMapu(); };
@@ -4075,6 +4094,44 @@ function kresliMapu() {
   requestAnimationFrame(() => { posadPanel(); kresliPlatno(); });
 }
 
+/* Akce nad vybraným prvkem: otočit, zdvojit, upravit, smazat */
+function geoAkce(id, co) {
+  const it = state.items[id]; if (!it) return;
+  if (it.zamek && co !== 'uprav') { toast('Nejdřív ho odemkni'); return; }
+  if (co === 'uprav') { dialogPrvku(id); return; }
+  if (co === 'smaz') {
+    potvrd('Smazat ' + it.nazev + '?', 'Zmizí z plánu i ze Záhonků, včetně fotek a zápisů.', () => {
+      delete state.items[id];
+      if (state.sel === id) state.sel = null;
+      save(); kresliMapu(); kresliZahonky(); toast('Smazáno');
+    });
+    return;
+  }
+  zapamatuj();
+  if (co === 'otoc') {
+    const rz = it.rozmer || PRVKY[it.typ].rozmer;
+    const nove = { w: rz.h, h: rz.w };
+    if (!it.m || volnoProMaly(it.m.x, it.m.y, nove.w, nove.h, it.id)) { it.rozmer = nove; toast('Otočeno'); }
+    else toast('Otočený se sem nevejde');
+  }
+  if (co === 'kopie') {
+    const r = rectOf(it);
+    const kopie = novyPrvek(it.typ, []);
+    kopie.nazev = it.nazev + ' (2)';
+    kopie.cropId = it.cropId;
+    if (jeMaly(it)) {
+      kopie.rozmer = { w:r.w, h:r.h };
+      const nx = r.x0 + r.w + 0.2;
+      kopie.m = { x:nx, y:r.y0 };
+      kopie.cells = [ck(Math.floor(nx), Math.floor(r.y0))];
+    } else {
+      addCells(kopie, rectKeys(Math.round(r.x1), Math.round(r.y0), Math.round(r.x1 + r.w), Math.round(r.y1)));
+    }
+    state.sel = kopie.id;
+    toast('Zdvojeno — přetáhni, kam patří');
+  }
+  save(); kresliMapu(); kresliZahonky();
+}
 /* Dialog Přidat: pixelartové dlaždice, ať je to čitelné i pro dítě */
 function dialogPridat() {
   const d = dialog(`<h2>Co přidáš do zahrady</h2>
@@ -4187,18 +4244,14 @@ function napojPanel() {
 /* Nástroje jsou vlevo, přiblížení vpravo, kartička dole. Spodek plánu
    si drží volno jen podle toho, co je právě vysunuté. */
 function posadPanel() {
-  const sh = el('msheet'), zo = el('m-zoom'), sc = el('m-scale'), ra = el('mrail');
+  const sh = el('msheet'), zo = el('m-zoom'), sc = el('m-scale'), ra = el('mnastroje');
   let hs = 0;
   if (sh) { sh.style.bottom = '0px'; hs = sh.offsetHeight || 0; }
-  if (zo) zo.style.bottom = (hs + 14) + 'px';
+  const fab = el('m-pridat');
+  if (fab) fab.style.bottom = (hs + 14) + 'px';
+  if (zo) zo.style.bottom = (hs + (fab ? 84 : 14)) + 'px';
   if (sc) sc.style.bottom = (hs + 18) + 'px';
-  const lista = ra || el('r-ukaz');
-  if (lista) {
-    const cv = el('cv');
-    const misto = (cv ? cv.clientHeight : 400) - hs;
-    const vys = lista.offsetHeight || 0;
-    lista.style.top = Math.max(14, Math.round((misto - vys) / 2)) + 'px';
-  }
+
 }
 
 /* --- prepocty mezi metry a pixely --- */
@@ -4267,7 +4320,7 @@ function fitView() {
   const b = bbox(pts);
   // mapu zakryva nahore pilulka s adresou a dole vysouvaci panel,
   // zahrada se musi vejit mezi ne
-  const shora = (el('otevri-adresu') || el('p-zavri')) ? 124 : (el('m-hotovo') ? 80 : (el('zpas') ? 58 : 14));
+  const shora = (el('p-zavri')) ? 140 : (el('m-hotovo') ? 80 : (el('zpas') ? 60 : 14));
   const zdola = panelVyska();
   const uzitna = Math.max(120, r.height - zdola - shora);
   // vlevo svislá lišta nástrojů, vpravo přiblížení
@@ -4317,10 +4370,7 @@ function handlesOf(it) {
 }
 
 /* --- kresleni --- */
-let preview = null;
-let potvrdBod = null;      // kde na plátně sedí potvrzovací fajfka
-let otocBod = null;        // tlačítko na otočení rozdělaného kusu
-let malyUchyt = null;      // úchyt na zvětšení truhlíku či květináče
+let rohy = [];             // úchyty vybraného prvku na plátně (plní kresliPlatno)
 let rafId = null;
 function scheduleRender() { if (rafId) return; rafId = requestAnimationFrame(() => { rafId = null; kresliPlatno(); }); }
 
@@ -4609,54 +4659,26 @@ function kresliPlatno() {
       parts.push(`<g color="var(--ink2)">` + artInto('zamek', sp0[0] + bw - 20, sp0[1] + 4, 16) + `</g>`);
     }
   });
-  // rozdělaný truhlík nebo květináč se dá posunout, zvětšit i otočit
-  malyUchyt = null;
-  if (state.rozdelano && state.items[state.rozdelano] && jeMaly(state.items[state.rozdelano]) && !state.zamek) {
-    const mi = state.items[state.rozdelano], mr = rectOf(mi);
-    const a = w2s(mr.x0, mr.y0), b2 = w2s(mr.x1, mr.y1);
-    parts.push(`<rect x="${(a[0]-4).toFixed(1)}" y="${(a[1]-4).toFixed(1)}" width="${(b2[0]-a[0]+8).toFixed(1)}" height="${(b2[1]-a[1]+8).toFixed(1)}" fill="none" stroke="var(--acc-dark)" stroke-width="2" stroke-dasharray="5 4" rx="4"/>`);
-    // úchyt na zvětšení v pravém dolním rohu
-    const ux = b2[0], uy = b2[1];
-    malyUchyt = { x:ux, y:uy, r:17, id:mi.id };
-    parts.push(`<circle cx="${ux.toFixed(1)}" cy="${uy.toFixed(1)}" r="13" fill="#ffffff" stroke="var(--acc-dark)" stroke-width="2.5"/>`);
-    parts.push(`<path d="M${(ux-5).toFixed(1)} ${(uy+5).toFixed(1)}l10 -10M${(ux+1).toFixed(1)} ${(uy-5).toFixed(1)}h4v4" fill="none" stroke="var(--acc-dark)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`);
-  }
-
-  // potvrzovací fajfka visí rovnou u rozdělaného tvaru
-  potvrdBod = null; otocBod = null;
-  if (state.rozdelano && state.items[state.rozdelano] && state.tool !== 'pan') {
-    const it2 = state.items[state.rozdelano];
-    const rb = rectOf(it2);
-    const rp = w2s(rb.x1, (rb.y0 + rb.y1) / 2);     // u pravého okraje, na střed výšky
-    const rr = 23;
-    const cx = clamp(rp[0] + rr + 22, 92, W - rr - 76);
-    const cy = clamp(rp[1], rr + 10, H - rr - 10);
-    potvrdBod = { x:cx, y:cy, r:rr + 8 };
-    parts.push(`<circle cx="${cx.toFixed(1)}" cy="${(cy+2).toFixed(1)}" r="${rr}" fill="rgba(21,96,48,.28)"/>`);
-    parts.push(`<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${rr}" fill="#1e7a3c" stroke="#ffffff" stroke-width="3"/>`);
-    parts.push(`<path d="M${(cx-10).toFixed(1)} ${cy.toFixed(1)}l${7} ${7.5} ${13} -${14}" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`);
-    if (jeMaly(it2) && !PRVKY[it2.typ].kulaty) {
-      const oy2 = cy + rr*2 + 8;
-      otocBod = { x:cx, y:oy2, r:rr + 6, id:it2.id };
-      parts.push(`<circle cx="${cx.toFixed(1)}" cy="${oy2.toFixed(1)}" r="${(rr-2)}" fill="#ffffff" stroke="var(--acc-dark)" stroke-width="2.5"/>`);
-      parts.push(`<path d="M${(cx-8).toFixed(1)} ${(oy2-2).toFixed(1)}a8 8 0 1 1 2.5 6" fill="none" stroke="var(--acc-dark)" stroke-width="2.6" stroke-linecap="round"/>`);
-      parts.push(`<path d="M${(cx-11.5).toFixed(1)} ${(oy2-6).toFixed(1)}l3.5 4 4 -3.2" fill="none" stroke="var(--acc-dark)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`);
-    }
-  }
-
-  // vybrany prvek: ramec a uchyty
+  // vybraný prvek: rámeček a úchyty v rozích
+  rohy = [];
   const sel = state.sel ? state.items[state.sel] : null;
-  if (sel && state.tool === 'pan') {
-    const b = itBBox(sel), sp = w2s(b.x0, b.y0);
-    parts.push(`<rect x="${(sp[0]-3).toFixed(1)}" y="${(sp[1]-3).toFixed(1)}" width="${(b.w*s+6).toFixed(1)}" height="${(b.h*s+6).toFixed(1)}" fill="none" stroke="var(--acc-dark)" stroke-width="2" stroke-dasharray="6 4" rx="4"/>`);
-    if (!sel.zamek && !state.zamek) handlesOf(sel).forEach(h => {
-      parts.push(`<circle cx="${h.p[0].toFixed(1)}" cy="${h.p[1].toFixed(1)}" r="9.5" fill="var(--card)" stroke="var(--acc-dark)" stroke-width="2.5"/>`);
-      const l = 4;
-      parts.push(h.ax === 'h'
-        ? `<path d="M${(h.p[0]).toFixed(1)} ${(h.p[1]-l).toFixed(1)}v${l*2}" stroke="var(--acc-dark)" stroke-width="2.5" stroke-linecap="round"/>`
-        : `<path d="M${(h.p[0]-l).toFixed(1)} ${(h.p[1]).toFixed(1)}h${l*2}" stroke="var(--acc-dark)" stroke-width="2.5" stroke-linecap="round"/>`);
-    });
+  if (sel && !state.zamek) {
+    const rb = rectOf(sel);
+    const a = w2s(rb.x0, rb.y0), b2 = w2s(rb.x1, rb.y1);
+    parts.push(`<rect x="${(a[0]-3).toFixed(1)}" y="${(a[1]-3).toFixed(1)}" width="${(b2[0]-a[0]+6).toFixed(1)}" height="${(b2[1]-a[1]+6).toFixed(1)}" fill="none" stroke="var(--acc-dark)" stroke-width="2.5" stroke-dasharray="7 5" rx="5"/>`);
+    if (!sel.zamek) {
+      [['sz',a[0],a[1]],['sv',b2[0],a[1]],['jz',a[0],b2[1]],['jv',b2[0],b2[1]]].forEach(q => {
+        rohy.push({ k:q[0], x:q[1], y:q[2] });
+        parts.push(`<circle cx="${q[1].toFixed(1)}" cy="${q[2].toFixed(1)}" r="11" fill="#ffffff" stroke="var(--acc-dark)" stroke-width="3"/>`);
+      });
+    }
+    // kóta vybraného prvku
+    const km = fmtDim(rb.w, rb.h);
+    const kw = km.length * 6.4 + 16, kx = (a[0]+b2[0])/2, ky = a[1] - 16;
+    parts.push(`<rect x="${(kx-kw/2).toFixed(1)}" y="${(ky-10).toFixed(1)}" width="${kw.toFixed(1)}" height="20" rx="10" fill="var(--acc-dark)"/>`);
+    parts.push(`<text x="${kx.toFixed(1)}" y="${(ky+1).toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="700" fill="#fff">${esc(km)}</text>`);
   }
+
   // vrcholy obrysu
   if (state.tool === 'outline') {
     const n = state.outline.length;
@@ -4667,153 +4689,71 @@ function kresliPlatno() {
         const pa = w2s(a[0],a[1]), pb = w2s(b[0],b[1]);
         if (Math.hypot(pa[0]-pb[0], pa[1]-pb[1]) < 46) continue;
         const mx = (pa[0]+pb[0])/2, my = (pa[1]+pb[1])/2;
-        parts.push(`<circle cx="${mx.toFixed(1)}" cy="${my.toFixed(1)}" r="6" fill="var(--paper)" fill-opacity="0.9" stroke="var(--acc)" stroke-width="1.6" stroke-dasharray="3 2.5" data-mid="${i}"/>`);
+        parts.push(`<circle cx="${mx.toFixed(1)}" cy="${my.toFixed(1)}" r="6.5" fill="var(--paper)" fill-opacity="0.92" stroke="var(--acc)" stroke-width="1.8" stroke-dasharray="3 2.5"/>`);
       }
     }
-    state.outline.forEach((p, i) => {
-      const sp = w2s(p[0], p[1]);
+    state.outline.forEach((q, i) => {
+      const sp = w2s(q[0], q[1]);
       const on = state.selVert === i;
-      parts.push(`<circle cx="${sp[0].toFixed(1)}" cy="${sp[1].toFixed(1)}" r="${on?8:6.5}" fill="${on?'var(--acc)':'var(--card)'}" stroke="var(--acc-dark)" stroke-width="2.5"/>`);
+      parts.push(`<circle cx="${sp[0].toFixed(1)}" cy="${sp[1].toFixed(1)}" r="${on?9:7.5}" fill="${on?'var(--acc)':'var(--card)'}" stroke="var(--acc-dark)" stroke-width="3"/>`);
       if (i === 0 && !state.outlineDone && state.outline.length >= 3) {
-        parts.push(`<circle cx="${sp[0].toFixed(1)}" cy="${sp[1].toFixed(1)}" r="12" fill="none" stroke="var(--acc)" stroke-width="1.5" stroke-dasharray="3 3"/>`);
+        parts.push(`<circle cx="${sp[0].toFixed(1)}" cy="${sp[1].toFixed(1)}" r="14" fill="none" stroke="var(--acc)" stroke-width="1.8" stroke-dasharray="3 3"/>`);
       }
     });
   }
-  // nahled tazeneho bloku
-  if (preview && preview.w > 0 && preview.h > 0) {
-    const d = PRVKY[preview.prvek] || PRVKY.bed;
-    const sp = w2s(preview.x, preview.y);
-    parts.push(`<rect x="${sp[0].toFixed(1)}" y="${sp[1].toFixed(1)}" width="${(preview.w*s).toFixed(1)}" height="${(preview.h*s).toFixed(1)}" fill="${d.fill}" fill-opacity="0.55" stroke="${d.line}" stroke-width="2" stroke-dasharray="6 4"/>`);
-    parts.push(`<text x="${(sp[0] + preview.w*s/2).toFixed(1)}" y="${(sp[1] - 7).toFixed(1)}" text-anchor="middle" font-size="11.5" font-weight="800" fill="var(--ink)">${preview.w} × ${preview.h} m</text>`);
+
+  // náhled taženého obdélníku i s rozměrem
+  if (nahled) {
+    const d2 = PRVKY[nahled.typ] || PRVKY.bed;
+    const k = krokMrizky(nahled.typ);
+    const x0 = Math.min(nahled.x0, nahled.x1), y0 = Math.min(nahled.y0, nahled.y1);
+    const sirka = Math.max(k, Math.abs(nahled.x1 - nahled.x0));
+    const vyska = Math.max(k, Math.abs(nahled.y1 - nahled.y0));
+    const sp = w2s(x0, y0), pw = sirka * view.scale, ph = vyska * view.scale;
+    const kula = d2.kulaty;
+    parts.push(kula
+      ? `<ellipse cx="${(sp[0]+pw/2).toFixed(1)}" cy="${(sp[1]+ph/2).toFixed(1)}" rx="${(pw/2).toFixed(1)}" ry="${(ph/2).toFixed(1)}" fill="${d2.fill}" fill-opacity=".55" stroke="var(--acc-dark)" stroke-width="2.5" stroke-dasharray="7 5"/>`
+      : `<rect x="${sp[0].toFixed(1)}" y="${sp[1].toFixed(1)}" width="${pw.toFixed(1)}" height="${ph.toFixed(1)}" rx="5" fill="${d2.fill}" fill-opacity=".55" stroke="var(--acc-dark)" stroke-width="2.5" stroke-dasharray="7 5"/>`);
+    const txt2 = fmtDim(sirka, vyska);
+    const tw = txt2.length * 7 + 18;
+    parts.push(`<rect x="${(sp[0]+pw/2-tw/2).toFixed(1)}" y="${(sp[1]-28).toFixed(1)}" width="${tw.toFixed(1)}" height="24" rx="12" fill="var(--acc-dark)"/>`);
+    parts.push(`<text x="${(sp[0]+pw/2).toFixed(1)}" y="${(sp[1]-15).toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="800" fill="#fff">${esc(txt2)}</text>`);
   }
+
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
   svg.setAttribute('shape-rendering', hezky ? 'crispEdges' : 'auto');
   svg.innerHTML = parts.join('');
 }
 
-/* ============ ŠTĚTEC ============
-   Prst maluje, co je pod ním. Velké prvky po čtverečcích a slepují se
-   se sousedem stejného druhu, malé se kladou jeden vedle druhého, takže
-   se jich do jednoho metru vejde několik. */
-function namaluj(g, wx, wy) {
-  /* Prst se mezi dvěma událostmi posune klidně o metr. Bez dokreslení
-     mezikroků by zůstal děravý záhon, do kterého se pak nedá klepnout. */
-  let zmena = false;
-  const a = g.posledni;
-  if (a) {
-    const dx = wx - a.x, dy = wy - a.y;
-    const kroku = Math.ceil(Math.hypot(dx, dy) / 0.3);
-    for (let i = 1; i < kroku && i < 400; i++) {
-      if (malujBod(g, a.x + dx*i/kroku, a.y + dy*i/kroku)) zmena = true;
-    }
+/* ============ GESTA NA PLÁNU ============
+   Jediné gesto na všechno: táhni prstem od tečky k tečce. Vznikne
+   obdélník přichycený k mřížce, rovnou vybraný a s úchyty v rozích.
+   Žádné režimy štětců, žádné potvrzování. */
+let ptrs = new Map(), gest = null;
+let nahled = null;                 // obdélník, který se právě táhne
+
+const krokMrizky = (typ) => (PRVKY[typ] && PRVKY[typ].maly) ? 0.25 : 1;
+const prichyt = (v, k) => Math.round(v / k) * k;
+
+/* Nastaví prvku obdélník v metrech. Malé prvky mají volnou polohu,
+   plošné se skládají ze čtverečků. */
+function nastavObdelnik(it, x0, y0, x1, y1) {
+  const k = krokMrizky(it.typ);
+  let ax = Math.min(x0, x1), ay = Math.min(y0, y1);
+  let bx = Math.max(x0, x1), by = Math.max(y0, y1);
+  if (jeMaly(it)) {
+    const r = omezRozmer(it.typ, Math.max(k, bx - ax), Math.max(k, by - ay), it.rozmer);
+    it.rozmer = r;
+    it.m = { x: prichyt(ax, k), y: prichyt(ay, k) };
+    it.cells = [ck(Math.floor(it.m.x), Math.floor(it.m.y))];
+    return;
   }
-  if (malujBod(g, wx, wy)) zmena = true;
-  g.posledni = { x:wx, y:wy };
-  return zmena;
-}
-function malujBod(g, wx, wy) {
-  const typ = g.prvek, d = PRVKY[typ];
-  if (d.maly) {
-    // jeden kus po druhém: dokud není potvrzený, další se nepokládá
-    const minuly = state.rozdelano ? state.items[state.rozdelano] : null;
-    if (minuly && jeMaly(minuly)) { g.cekaPotvrzeni = true; return false; }
-    const rz = { w: d.rozmer.w, h: d.rozmer.h };
-    // razítkuje se po celém rozměru, aby šly klást těsně vedle sebe
-    const krok = Math.max(rz.w, rz.h);
-    const kl = Math.round(wx/krok) + ',' + Math.round(wy/krok);
-    if (g.done.has(kl)) return false;
-    g.done.add(kl);
-    const x = Math.round((wx - rz.w/2) * 20) / 20;
-    const y = Math.round((wy - rz.h/2) * 20) / 20;
-    // na obsazené místo se nestaví; zkusíme ještě kousek vedle
-    let mx = x, my = y;
-    const prekazka = coPrekazi(mx, my, rz.w, rz.h);
-    if (prekazka === 'velky') { g.naPrvku = true; return false; }   // na dům ani do záhonu ne
-    if (prekazka === 'maly') {
-      // vedle souseda se ještě podíváme, ať jde klást těsně v řadě
-      const posuny = [[rz.w,0],[-rz.w,0],[0,rz.h],[0,-rz.h]];
-      const nasel = posuny.find(o => volnoProMaly(x+o[0], y+o[1], rz.w, rz.h));
-      if (!nasel) { g.obsazeno = true; return false; }
-      mx = Math.round((x+nasel[0])*20)/20; my = Math.round((y+nasel[1])*20)/20;
-    }
-    const it = novyPrvek(typ, [ck(Math.floor(mx), Math.floor(my))]);
-    it.m = { x:mx, y:my };
-    state.rozdelano = it.id;
-    return true;
-  }
-  const kx = Math.floor(wx), ky = Math.floor(wy), k = ck(kx, ky);
-  if (g.done.has(k)) return false;
-  const stary = ownerAt(k);
-  if (stary && stary.zamek) { g.zamceno = true; return false; }
-  /* Režim tahu určí první čtvereček: když jsem začal na svém, celý tah
-     maže. Druhé klepnutí tak políčko zase sundá. */
-  if (g.rezim === undefined) g.rezim = (stary && stary.typ === typ) ? 'mazat' : 'malovat';
-  if (g.rezim === 'mazat') {
-    if (!stary || stary.typ !== typ) return false;
-    g.done.add(k);
-    removeCells([k]);
-    if (!state.items[state.rozdelano]) state.rozdelano = null;
-    return true;
-  }
-  g.done.add(k);
-  if (stary && stary.typ === typ) return false;
-  // slepit se sousedem stejného druhu, ať záhon zůstane jeden celek
-  let cil = g.cil ? state.items[g.cil] : null;
-  if (!cil && state.rozdelano && state.items[state.rozdelano]
-      && state.items[state.rozdelano].typ === typ) {
-    // rozdělaný tvar se dokresluje dál; hotový už se nespojí
-    cil = state.items[state.rozdelano];
-  }
-  if (!cil) {
-    // rovnou s prvním čtverečkem — prázdný prvek by se hned zahodil
-    cil = novyPrvek(typ, [k]);
-    g.cil = cil.id;
-    state.rozdelano = cil.id;
-    return true;
-  }
-  g.cil = cil.id;
-  state.rozdelano = cil.id;
-  addCells(cil, [k]);
-  return true;
-}
-/* Guma maže také po celé dráze prstu */
-function smazNaBode(g, wx, wy) {
-  let zmena = false;
-  const a = g.posledni;
-  if (a) {
-    const dx = wx - a.x, dy = wy - a.y;
-    const kroku = Math.ceil(Math.hypot(dx, dy) / 0.3);
-    for (let i = 1; i < kroku && i < 400; i++) {
-      if (smazBod(g, a.x + dx*i/kroku, a.y + dy*i/kroku)) zmena = true;
-    }
-  }
-  if (smazBod(g, wx, wy)) zmena = true;
-  g.posledni = { x:wx, y:wy };
-  return zmena;
-}
-function smazBod(g, wx, wy) {
-  const male = items().filter(jeMaly).reverse();
-  for (const i of male) {
-    const r = rectOf(i);
-    if (wx >= r.x0 && wx <= r.x1 && wy >= r.y0 && wy <= r.y1) {
-      if (i.zamek) { g.zamceno = true; return false; }
-      delete state.items[i.id];
-      if (state.sel === i.id) state.sel = null;
-      return true;
-    }
-  }
-  const k = ck(Math.floor(wx), Math.floor(wy));
-  if (g.done.has(k)) return false;
-  const o = ownerAt(k);
-  if (!o) return false;
-  if (o.zamek) { g.zamceno = true; return false; }
-  g.done.add(k);
-  removeCells([k]);
-  return true;
+  ax = Math.round(ax); ay = Math.round(ay);
+  bx = Math.max(ax + 1, Math.round(bx)); by = Math.max(ay + 1, Math.round(by));
+  it.cells = [];
+  addCells(it, rectKeys(ax, ay, bx, by));
 }
 
-/* --- gesta --- */
-let ptrs = new Map(), gest = null;
 function napojPlatno() {
   const cv = el('cv'); if (!cv || cv.dataset.bound) return;
   cv.dataset.bound = '1';
@@ -4823,51 +4763,26 @@ function napojPlatno() {
     cv.setPointerCapture(e.pointerId);
     const p = local(e);
     ptrs.set(e.pointerId, p);
-    // fajfka má přednost úplně nejvyšší, ať ji nepřebije úchyt vedle ní
-    if (ptrs.size === 1 && potvrdBod && Math.hypot(p.x - potvrdBod.x, p.y - potvrdBod.y) <= potvrdBod.r) {
-      const t = state.items[state.rozdelano];
-      state.rozdelano = null; gest = null; ptrs.clear();
-      save(); kresliMapu();
-      toast((t ? t.nazev : 'Tvar') + ' hotový — další kreslení začne nový');
-      return;
-    }
-    if (ptrs.size === 1 && otocBod && Math.hypot(p.x - otocBod.x, p.y - otocBod.y) <= otocBod.r) {
-      const it3 = state.items[otocBod.id];
-      if (it3) {
-        const rz3 = it3.rozmer || PRVKY[it3.typ].rozmer;
-        const nove = { w: rz3.h, h: rz3.w };
-        if (volnoProMaly(it3.m.x, it3.m.y, nove.w, nove.h, it3.id)) {
-          it3.rozmer = nove; save(); kresliMapu(); toast('Otočeno');
-        } else toast('Otočený se sem nevejde');
-      }
-      gest = null; ptrs.clear(); return;
-    }
-    if (ptrs.size === 1 && malyUchyt && Math.hypot(p.x - malyUchyt.x, p.y - malyUchyt.y) <= malyUchyt.r) {
-      const it4 = state.items[malyUchyt.id];
-      if (it4) {
-        const rz4 = it4.rozmer || PRVKY[it4.typ].rozmer;
-        gest = { type:'zvetsitMaly', id:it4.id, start:p, w0:rz4.w, h0:rz4.h, moved:false };
-        return;
-      }
-    }
-    if (ptrs.size === 1 && state.tool !== 'pan' && !state.zamek) zapamatuj();
 
     if (ptrs.size === 2) {
       const a = [...ptrs.values()];
       const mid = { x:(a[0].x+a[1].x)/2, y:(a[0].y+a[1].y)/2 };
       gest = { type:'pinch', d0: Math.hypot(a[0].x-a[1].x, a[0].y-a[1].y) || 1, s0: view.scale, w0: s2w(mid.x, mid.y) };
-      preview = null; return;
+      nahled = null; return;
     }
 
-    /* Zamčená zahrada: prst jen posouvá a vybírá, nic se nepřekreslí. */
-    if (state.zamek && state.tool !== 'pan') {
-      gest = { type:'pan', start:p, o0:{ ox:view.ox, oy:view.oy }, moved:false };
+    const w = s2w(p.x, p.y);
+
+    // zamčená zahrada: jen prohlížení
+    if (state.zamek) {
+      gest = { type:'pan', start:p, o0:{ ox:view.ox, oy:view.oy }, moved:false, klep: (prvekNaBode(w[0], w[1])||{}).id || null };
       return;
     }
 
+    // obrys zahrady
     if (state.tool === 'outline') {
-      const hv = state.outline.findIndex(q => { const sp = w2s(q[0],q[1]); return Math.hypot(sp[0]-p.x, sp[1]-p.y) <= 17; });
-      if (hv >= 0) { gest = { type:'vertex', i:hv, start:p, moved:false }; return; }
+      const hv = state.outline.findIndex(q => { const sp = w2s(q[0],q[1]); return Math.hypot(sp[0]-p.x, sp[1]-p.y) <= 19; });
+      if (hv >= 0) { zapamatuj(); gest = { type:'vertex', i:hv, start:p, moved:false }; return; }
       const n = state.outline.length;
       if (n >= 2) {
         const lim = (state.outlineDone && n >= 3) ? n : n-1;
@@ -4876,57 +4791,47 @@ function napojPlatno() {
           const pa = w2s(a[0],a[1]), pb = w2s(b[0],b[1]);
           if (Math.hypot(pa[0]-pb[0], pa[1]-pb[1]) < 46) continue;
           const mx = (pa[0]+pb[0])/2, my = (pa[1]+pb[1])/2;
-          if (Math.hypot(mx-p.x, my-p.y) <= 15) { gest = { type:'insert', i, start:p, moved:false }; return; }
+          if (Math.hypot(mx-p.x, my-p.y) <= 16) { zapamatuj(); gest = { type:'insert', i, start:p, moved:false }; return; }
         }
       }
-      // uzavřeným obrysem se dá hýbat celým: chytne se zevnitř a táhne
-      if (state.outlineDone && state.outline.length >= 3) {
-        const w = s2w(p.x, p.y);
-        if (pointInPoly(w[0], w[1], state.outline)) {
-          gest = { type:'obrysPosun', start:p, moved:false, last:{dx:0,dy:0},
-                   zaloha: state.outline.map(q => q.slice()),
-                   zalohaV: (state.vedlejsi||[]).map(v => v.map(q => q.slice())) };
-          return;
-        }
+      if (state.outlineDone && n >= 3 && pointInPoly(w[0], w[1], state.outline)) {
+        zapamatuj();
+        gest = { type:'obrysPosun', start:p, moved:false,
+                 zaloha: state.outline.map(q => q.slice()),
+                 zalohaV: (state.vedlejsi||[]).map(v => v.map(q => q.slice())) };
+        return;
       }
       gest = { type:'tapAdd', start:p, moved:false }; return;
     }
 
-    if (state.tool === 'erase') {
-      gest = { type:'erase', start:p, moved:false, done:new Set() };
-      const w = s2w(p.x, p.y);
-      if (smazNaBode(gest, w[0], w[1])) scheduleRender();
-      return;
-    }
-
+    // pokládání nového prvku: táhni obdélník
     if (PRVKY[state.tool]) {
-      const roz = state.rozdelano ? state.items[state.rozdelano] : null;
-      if (roz && jeMaly(roz)) {
-        const w6 = s2w(p.x, p.y), r6 = rectOf(roz);
-        if (w6[0] >= r6.x0 && w6[0] <= r6.x1 && w6[1] >= r6.y0 && w6[1] <= r6.y1) {
-          gest = { type:'move', id:roz.id, start:p, last:{dx:0,dy:0}, moved:false };
-          return;
-        }
-      }
-      gest = { type:'stetec', prvek: state.tool, start:p, moved:false, done:new Set() };
-      const w = s2w(p.x, p.y);
-      namaluj(gest, w[0], w[1]);
-      scheduleRender();
-      return;
+      const k = krokMrizky(state.tool);
+      gest = { type:'novy', typ: state.tool, start:p, moved:false,
+               ax: prichyt(w[0], k), ay: prichyt(w[1], k) };
+      nahled = { typ: state.tool, x0:gest.ax, y0:gest.ay, x1:gest.ax, y1:gest.ay };
+      scheduleRender(); return;
     }
 
-    /* Ruka: prst vždy posouvá plán. Prvek se hýbe jen když je předtím vybraný —
-       jinak by se při listování zahradou omylem přetahovaly záhony. */
+    // ruka: úchyty vybraného, posun vybraného, jinak posun plánu
     const sel = state.sel ? state.items[state.sel] : null;
     if (sel && !sel.zamek) {
-      const h = handlesOf(sel).find(h => Math.hypot(h.p[0]-p.x, h.p[1]-p.y) <= 18);
-      if (h) { gest = { type:'stretch', id:sel.id, side:h.side, start:p, applied:0, moved:false }; return; }
+      const roh = rohy.find(h2 => Math.hypot(h2.x - p.x, h2.y - p.y) <= 26);
+      if (roh) {
+        zapamatuj();
+        const r = rectOf(sel);
+        gest = { type:'zmena', id:sel.id, roh:roh.k, start:p,
+                 pevny: { x: roh.k.indexOf('z') >= 0 ? r.x1 : r.x0, y: roh.k.indexOf('s') >= 0 ? r.y1 : r.y0 }, moved:false };
+        return;
+      }
+      const r2 = rectOf(sel);
+      if (w[0] >= r2.x0 && w[0] <= r2.x1 && w[1] >= r2.y0 && w[1] <= r2.y1) {
+        zapamatuj();
+        gest = { type:'posun', id:sel.id, start:p, r0:{ x:r2.x0, y:r2.y0, w:r2.w, h:r2.h }, moved:false };
+        return;
+      }
     }
-    const wq = s2w(p.x, p.y);
-    const own = prvekNaBode(wq[0], wq[1]);
-    if (own && state.sel === own.id && !own.zamek && !state.zamek) {
-      gest = { type:'move', id:own.id, start:p, last:{dx:0,dy:0}, moved:false }; return;
-    }
+    const own = prvekNaBode(w[0], w[1]);
     gest = { type:'pan', start:p, o0:{ ox:view.ox, oy:view.oy }, moved:false, klep: own ? own.id : null };
   });
 
@@ -4935,57 +4840,42 @@ function napojPlatno() {
     const p = local(e);
     ptrs.set(e.pointerId, p);
     if (!gest) return;
-    if (gest.type !== 'pinch' && !gest.moved && Math.hypot(p.x-gest.start.x, p.y-gest.start.y) > 7) gest.moved = true;
+    if (gest.type !== 'pinch' && !gest.moved && Math.hypot(p.x-gest.start.x, p.y-gest.start.y) > 6) gest.moved = true;
 
     if (gest.type === 'pinch') {
       const a = [...ptrs.values()]; if (a.length < 2) return;
       const d = Math.hypot(a[0].x-a[1].x, a[0].y-a[1].y) || 1;
       const mid = { x:(a[0].x+a[1].x)/2, y:(a[0].y+a[1].y)/2 };
       view.scale = clamp(gest.s0 * (d/gest.d0), 1.2, 60);
-      if (izo()) {
-        const T = view.scale;
-        const a = (mid.x - isoOff.x) / (T * 0.5), b = (mid.y - isoOff.y) / (T * 0.25);
-        view.ox = gest.w0[0] - (a + b) / 2;
-        view.oy = gest.w0[1] - (b - a) / 2;
-      } else {
-        view.ox = gest.w0[0] - mid.x/view.scale;
-        view.oy = gest.w0[1] - mid.y/view.scale;
-      }
+      view.ox = gest.w0[0] - mid.x/view.scale;
+      view.oy = gest.w0[1] - mid.y/view.scale;
       scheduleRender(); return;
     }
     if (gest.type === 'pan' && gest.moved) {
-      if (izo()) {
-        const T = view.scale;
-        const da = (p.x - gest.start.x) / (T * 0.5), db = (p.y - gest.start.y) / (T * 0.25);
-        view.ox = gest.o0.ox - (da + db) / 2;
-        view.oy = gest.o0.oy - (db - da) / 2;
-      } else {
-        view.ox = gest.o0.ox - (p.x - gest.start.x)/view.scale;
-        view.oy = gest.o0.oy - (p.y - gest.start.y)/view.scale;
-      }
+      view.ox = gest.o0.ox - (p.x - gest.start.x)/view.scale;
+      view.oy = gest.o0.oy - (p.y - gest.start.y)/view.scale;
       scheduleRender(); return;
     }
-    if (gest.type === 'erase') {
-      const w = s2w(p.x, p.y);
-      if (smazNaBode(gest, w[0], w[1])) scheduleRender();
-      return;
+    if (gest.type === 'novy') {
+      const w = s2w(p.x, p.y), k = krokMrizky(gest.typ);
+      nahled = { typ:gest.typ, x0:gest.ax, y0:gest.ay, x1: prichyt(w[0], k), y1: prichyt(w[1], k) };
+      scheduleRender(); return;
     }
-    if (gest.type === 'zvetsitMaly') {
-      const it5 = state.items[gest.id]; if (!it5) return;
-      const dw = (p.x - gest.start.x)/view.scale, dh = (p.y - gest.start.y)/view.scale;
-      const r5 = omezRozmer(it5.typ, gest.w0 + dw, gest.h0 + dh, { w:gest.w0, h:gest.h0 });
-      const w2 = r5.w, h2 = r5.h;
-      if (volnoProMaly(it5.m.x, it5.m.y, w2, h2, it5.id)) {
-        it5.rozmer = { w:w2, h:h2 };
-        it5.cells = [ck(Math.floor(it5.m.x), Math.floor(it5.m.y))];
-        scheduleRender();
-      }
-      return;
+    if (gest.type === 'posun' && gest.moved) {
+      const it = state.items[gest.id]; if (!it) return;
+      const k = krokMrizky(it.typ);
+      const dx = prichyt((p.x - gest.start.x)/view.scale, k);
+      const dy = prichyt((p.y - gest.start.y)/view.scale, k);
+      const nx = gest.r0.x + dx, ny = gest.r0.y + dy;
+      if (jeMaly(it) && !volnoProMaly(nx, ny, gest.r0.w, gest.r0.h, it.id)) return;
+      nastavObdelnik(it, nx, ny, nx + gest.r0.w, ny + gest.r0.h);
+      scheduleRender(); return;
     }
-    if (gest.type === 'stetec') {
-      const w = s2w(p.x, p.y);
-      if (namaluj(gest, w[0], w[1])) scheduleRender();
-      return;
+    if (gest.type === 'zmena') {
+      const it = state.items[gest.id]; if (!it) return;
+      const w = s2w(p.x, p.y), k = krokMrizky(it.typ);
+      nastavObdelnik(it, gest.pevny.x, gest.pevny.y, prichyt(w[0], k), prichyt(w[1], k));
+      scheduleRender(); return;
     }
     if (gest.type === 'obrysPosun' && gest.moved) {
       const dx = (p.x - gest.start.x)/view.scale, dy = (p.y - gest.start.y)/view.scale;
@@ -4996,30 +4886,6 @@ function napojPlatno() {
     if (gest.type === 'vertex' && gest.moved) {
       state.outline[gest.i] = snapW(...s2w(p.x, p.y));
       scheduleRender(); return;
-    }
-    if (gest.type === 'stretch') {
-      const it = state.items[gest.id]; if (!it) return;
-      const side = gest.side;
-      const d = (side === 'E' || side === 'W')
-        ? (p.x - gest.start.x)/view.scale
-        : (p.y - gest.start.y)/view.scale;
-      const want = Math.round((side === 'W' || side === 'N') ? -d : d);
-      let guard = 0;
-      while (gest.applied < want && guard++ < 80) { if (!stretch(it, side, true)) break; gest.applied++; }
-      guard = 0;
-      while (gest.applied > want && guard++ < 80) { if (!stretch(it, side, false)) break; gest.applied--; }
-      scheduleRender(); return;
-    }
-    if (gest.type === 'move' && gest.moved) {
-      const it = state.items[gest.id]; if (!it) return;
-      const dx = Math.round((p.x - gest.start.x)/view.scale);
-      const dy = Math.round((p.y - gest.start.y)/view.scale);
-      if (dx !== gest.last.dx || dy !== gest.last.dy) {
-        moveItemBy(it, dx - gest.last.dx, dy - gest.last.dy);
-        gest.last = { dx, dy };
-        scheduleRender();
-      }
-      return;
     }
   });
 
@@ -5032,15 +4898,42 @@ function napojPlatno() {
 
     if (g.type === 'pinch') { save(); kresliPlatno(); return; }
 
+    if (g.type === 'novy') {
+      const n = nahled; nahled = null;
+      zapamatuj();
+      const d = PRVKY[g.typ];
+      let x0 = n.x0, y0 = n.y0, x1 = n.x1, y1 = n.y1;
+      if (!g.moved) {   // jen klepnutí: výchozí velikost
+        const zw = d.rozmer ? d.rozmer.w : 2, zh = d.rozmer ? d.rozmer.h : 1;
+        x0 = n.x0 - zw/2; y0 = n.y0 - zh/2; x1 = x0 + zw; y1 = y0 + zh;
+      }
+      if (d.maly) {
+        const rr = omezRozmer(g.typ, Math.abs(x1-x0) || d.rozmer.w, Math.abs(y1-y0) || d.rozmer.h, d.rozmer);
+        const mx = prichyt(Math.min(x0,x1), 0.25), my = prichyt(Math.min(y0,y1), 0.25);
+        if (!volnoProMaly(mx, my, rr.w, rr.h)) { toast('Tady už něco stojí'); kresliMapu(); return; }
+      }
+      const it = novyPrvek(g.typ, []);
+      nastavObdelnik(it, x0, y0, x1, y1);
+      if (!cellsOf(it).length) { delete state.items[it.id]; kresliMapu(); return; }
+      state.tool = 'pan';
+      state.sel = it.id;
+      save(); kresliMapu(); kresliZahonky();
+      toast(it.nazev + ' · přetáhni nebo zvětši za rohy');
+      return;
+    }
+    if (g.type === 'posun' || g.type === 'zmena') {
+      save(); kresliMapu(); kresliZahonky(); return;
+    }
     if (g.type === 'tapAdd' && !g.moved) {
       const w = snapW(...s2w(g.start.x, g.start.y));
       if (!state.outlineDone && state.outline.length >= 3) {
         const f = w2s(state.outline[0][0], state.outline[0][1]);
-        if (Math.hypot(f[0]-g.start.x, f[1]-g.start.y) <= 19) {
+        if (Math.hypot(f[0]-g.start.x, f[1]-g.start.y) <= 20) {
           state.outlineDone = true; save(); kresliMapu(); toast('Obrys uzavřen'); return;
         }
       }
       if (state.outlineDone) { state.selVert = null; save(); kresliMapu(); return; }
+      zapamatuj();
       state.outline.push(w); state.selVert = null; save(); kresliMapu(); return;
     }
     if (g.type === 'insert' && !g.moved) {
@@ -5059,27 +4952,6 @@ function napojPlatno() {
       else { state.selVert = null; save(); kresliMapu(); }
       return;
     }
-    if (g.type === 'erase') {
-      if (g.zamceno) toast('Tahle část je zamčená');
-      save(); kresliMapu(); return;
-    }
-
-    if (g.type === 'zvetsitMaly') { save(); kresliMapu(); return; }
-    if (g.type === 'stetec') {
-      if (g.zamceno) toast('Tahle část je zamčená');
-      else if (g.cekaPotvrzeni) toast('Nejdřív tenhle kus potvrď fajfkou');
-      else if (g.naPrvku) toast('Na dům ani do záhonu se nedá postavit');
-      else if (g.obsazeno) toast('Tady už něco stojí, zkus to vedle');
-      state.sel = null;
-      save(); kresliMapu();
-      return;
-    }
-    if (g.type === 'stretch') { save(); kresliMapu(); return; }
-    if (g.type === 'move') {
-      if (g.moved) { save(); kresliMapu(); }
-      else { state.sel = g.id; save(); kresliMapu(); }
-      return;
-    }
     if (g.type === 'pan') {
       if (g.moved) { save(); return; }
       if (g.klep && state.sel !== g.klep) { state.sel = g.klep; save(); kresliMapu(); }
@@ -5095,7 +4967,6 @@ function napojPlatno() {
     const r = cvRect();
     zoomAt(e.deltaY < 0 ? 1.12 : 1/1.12, e.clientX - r.left, e.clientY - r.top);
   }, { passive:false });
-
 }
 
 
