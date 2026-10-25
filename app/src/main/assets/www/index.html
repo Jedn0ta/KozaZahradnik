@@ -493,8 +493,8 @@ h1,h2,h3,h4 { margin: 0; font-weight: 800; letter-spacing: -.02em; }
 }
 .dlg h2 { font-size: 21px; margin-bottom: 4px; }
 .dlg .lead { color: var(--ink2); font-size: 14px; font-weight: 600; margin: 0 0 18px; }
-.dacts { display: flex; gap: 10px; margin-top: 6px; }
-.dacts .btn { flex: 1; }
+.dacts { display: flex; align-items: stretch; gap: 10px; margin-top: 6px; }
+.dacts .btn { flex: 1; min-width: 0; height: 54px; }
 
 .toast {
   position: fixed; left: 50%; transform: translateX(-50%);
@@ -889,7 +889,7 @@ body { font-size: 17px; }
 
 <script>
 
-const VERZE = 'v2.9 · 25. 10. 2026';
+const VERZE = 'v3.0 · 25. 10. 2026';
 const LOGO_KOZEL = `<svg viewBox="0 0 32 32" aria-hidden="true">
   <path d="M11.2 9.4C9.6 6.6 7.4 4.6 4.6 3.9c-.5-.1-.9.3-.8.8.5 2.9 1.9 5.4 4.1 7.2.7.6 1.5 1 2.4 1.3z" fill="#fff" opacity=".95"/>
   <path d="M20.8 9.4c1.6-2.8 3.8-4.8 6.6-5.5.5-.1.9.3.8.8-.5 2.9-1.9 5.4-4.1 7.2-.7.6-1.5 1-2.4 1.3z" fill="#fff" opacity=".95"/>
@@ -1980,6 +1980,26 @@ function ownerAt(key) {
   for (const i of items()) if (!jeMaly(i) && (i.cells||[]).indexOf(key) >= 0) return i;
   return null;
 }
+/* Je na tomhle místě volno pro truhlík nebo květináč? Nesmí stát na
+   jiném, ani na domě nebo záhonu — jen na trávě nebo na dlažbě. */
+function coPrekazi(x, y, w, hh, krome) {
+  const prekryv = (ax0, ay0, ax1, ay1) => x < ax1 && x + w > ax0 && y < ay1 && y + hh > ay0;
+  for (const i of items()) {
+    if (krome && i.id === krome) continue;
+    if (jeMaly(i)) {
+      const r = rectOf(i);
+      if (prekryv(r.x0, r.y0, r.x1, r.y1)) return 'maly';
+    } else if (i.typ === 'house' || roste(i)) {
+      for (const k of (i.cells || [])) {
+        const c = cxy(k);
+        if (prekryv(c[0], c[1], c[0]+1, c[1]+1)) return 'velky';
+      }
+    }
+  }
+  return null;
+}
+const volnoProMaly = (x, y, w, hh, krome) => !coPrekazi(x, y, w, hh, krome);
+
 /* Presny zasah: nejdriv male prvky podle skutecneho obdelniku, pak velke */
 function prvekNaBode(wx, wy) {
   const male = items().filter(jeMaly).reverse();
@@ -2028,8 +2048,11 @@ function novyPrvek(typ, keys) {
 }
 function moveItemBy(it, dx, dy) {
   if (jeMaly(it) && it.m) {
-    it.m = { x: Math.round((it.m.x + dx) * 20) / 20, y: Math.round((it.m.y + dy) * 20) / 20 };
-    it.cells = [ck(Math.floor(it.m.x), Math.floor(it.m.y))];
+    const rz = it.rozmer || PRVKY[it.typ].rozmer;
+    const nx = Math.round((it.m.x + dx) * 20) / 20, ny = Math.round((it.m.y + dy) * 20) / 20;
+    if (!volnoProMaly(nx, ny, rz.w, rz.h, it.id)) return;   // do obsazeného se neposune
+    it.m = { x:nx, y:ny };
+    it.cells = [ck(Math.floor(nx), Math.floor(ny))];
     return;
   }
   const keys = cellsOf(it).map(k => { const c = cxy(k); return ck(c[0]+dx, c[1]+dy); });
@@ -4160,10 +4183,11 @@ function kresliPlatno() {
   potvrdBod = null;
   if (state.rozdelano && state.items[state.rozdelano] && state.tool !== 'pan') {
     const it2 = state.items[state.rozdelano];
-    const rb = rectOf(it2), rp = w2s(rb.x1, rb.y0);
+    const rb = rectOf(it2);
+    const rp = w2s(rb.x1, (rb.y0 + rb.y1) / 2);     // u pravého okraje, na střed výšky
     const rr = 23;
-    const cx = clamp(rp[0], rr + 6, W - rr - 6);
-    const cy = clamp(rp[1], rr + 6, H - rr - 6);
+    const cx = clamp(rp[0] + rr + 8, 92, W - rr - 76);
+    const cy = clamp(rp[1], rr + 10, H - rr - 10);
     potvrdBod = { x:cx, y:cy, r:rr + 8 };
     parts.push(`<circle cx="${cx.toFixed(1)}" cy="${(cy+2).toFixed(1)}" r="${rr}" fill="rgba(21,96,48,.28)"/>`);
     parts.push(`<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${rr}" fill="#1e7a3c" stroke="#ffffff" stroke-width="3"/>`);
@@ -4241,23 +4265,44 @@ function malujBod(g, wx, wy) {
   const typ = g.prvek, d = PRVKY[typ];
   if (d.maly) {
     const rz = d.rozmer;
-    state.rozdelano = null;
-    // razítkujeme po půlce rozměru, ať se při tažení nenaskládají na sebe
-    const krok = Math.max(0.2, Math.min(rz.w, rz.h) * 0.9);
+    // razítkuje se po celém rozměru, aby šly klást těsně vedle sebe
+    const krok = Math.max(rz.w, rz.h);
     const kl = Math.round(wx/krok) + ',' + Math.round(wy/krok);
     if (g.done.has(kl)) return false;
     g.done.add(kl);
     const x = Math.round((wx - rz.w/2) * 20) / 20;
     const y = Math.round((wy - rz.h/2) * 20) / 20;
-    const it = novyPrvek(typ, [ck(Math.floor(x), Math.floor(y))]);
-    it.m = { x, y };
+    // na obsazené místo se nestaví; zkusíme ještě kousek vedle
+    let mx = x, my = y;
+    const prekazka = coPrekazi(mx, my, rz.w, rz.h);
+    if (prekazka === 'velky') { g.naPrvku = true; return false; }   // na dům ani do záhonu ne
+    if (prekazka === 'maly') {
+      // vedle souseda se ještě podíváme, ať jde klást těsně v řadě
+      const posuny = [[rz.w,0],[-rz.w,0],[0,rz.h],[0,-rz.h]];
+      const nasel = posuny.find(o => volnoProMaly(x+o[0], y+o[1], rz.w, rz.h));
+      if (!nasel) { g.obsazeno = true; return false; }
+      mx = Math.round((x+nasel[0])*20)/20; my = Math.round((y+nasel[1])*20)/20;
+    }
+    const it = novyPrvek(typ, [ck(Math.floor(mx), Math.floor(my))]);
+    it.m = { x:mx, y:my };
+    state.rozdelano = it.id;
     return true;
   }
   const kx = Math.floor(wx), ky = Math.floor(wy), k = ck(kx, ky);
   if (g.done.has(k)) return false;
-  g.done.add(k);
   const stary = ownerAt(k);
   if (stary && stary.zamek) { g.zamceno = true; return false; }
+  /* Režim tahu určí první čtvereček: když jsem začal na svém, celý tah
+     maže. Druhé klepnutí tak políčko zase sundá. */
+  if (g.rezim === undefined) g.rezim = (stary && stary.typ === typ) ? 'mazat' : 'malovat';
+  if (g.rezim === 'mazat') {
+    if (!stary || stary.typ !== typ) return false;
+    g.done.add(k);
+    removeCells([k]);
+    if (!state.items[state.rozdelano]) state.rozdelano = null;
+    return true;
+  }
+  g.done.add(k);
   if (stary && stary.typ === typ) return false;
   // slepit se sousedem stejného druhu, ať záhon zůstane jeden celek
   let cil = g.cil ? state.items[g.cil] : null;
@@ -4515,6 +4560,8 @@ function napojPlatno() {
 
     if (g.type === 'stetec') {
       if (g.zamceno) toast('Tahle část je zamčená');
+      else if (g.naPrvku) toast('Na dům ani do záhonu se nedá postavit');
+      else if (g.obsazeno) toast('Tady už něco stojí, zkus to vedle');
       state.sel = null;
       save(); kresliMapu();
       return;
