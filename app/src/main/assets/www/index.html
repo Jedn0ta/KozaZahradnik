@@ -910,7 +910,7 @@ body { font-size: 17px; }
 
 <script>
 
-const VERZE = 'v3.3 · 25. 10. 2026';
+const VERZE = 'v3.4 · 25. 10. 2026';
 const LOGO_KOZEL = `<svg viewBox="0 0 32 32" aria-hidden="true">
   <path d="M11.2 9.4C9.6 6.6 7.4 4.6 4.6 3.9c-.5-.1-.9.3-.8.8.5 2.9 1.9 5.4 4.1 7.2.7.6 1.5 1 2.4 1.3z" fill="#fff" opacity=".95"/>
   <path d="M20.8 9.4c1.6-2.8 3.8-4.8 6.6-5.5.5-.1.9.3.8.8-.5 2.9-1.9 5.4-4.1 7.2-.7.6-1.5 1-2.4 1.3z" fill="#fff" opacity=".95"/>
@@ -4088,8 +4088,27 @@ function posadPanel() {
 
 /* --- prepocty mezi metry a pixely --- */
 function cvRect() { const c = el('cv'); return c ? c.getBoundingClientRect() : { width:0, height:0, left:0, top:0 }; }
-function w2s(x, y) { return [ (x - view.ox) * view.scale, (y - view.oy) * view.scale ]; }
-function s2w(px, py) { return [ px / view.scale + view.ox, py / view.scale + view.oy ]; }
+/* ============ IZOMETRIE ============
+   Zamčená zahrada se kreslí šikmo shora: metr čtvereční je kosočtverec
+   široký T a vysoký T/2. Odemčený plán zůstává kolmý shora, aby se
+   v něm dalo přesně kreslit. */
+let isoOff = { x: 0, y: 0 };
+const izo = () => !!state.zamek;
+function w2iso(x, y) {
+  const T = view.scale, u = x - view.ox, v = y - view.oy;
+  return [ (u - v) * T * 0.5 + isoOff.x, (u + v) * T * 0.25 + isoOff.y ];
+}
+function iso2w(px, py) {
+  const T = view.scale;
+  const a = (px - isoOff.x) / (T * 0.5), b = (py - isoOff.y) / (T * 0.25);
+  return [ view.ox + (a + b) / 2, view.oy + (b - a) / 2 ];
+}
+function w2s(x, y) {
+  return izo() ? w2iso(x, y) : [ (x - view.ox) * view.scale, (y - view.oy) * view.scale ];
+}
+function s2w(px, py) {
+  return izo() ? iso2w(px, py) : [ px / view.scale + view.ox, py / view.scale + view.oy ];
+}
 function snapW(x, y) { return [ Math.round(x/snapStep)*snapStep, Math.round(y/snapStep)*snapStep ]; }
 function cellAt(px, py) { const w = s2w(px, py); return ck(Math.floor(w[0]), Math.floor(w[1])); }
 
@@ -4115,6 +4134,20 @@ function fitView() {
       requestAnimationFrame(() => { fitView._znovu = false; fitView(); });
     }
     return;
+  }
+  if (izo()) {
+    const T0 = 1;
+    const xs = pts.map(q => (q[0]-q[1]) * 0.5), ys = pts.map(q => (q[0]+q[1]) * 0.25);
+    const iw = Math.max(0.5, Math.max(...xs) - Math.min(...xs));
+    const ih = Math.max(0.5, Math.max(...ys) - Math.min(...ys));
+    const zdola2 = panelVyska();
+    const sirka2 = Math.max(140, r.width - 110);
+    const vyska2 = Math.max(120, r.height - zdola2 - 76);
+    view.scale = clamp(Math.min(sirka2 / iw, vyska2 / ih) * 0.94, 1.2, 60);
+    const bb = bbox(pts);
+    view.ox = (bb.x0 + bb.x1) / 2;
+    view.oy = (bb.y0 + bb.y1) / 2;
+    save(); kresliPlatno(); return;
   }
   const b = bbox(pts);
   // mapu zakryva nahore pilulka s adresou a dole vysouvaci panel,
@@ -4145,8 +4178,15 @@ function centerOn(it) {
 function zoomAt(f, px, py) {
   const w = s2w(px, py);
   view.scale = clamp(view.scale * f, 1.2, 60);
-  view.ox = w[0] - px/view.scale;
-  view.oy = w[1] - py/view.scale;
+  if (izo()) {
+    const T = view.scale;
+    const a = (px - isoOff.x) / (T * 0.5), b = (py - isoOff.y) / (T * 0.25);
+    view.ox = w[0] - (a + b) / 2;
+    view.oy = w[1] - (b - a) / 2;
+  } else {
+    view.ox = w[0] - px/view.scale;
+    view.oy = w[1] - py/view.scale;
+  }
   save(); kresliPlatno();
 }
 
@@ -4169,10 +4209,186 @@ let malyUchyt = null;      // úchyt na zvětšení truhlíku či květináče
 let rafId = null;
 function scheduleRender() { if (rafId) return; rafId = requestAnimationFrame(() => { rafId = null; kresliPlatno(); }); }
 
+/* Vzor textury zkosený do izometrie: pixely dlaždice se tím samy
+   promění v kosočtverečky, přesně jak má izometrická grafika vypadat. */
+function izoVzor(id, nazev, mat) {
+  const t = DLAZDICE[id];
+  if (!t) return '';
+  const q = 1/16;
+  let r = '';
+  for (let y = 0; y < 16; y++) {
+    const row = t.d[y];
+    for (let x = 0; x < 16; x++) {
+      const c = t.p[row[x]];
+      if (c) r += `<rect x="${(x*q).toFixed(5)}" y="${(y*q).toFixed(5)}" width="${(q*1.04).toFixed(5)}" height="${(q*1.04).toFixed(5)}" fill="${c}"/>`;
+    }
+  }
+  return `<pattern id="${nazev}" width="1" height="1" patternUnits="userSpaceOnUse" patternTransform="${mat}">${r}</pattern>`;
+}
+const izoVyska = (it) => {
+  const T = view.scale;
+  if (it.typ === 'house') return Math.max(1, Math.min(5, it.patra || 1)) * 2.6 * T * 0.26;
+  if (it.typ === 'raised') return 0.4 * T * 0.5;
+  if (it.typ === 'trough') return 0.3 * T * 0.5;
+  if (it.typ === 'pot') return 0.35 * T * 0.5;
+  return 0;
+};
+const IZO_VZOR = { house:'iv-strecha', paved:'iv-dlazba', bed:'iv-hlina',
+  raised:'iv-hlina', trough:'iv-hlina', pot:'iv-hlina' };
+const IZO_STENA = {
+  house:  { v:'#efe7d8', j:'#d8cdba', lem:'#a99c86' },
+  raised: { v:'#b5834e', j:'#8f6436', lem:'#6b4a24' },
+  trough: { v:'#b5834e', j:'#8f6436', lem:'#6b4a24' },
+  pot:    { v:'#cc7a4e', j:'#a2593a', lem:'#7e4328' },
+};
+
+function kresliIzo(cv, svg, W, H) {
+  potvrdBod = null; otocBod = null; malyUchyt = null;
+  isoOff = { x: W/2, y: H * 0.46 };
+  const T = view.scale;
+  cv.style.backgroundImage = 'none';
+  cv.style.backgroundColor = '#cfe3ef';
+
+  const e0 = (view.oy - view.ox) * T/2 + isoOff.x;
+  const f0 = -(view.ox + view.oy) * T/4 + isoOff.y;
+  const mat = `matrix(${(T/2).toFixed(4)} ${(T/4).toFixed(4)} ${(-T/2).toFixed(4)} ${(T/4).toFixed(4)} ${e0.toFixed(2)} ${f0.toFixed(2)})`;
+  const parts = [`<defs>` + ['trava','hlina','dlazba','drevo','strecha']
+    .map(x => izoVzor(x, 'iv-' + x, mat)).join('') + `</defs>`];
+
+  const P = (x, y) => w2iso(x, y);
+  const poly = (body, vypln, tah, sirka) =>
+    `<polygon points="${body.map(q => q[0].toFixed(1) + ',' + q[1].toFixed(1)).join(' ')}" fill="${vypln}"${tah ? ` stroke="${tah}" stroke-width="${sirka||1.5}" stroke-linejoin="round"` : ''}/>`;
+  const kosoctverec = (x, y) => [P(x,y), P(x+1,y), P(x+1,y+1), P(x,y+1)];
+
+  // travnatá zahrada
+  (state.vedlejsi || []).forEach(pl => {
+    if (pl.length >= 3) parts.push(poly(pl.map(q => P(q[0], q[1])), 'url(#iv-trava)', '#5c8a3e', 2));
+  });
+  if (state.outline.length >= 3) {
+    parts.push(poly(state.outline.map(q => P(q[0], q[1])), 'url(#iv-trava)', '#4e7a33', 2.5));
+  }
+
+  /* Malířův postup: co je blíž pozorovateli, kreslí se později. */
+  const hloubka = (it) => {
+    const r = rectOf(it);
+    return r.x1 + r.y1;
+  };
+  items().slice().sort((a,b) => hloubka(a) - hloubka(b)).forEach(it => {
+    const d = PRVKY[it.typ] || PRVKY.bed;
+    const c = crop(it.cropId);
+    const vys = izoVyska(it);
+    const st = IZO_STENA[it.typ];
+    const vzor = `url(#${IZO_VZOR[it.typ] || 'iv-hlina'})`;
+    const policka = jeMaly(it) ? null : cellsOf(it).map(cxy).sort((a,b) => (a[0]+a[1]) - (b[0]+b[1]));
+
+    const stena = (a, b2) => {
+      if (vys <= 0.5 || !st) return;
+      const sa = P(a[0], a[1]), sb = P(b2[0], b2[1]);
+      const svisla = Math.abs(a[0] - b2[0]) < 0.001;           // východní stěna
+      parts.push(poly([sa, sb, [sb[0], sb[1]+vys], [sa[0], sa[1]+vys]],
+        svisla ? st.v : st.j, st.lem, 1.2));
+    };
+
+    if (policka) {
+      const mam = new Set(cellsOf(it));
+      policka.forEach(q => {
+        const [cx, cy] = q;
+        // nejdřív stěny dopředu, pak horní plocha nad nimi
+        if (!mam.has(ck(cx+1, cy))) stena([cx+1, cy], [cx+1, cy+1]);
+        if (!mam.has(ck(cx, cy+1))) stena([cx, cy+1], [cx+1, cy+1]);
+        const vrch = kosoctverec(cx, cy).map(s2 => [s2[0], s2[1] - vys]);
+        parts.push(poly(vrch, vzor, null));
+      });
+      // obrys celého prvku
+      let obr = '';
+      edgeSegments(it).forEach(gq => {
+        const a = P(gq[0], gq[1]), b2 = P(gq[2], gq[3]);
+        obr += `M${a[0].toFixed(1)} ${(a[1]-vys).toFixed(1)}L${b2[0].toFixed(1)} ${(b2[1]-vys).toFixed(1)}`;
+      });
+      parts.push(`<path d="${obr}" fill="none" stroke="${it.typ==='house' ? '#7c3326' : (st ? st.lem : '#6b4a24')}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>`);
+    } else {
+      const r = rectOf(it);
+      stena([r.x1, r.y0], [r.x1, r.y1]);
+      stena([r.x0, r.y1], [r.x1, r.y1]);
+      const vrch = [P(r.x0,r.y0), P(r.x1,r.y0), P(r.x1,r.y1), P(r.x0,r.y1)].map(s2 => [s2[0], s2[1] - vys]);
+      parts.push(poly(vrch, vzor, st ? st.lem : '#6b4a24', 1.6));
+    }
+
+    // okna a dveře na jižní stěně domu
+    if (it.typ === 'house' && vys > 14) {
+      const r = rectOf(it);
+      const a = P(r.x0, r.y1), b2 = P(r.x1, r.y1);
+      const sirka = b2[0] - a[0], patra = Math.max(1, Math.min(5, it.patra || 1));
+      const vp = vys / patra;
+      const oken = Math.max(1, Math.min(4, Math.round(sirka / 46)));
+      for (let f = 0; f < patra; f++) {
+        for (let o = 0; o < oken; o++) {
+          const t2 = (o + 0.5) / oken;
+          const ox2 = a[0] + sirka * t2, oy2 = a[1] + (b2[1]-a[1]) * t2 + f * vp;
+          const ow = Math.min(vp * 0.42, sirka / (oken * 2.3)), oh = vp * 0.4;
+          parts.push(`<rect x="${(ox2-ow/2).toFixed(1)}" y="${(oy2 + vp*0.28).toFixed(1)}" width="${ow.toFixed(1)}" height="${oh.toFixed(1)}" fill="#86a7bd" stroke="#5d7488" stroke-width="1"/>`);
+        }
+      }
+      const dw = Math.min(vp * 0.5, sirka * 0.16);
+      const dx = a[0] + sirka * 0.5, dy = a[1] + (b2[1]-a[1]) * 0.5;
+      parts.push(`<rect x="${(dx-dw/2).toFixed(1)}" y="${(dy + vys - vp*0.7).toFixed(1)}" width="${dw.toFixed(1)}" height="${(vp*0.7).toFixed(1)}" fill="#8a5f33" stroke="#64421f" stroke-width="1"/>`);
+    }
+
+    // rostliny na horní ploše
+    if (roste(it) && c && T >= 16) {
+      const zn = (PIX[c.id] && !cropIkona(c.id) && !cropFotky(c.id).length)
+        ? { typ:'pixel', v:c.id } : plodinaZnak(c);
+      const r = rectOf(it);
+      const hust = c.hustota || 4;
+      const krok = clamp(1 / Math.sqrt(hust), 0.3, 1);
+      const vel = Math.min(krok * T * 0.9, 30);
+      let n = 0;
+      for (let y = r.y0 + krok/2; y < r.y1 && n < 70; y += krok) {
+        for (let x = r.x0 + krok/2; x < r.x1 && n < 70; x += krok) {
+          const sp = P(x, y); n++;
+          const cx2 = sp[0], cy2 = sp[1] - vys - vel*0.3;
+          if (zn.typ === 'pixel') parts.push(pixInto(zn.v, cx2 - vel/2, cy2 - vel/2, vel));
+          else if (zn.typ === 'foto') parts.push(`<image href="${zn.v}" x="${(cx2-vel/2).toFixed(1)}" y="${(cy2-vel/2).toFixed(1)}" width="${vel.toFixed(1)}" height="${vel.toFixed(1)}" preserveAspectRatio="xMidYMid slice"/>`);
+          else if (zn.typ === 'msym') parts.push(`<text x="${cx2.toFixed(1)}" y="${cy2.toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="${vel.toFixed(1)}" font-family="${SADY[zn.sada].font}" fill="#2f6b2f">${esc(zn.v)}</text>`);
+          else parts.push(`<text x="${cx2.toFixed(1)}" y="${cy2.toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="${vel.toFixed(1)}">${zn.v}</text>`);
+        }
+      }
+    }
+
+    // jmenovka a stav
+    const r2 = rectOf(it);
+    const sp2 = P((r2.x0+r2.x1)/2, (r2.y0+r2.y1)/2);
+    const txt = c ? c.nazev : it.nazev;
+    if (T >= 10 && it.typ !== 'paved') {
+      const fs = Math.min(13, Math.max(9.5, T * 0.3));
+      const pw = txt.length * fs * 0.56 + 14, ph = fs * 1.7;
+      const ty = sp2[1] - vys - (roste(it) && c ? T*0.5 : 0) - 6;
+      parts.push(`<rect x="${(sp2[0]-pw/2).toFixed(1)}" y="${(ty-ph/2).toFixed(1)}" width="${pw.toFixed(1)}" height="${ph.toFixed(1)}" rx="${(ph/2).toFixed(1)}" fill="rgba(24,38,24,.7)"/>`);
+      parts.push(`<text x="${sp2[0].toFixed(1)}" y="${ty.toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="${fs.toFixed(1)}" font-weight="700" fill="#ffffff">${esc(txt)}</text>`);
+      if (roste(it)) {
+        const sv = stavy(it).filter(x => x !== 'prazdny').slice(0, 2);
+        sv.forEach((sx, i) => {
+          const bx = sp2[0] + pw/2 + 12 + i*26, by = ty;
+          parts.push(`<circle cx="${bx.toFixed(1)}" cy="${by.toFixed(1)}" r="11" fill="${STAV_BARVY[sx].bg}" stroke="#ffffff" stroke-width="2"/>`);
+          parts.push(`<g color="#ffffff">` + artInto(STAV_BARVY[sx].ik, bx-7, by-7, 14) + `</g>`);
+        });
+      }
+    }
+  });
+
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('shape-rendering', 'auto');
+  svg.innerHTML = parts.join('');
+  const sb = el('sc-b'); if (sb) sb.parentElement.style.opacity = '0';
+}
+
 function kresliPlatno() {
   const cv = el('cv'), svg = el('svg');
   if (!cv || !svg) return;
   const W = cv.clientWidth, H = cv.clientHeight;
+  if (izo()) { kresliIzo(cv, svg, W, H); return; }
+  const sbx = el('sc-b'); if (sbx) sbx.parentElement.style.opacity = '1';
+  cv.style.backgroundColor = '';
 
   snapStep = 1;
   const dotStep = view.scale >= 9 ? 1 : (view.scale >= 3.5 ? 5 : 10);
@@ -4766,13 +4982,27 @@ function napojPlatno() {
       const d = Math.hypot(a[0].x-a[1].x, a[0].y-a[1].y) || 1;
       const mid = { x:(a[0].x+a[1].x)/2, y:(a[0].y+a[1].y)/2 };
       view.scale = clamp(gest.s0 * (d/gest.d0), 1.2, 60);
-      view.ox = gest.w0[0] - mid.x/view.scale;
-      view.oy = gest.w0[1] - mid.y/view.scale;
+      if (izo()) {
+        const T = view.scale;
+        const a = (mid.x - isoOff.x) / (T * 0.5), b = (mid.y - isoOff.y) / (T * 0.25);
+        view.ox = gest.w0[0] - (a + b) / 2;
+        view.oy = gest.w0[1] - (b - a) / 2;
+      } else {
+        view.ox = gest.w0[0] - mid.x/view.scale;
+        view.oy = gest.w0[1] - mid.y/view.scale;
+      }
       scheduleRender(); return;
     }
     if (gest.type === 'pan' && gest.moved) {
-      view.ox = gest.o0.ox - (p.x - gest.start.x)/view.scale;
-      view.oy = gest.o0.oy - (p.y - gest.start.y)/view.scale;
+      if (izo()) {
+        const T = view.scale;
+        const da = (p.x - gest.start.x) / (T * 0.5), db = (p.y - gest.start.y) / (T * 0.25);
+        view.ox = gest.o0.ox - (da + db) / 2;
+        view.oy = gest.o0.oy - (db - da) / 2;
+      } else {
+        view.ox = gest.o0.ox - (p.x - gest.start.x)/view.scale;
+        view.oy = gest.o0.oy - (p.y - gest.start.y)/view.scale;
+      }
       scheduleRender(); return;
     }
     if (gest.type === 'erase') {
