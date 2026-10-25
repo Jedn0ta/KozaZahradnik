@@ -885,7 +885,7 @@ body { font-size: 17px; }
 
 <script>
 
-const VERZE = 'v2.7 · 25. 10. 2026';
+const VERZE = 'v2.8 · 25. 10. 2026';
 const LOGO_KOZEL = `<svg viewBox="0 0 32 32" aria-hidden="true">
   <path d="M11.2 9.4C9.6 6.6 7.4 4.6 4.6 3.9c-.5-.1-.9.3-.8.8.5 2.9 1.9 5.4 4.1 7.2.7.6 1.5 1 2.4 1.3z" fill="#fff" opacity=".95"/>
   <path d="M20.8 9.4c1.6-2.8 3.8-4.8 6.6-5.5.5-.1.9.3.8.8-.5 2.9-1.9 5.4-4.1 7.2-.7.6-1.5 1-2.4 1.3z" fill="#fff" opacity=".95"/>
@@ -933,6 +933,7 @@ let state = {
   theme: null,
   uiVerze: 5,
   panelSkryt: false,   // svisla lista nastroju na planu
+  rozdelano: null,     // tvar, ktery se prave kresli a jeste nebyl potvrzen
   radyEdit: {},        // uzivatelske prepisy vestavenych rad
   vlastniRady: [],     // rady, ktere si zahradnik napsal sam
   akce: null,          // rychle akce u zahonku, vcetne vlastnich
@@ -1233,9 +1234,227 @@ const CROPS = [
             {m:9,t:'Dosadba, zamulčovat',ic:'🍓',typ:'plant'}, {m:4,t:'Odstranit suché listy, přihnojit',ic:'✂️',typ:'care'},
             {m:5,t:'Podestlat slámu pod plody',ic:'✂️',typ:'care'}, {m:6,t:'Sklizeň',ic:'🍓',typ:'harvest'},
             {m:7,t:'Dosklizeň, zastřihnout listy',ic:'🍓',typ:'harvest'} ] },
+
+  { id:'paprika', nazev:'Paprika', lat:'Capsicum annuum', emoji:'🫑', kat:'Plodová', celed:'Lilkovité', jednotka:'kg',
+    sow:[2, 3], plant:[5], harvest:[7, 8, 9], hustota:4.5,
+    rozestup:'40 × 50 cm', hloubka:'1 cm', slunce:'Plné slunce, závětří',
+    pozor:'Nesnáší chlad pod 10 °C a průvan. Vysazovat až po zmrzlých, raději do fólie nebo k jižní zdi.',
+    rady:'Předpěstovat od konce února, vysazovat až ve druhé polovině května. První květ vyštípnout, rostlina pak lépe obrazí.',
+    zaliv:'Pravidelně a vydatně, nerada vysychá. Při nedostatku vody plody hořknou.',
+    sousedi:'Dobře: bazalka, mrkev, cibule. Špatně: rajčata a brambory, trpí stejnými chorobami.' },
+  { id:'okurka', nazev:'Okurka nakládačka', lat:'Cucumis sativus', emoji:'🥒', kat:'Plodová', celed:'Tykvovité', jednotka:'kg',
+    sow:[5], plant:[5, 6], harvest:[7, 8, 9], hustota:5,
+    rozestup:'25 × 80 cm', hloubka:'2 cm', slunce:'Plné slunce, teplo',
+    pozor:'Plíseň okurková po srpnových rosách. Zalévat jen odstátou vlažnou vodou, studená vodovodní je šokuje.',
+    rady:'Sít přímo do země po 15. květnu, dřív se stejně nerozběhnou. Mulčovat slámou, drží vláhu a plody zůstanou čisté.',
+    zaliv:'Hodně a pravidelně, hlavně v době nasazování plodů. Nepravidelná zálivka dělá hořké okurky.',
+    sousedi:'Dobře: kopr, hrách, fazole, slunečnice jako opora. Špatně: rajčata, brambory.' },
+  { id:'lilek', nazev:'Lilek', lat:'Solanum melongena', emoji:'🍆', kat:'Plodová', celed:'Lilkovité', jednotka:'ks',
+    sow:[2, 3], plant:[5, 6], harvest:[8, 9], hustota:3,
+    rozestup:'50 × 60 cm', hloubka:'1 cm', slunce:'Nejteplejší místo v zahradě',
+    pozor:'U nás jen do fólie nebo na opravdu teplé místo. Mšice a svilušky v suchu.',
+    rady:'Předpěstovat brzy, roste pomalu. Nechat na rostlině jen čtyři až pět plodů, víc nevyzraje.',
+    zaliv:'Vydatně ke korenům, nikdy na listy.',
+    sousedi:'Dobře: fazole, tymián. Špatně: ostatní lilkovité.' },
+  { id:'kukurice', nazev:'Kukuřice cukrová', lat:'Zea mays', emoji:'🌽', kat:'Plodová', celed:'Lipnicovité', jednotka:'ks',
+    sow:[5], plant:[], harvest:[8, 9], hustota:6,
+    rozestup:'30 × 60 cm', hloubka:'4 cm', slunce:'Plné slunce',
+    pozor:'Opyluje se větrem, proto nikdy jednu řadu — sázet do bloku aspoň čtyři řady vedle sebe, jinak budou palice poloprázdné.',
+    rady:'Sít přímo, až se půda ohřeje na 12 °C. Sklízet, když je blizna hnědá a zrno po stisknutí pustí mléčnou šťávu.',
+    zaliv:'Nejvíc v době metání a nalévání palic.',
+    sousedi:'Dobře: fazole a dýně, klasická trojice. Špatně: celer.' },
+  { id:'petrzel', nazev:'Petržel kořenová', lat:'Petroselinum crispum', emoji:'🥕', kat:'Kořenová', celed:'Miříkovité', jednotka:'kg',
+    sow:[3, 4], plant:[], harvest:[9, 10, 11], hustota:60,
+    rozestup:'4 × 30 cm', hloubka:'1,5 cm', slunce:'Slunce i polostín',
+    pozor:'Klíčí pomalu, i tři týdny. Záhon nesmí mezitím zarůst plevelem ani zaschnout.',
+    rady:'Přidat pár semínek ředkvičky jako značkovač řádku. Nehnojit čerstvým hnojem, kořeny se rozvětví.',
+    zaliv:'Rovnoměrně, aby kořeny nepraskaly.',
+    sousedi:'Dobře: ředkvička, salát. Špatně: mrkev a ostatní miříkovité.' },
+  { id:'celer', nazev:'Celer bulvový', lat:'Apium graveolens', emoji:'🥗', kat:'Kořenová', celed:'Miříkovité', jednotka:'kg',
+    sow:[2, 3], plant:[5], harvest:[10, 11], hustota:6,
+    rozestup:'40 × 40 cm', hloubka:'povrchově, světloklíčný', slunce:'Slunce, vlhčí půda',
+    pozor:'Potřebuje hodně vláhy a dlouhou sezónu. Při suchu bulva zdřevnatí.',
+    rady:'Předpěstovat, semeno jen přitlačit, nezahrnovat. Sázet mělce, bulva má sedět na povrchu.',
+    zaliv:'Hodně a pravidelně celé léto.',
+    sousedi:'Dobře: pórek, zelí. Špatně: kukuřice, petržel.' },
+  { id:'repa', nazev:'Řepa salátová', lat:'Beta vulgaris', emoji:'🍠', kat:'Kořenová', celed:'Laskavcovité', jednotka:'kg',
+    sow:[4, 5, 6], plant:[], harvest:[8, 9, 10], hustota:25,
+    rozestup:'8 × 30 cm', hloubka:'2 cm', slunce:'Slunce',
+    pozor:'Jedno klubíčko dá víc rostlin, je potřeba protrhat, jinak zůstanou malé bulvy.',
+    rady:'Dá se sít dvakrát — na jaře k přímé spotřebě a v červnu na uskladnění.',
+    zaliv:'Mírně, ale rovnoměrně.',
+    sousedi:'Dobře: cibule, salát, kedluben. Špatně: špenát, mangold.' },
+  { id:'cibule', nazev:'Cibule kuchyňská', lat:'Allium cepa', emoji:'🧅', kat:'Cibulová', celed:'Amarylkovité', jednotka:'kg',
+    sow:[3], plant:[3, 4], harvest:[7, 8], hustota:25,
+    rozestup:'10 × 25 cm', hloubka:'sazečka 2 cm', slunce:'Plné slunce',
+    pozor:'Nesnáší čerstvý hnůj ani přemokřenou půdu. Před sklizní dva týdny nezalévat.',
+    rady:'Nejjednodušší je sazečka, sázet hned jak se dá na záhon. Nať nezalamovat, nechat uschnout přirozeně.',
+    zaliv:'Málo. Nadbytek vody zkracuje skladovatelnost.',
+    sousedi:'Dobře: mrkev — vzájemně si pletou škůdce. Špatně: hrách, fazole, zelí.' },
+  { id:'porek', nazev:'Pórek', lat:'Allium porrum', emoji:'🧅', kat:'Cibulová', celed:'Amarylkovité', jednotka:'ks',
+    sow:[2, 3], plant:[5, 6], harvest:[9, 10, 11], hustota:16,
+    rozestup:'15 × 35 cm', hloubka:'1,5 cm', slunce:'Slunce',
+    pozor:'Vrtalka pórová. Pomáhá netkaná textilie od května do srpna.',
+    rady:'Sázet do hlubokých důlků a postupně přihrnovat, bílá část tím bude delší. Vydrží na záhoně přes mrazy.',
+    zaliv:'Rovnoměrně, snese i vlhčí půdu.',
+    sousedi:'Dobře: mrkev, celer, jahody. Špatně: hrách, fazole.' },
+  { id:'zeli', nazev:'Zelí hlávkové', lat:'Brassica oleracea', emoji:'🥬', kat:'Listová', celed:'Brukvovité', jednotka:'ks',
+    sow:[3, 4], plant:[5, 6], harvest:[9, 10], hustota:3,
+    rozestup:'50 × 60 cm', hloubka:'1,5 cm', slunce:'Plné slunce',
+    pozor:'Housenky běláska a dřepčíci. Pomáhá síťka a mulč. Nádorovitost se drží v půdě roky — proto čtyřletý odstup brukvovitých.',
+    rady:'Žravá plodina, na podzim zarýt kompost nebo hnůj. Vápnitou půdu má ráda.',
+    zaliv:'Hodně a pravidelně, hlavně při tvorbě hlávek.',
+    sousedi:'Dobře: kopr, máta, celer. Špatně: cibule, česnek, jahody.' },
+  { id:'kapusta', nazev:'Kapusta', lat:'Brassica oleracea sabauda', emoji:'🥬', kat:'Listová', celed:'Brukvovité', jednotka:'ks',
+    sow:[4, 5], plant:[6], harvest:[10, 11], hustota:3,
+    rozestup:'50 × 55 cm', hloubka:'1,5 cm', slunce:'Slunce',
+    pozor:'Stejní škůdci jako u zelí. Nádorovitost přenáší půda.',
+    rady:'Snese mráz, po přimrznutí je dokonce sladší. Dá se sklízet až do prosince.',
+    zaliv:'Pravidelně, ale snese i sušší období.',
+    sousedi:'Dobře: hrách jako předplodina, kopr. Špatně: ostatní brukvovité.' },
+  { id:'kedluben', nazev:'Kedluben', lat:'Brassica oleracea gongylodes', emoji:'🥬', kat:'Listová', celed:'Brukvovité', jednotka:'ks',
+    sow:[3, 4, 7], plant:[4, 5, 8], harvest:[6, 7, 10], hustota:9,
+    rozestup:'25 × 30 cm', hloubka:'1,5 cm', slunce:'Slunce',
+    pozor:'Při nepravidelné zálivce bulvy praskají a dřevnatí.',
+    rady:'Rychlovka — od výsadby ke sklizni sedm týdnů. Sít nadvakrát, na jaře a v červenci na podzimní sklizeň.',
+    zaliv:'Rovnoměrně, nesmí vyschnout.',
+    sousedi:'Dobře: salát, řepa, cibule. Špatně: ostatní brukvovité.' },
+  { id:'brokolice', nazev:'Brokolice', lat:'Brassica oleracea italica', emoji:'🥦', kat:'Listová', celed:'Brukvovité', jednotka:'ks',
+    sow:[3, 4], plant:[5], harvest:[7, 8, 9], hustota:4,
+    rozestup:'40 × 50 cm', hloubka:'1,5 cm', slunce:'Slunce',
+    pozor:'V horku vybíhá do květu. Hlavní růžici sklidit dřív, než se začnou otvírat poupata.',
+    rady:'Po sklizni hlavní růžice nechat rostlinu v zemi, z úžlabí narostou menší postranní růžice až do mrazů.',
+    zaliv:'Hodně, nesnáší sucho.',
+    sousedi:'Dobře: celer, kopr, salát. Špatně: ostatní brukvovité, rajčata.' },
+  { id:'kvetak', nazev:'Květák', lat:'Brassica oleracea botrytis', emoji:'🥦', kat:'Listová', celed:'Brukvovité', jednotka:'ks',
+    sow:[3, 4], plant:[5], harvest:[8, 9], hustota:4,
+    rozestup:'45 × 55 cm', hloubka:'1,5 cm', slunce:'Slunce',
+    pozor:'Nejnáročnější brukvovitá. Při zaschnutí nebo chladu udělá jen malou růžici.',
+    rady:'Když se ukáže růžice, zalomit nad ní dva listy — zůstane bílá a nezežloutne na slunci.',
+    zaliv:'Hodně a bez výpadků.',
+    sousedi:'Dobře: celer, fazole. Špatně: ostatní brukvovité.' },
+  { id:'rukola', nazev:'Rukola', lat:'Eruca vesicaria', emoji:'🥬', kat:'Listová', celed:'Brukvovité', jednotka:'kg',
+    sow:[3, 4, 5, 8, 9], plant:[], harvest:[4, 5, 6, 9, 10], hustota:150,
+    rozestup:'5 × 20 cm', hloubka:'1 cm', slunce:'Polostín v létě',
+    pozor:'V horku rychle vybíhá a je palčivá. Dřepčíci dělají do listů dírky.',
+    rady:'Sít po malých dávkách každé dva týdny. Sklízet mladé listy, dorůstají znovu.',
+    zaliv:'Pravidelně, aby nezhořkla.',
+    sousedi:'Dobře: salát, mrkev. Špatně: ostatní brukvovité.' },
+  { id:'mangold', nazev:'Mangold', lat:'Beta vulgaris cicla', emoji:'🥬', kat:'Listová', celed:'Laskavcovité', jednotka:'kg',
+    sow:[4, 5], plant:[], harvest:[6, 7, 8, 9, 10], hustota:9,
+    rozestup:'30 × 35 cm', hloubka:'2 cm', slunce:'Slunce i polostín',
+    pozor:'Prakticky bez škůdců. Jen při suchu listy tuhnou.',
+    rady:'Sklízet po jednotlivých listech od kraje, srdíčko nechat — rostlina pak dává úrodu půl roku.',
+    zaliv:'Pravidelně, má ráda vlhko.',
+    sousedi:'Dobře: mrkev, cibule, ředkvička. Špatně: řepa, špenát.' },
+  { id:'polnicek', nazev:'Polníček', lat:'Valerianella locusta', emoji:'🥬', kat:'Listová', celed:'Kozlíkovité', jednotka:'kg',
+    sow:[8, 9], plant:[], harvest:[10, 11, 2, 3], hustota:200,
+    rozestup:'5 × 15 cm', hloubka:'1 cm', slunce:'Slunce i polostín',
+    pozor:'Letní výsev nevzejde, semeno potřebuje chladno. Sít až koncem srpna.',
+    rady:'Nejlevnější zimní zelenina. Vydrží na záhoně pod sněhem a sklízí se i v únoru.',
+    zaliv:'Po výsevu udržovat vlhko, pak skoro nic.',
+    sousedi:'Dobře: jde po kterékoli sklizené plodině. Špatně: nic zásadního.' },
+  { id:'bob', nazev:'Bob obecný', lat:'Vicia faba', emoji:'🫘', kat:'Luskovina', celed:'Bobovité', jednotka:'kg',
+    sow:[3, 4], plant:[], harvest:[7, 8], hustota:12,
+    rozestup:'15 × 45 cm', hloubka:'5 cm', slunce:'Slunce',
+    pozor:'Mšice na vrcholcích. Jakmile nasadí lusky, vrcholky zaštípnout — mšice zmizí.',
+    rady:'Snese chlad, sít brzy zjara. Po sklizni nechat kořeny v zemi, zůstane v ní dusík.',
+    zaliv:'V době kvetení a nalévání lusků.',
+    sousedi:'Dobře: brambory, kukuřice, salát. Špatně: cibule a česnek.' },
+  { id:'bazalka', nazev:'Bazalka', lat:'Ocimum basilicum', emoji:'🌿', kat:'Bylinka', celed:'Hluchavkovité', jednotka:'ks',
+    sow:[3, 4], plant:[5], harvest:[6, 7, 8, 9], hustota:16,
+    rozestup:'20 × 25 cm', hloubka:'povrchově', slunce:'Plné slunce, teplo',
+    pozor:'Nesnáší chlad ani mokré nohy. Pod 10 °C černá.',
+    rady:'Vršky pravidelně zaštipovat, rostlina se rozkřoví a nevykvete. Před mrazem přesadit do květináče na okno.',
+    zaliv:'Ráno ke korenům, listy nechat suché.',
+    sousedi:'Dobře: rajčata, paprika. Špatně: máta, ta ji přeroste.' },
+  { id:'petrzelka', nazev:'Petrželka naťová', lat:'Petroselinum crispum', emoji:'🌱', kat:'Bylinka', celed:'Miříkovité', jednotka:'kg',
+    sow:[3, 4, 5], plant:[], harvest:[6, 7, 8, 9, 10], hustota:40,
+    rozestup:'8 × 25 cm', hloubka:'1 cm', slunce:'Slunce i polostín',
+    pozor:'Klíčí dlouho, i tři týdny. Semeno před výsevem namočit přes noc.',
+    rady:'Dvouletka — druhý rok vykvete a nať zhořkne. Sít proto každý rok znovu.',
+    zaliv:'Rovnoměrně, nesnáší vyschnutí.',
+    sousedi:'Dobře: rajčata, ředkvička. Špatně: salát, kopr.' },
+  { id:'kopr', nazev:'Kopr', lat:'Anethum graveolens', emoji:'🌾', kat:'Bylinka', celed:'Miříkovité', jednotka:'kg',
+    sow:[4, 5, 6, 7], plant:[], harvest:[6, 7, 8, 9], hustota:30,
+    rozestup:'10 × 25 cm', hloubka:'1,5 cm', slunce:'Slunce',
+    pozor:'Vysemeňuje se sám, pak se objevuje všude. Kdo to nechce, musí okvětí včas ostříhat.',
+    rady:'Sít postupně každé tři týdny, aby byla nať pořád. Na nakládačky nechat dozrát okolíky.',
+    zaliv:'Mírně.',
+    sousedi:'Dobře: okurky, zelí, cibule. Špatně: mrkev, fenykl.' },
+  { id:'pazitka', nazev:'Pažitka', lat:'Allium schoenoprasum', emoji:'🍀', kat:'Bylinka', celed:'Amarylkovité', jednotka:'kg',
+    sow:[3, 4], plant:[4, 9], harvest:[4, 5, 6, 7, 8, 9, 10], hustota:25,
+    rozestup:'20 × 25 cm', hloubka:'1 cm', slunce:'Slunce i polostín',
+    pozor:'Po letech trs zhoustne a slábne. Jednou za tři roky rozdělit a přesadit.',
+    rady:'Vytrvalá, vyraší hned zjara. Po sklizni sestřihnout těsně nad zemí, naroste znovu.',
+    zaliv:'Pravidelně, pak je nať měkká.',
+    sousedi:'Dobře: mrkev, rajčata, jahody. Špatně: hrách, fazole.' },
+  { id:'tymian', nazev:'Tymián', lat:'Thymus vulgaris', emoji:'🍃', kat:'Bylinka', celed:'Hluchavkovité', jednotka:'kg',
+    sow:[4, 5], plant:[5], harvest:[6, 7, 8, 9], hustota:9,
+    rozestup:'25 × 30 cm', hloubka:'povrchově', slunce:'Plné slunce, sucho',
+    pozor:'Zahnije v těžké mokré půdě. Potřebuje propustné, spíš chudé stanoviště.',
+    rady:'Vytrvalý, po zimě zastřihnout zdřevnatělé konce. Nejvíc vůně má těsně před květem.',
+    zaliv:'Minimálně, snese sucho.',
+    sousedi:'Dobře: zelí, jahody — odpuzuje škůdce. Špatně: nic zásadního.' },
+  { id:'rozmaryn', nazev:'Rozmarýn', lat:'Rosmarinus officinalis', emoji:'🌲', kat:'Bylinka', celed:'Hluchavkovité', jednotka:'kg',
+    sow:[], plant:[5], harvest:[5, 6, 7, 8, 9, 10], hustota:4,
+    rozestup:'50 × 50 cm', hloubka:'—', slunce:'Plné slunce, závětří',
+    pozor:'U nás nespolehlivě přezimuje. Nejjistější je květináč a přes zimu světlá chladná místnost kolem 8 °C.',
+    rady:'Množí se řízky, ze semene roste zoufale pomalu. Nehnojit dusíkem, ztrácí vůni.',
+    zaliv:'Málo. Mokro mu škodí víc než sucho.',
+    sousedi:'Dobře: zelí, mrkev, fazole. Špatně: nic zásadního.' },
+  { id:'mata', nazev:'Máta', lat:'Mentha', emoji:'☘️', kat:'Bylinka', celed:'Hluchavkovité', jednotka:'kg',
+    sow:[], plant:[4, 5, 9], harvest:[5, 6, 7, 8, 9], hustota:6,
+    rozestup:'30 × 40 cm', hloubka:'—', slunce:'Polostín, vlhko',
+    pozor:'Rozlézá se výběžky a přeroste celý záhon. Sázet do zapuštěného kbelíku bez dna.',
+    rady:'Vytrvalá a nezničitelná. Po odkvětu seříznout, naroste nová měkká nať.',
+    zaliv:'Má ráda vlhko, snese i vlhčí kout zahrady.',
+    sousedi:'Dobře: zelí, rajčata. Špatně: bazalka, heřmánek.' },
+  { id:'oregano', nazev:'Oregano', lat:'Origanum vulgare', emoji:'🏵️', kat:'Bylinka', celed:'Hluchavkovité', jednotka:'kg',
+    sow:[4, 5], plant:[5], harvest:[7, 8, 9], hustota:9,
+    rozestup:'25 × 30 cm', hloubka:'povrchově', slunce:'Plné slunce, sucho',
+    pozor:'V příliš živné půdě bují nať a mizí vůně.',
+    rady:'Vytrvalé, roky vydrží na jednom místě. Sklízet v plném květu, tehdy voní nejvíc.',
+    zaliv:'Málo.',
+    sousedi:'Dobře: okurky, fazole. Špatně: nic zásadního.' },
+  { id:'salvej', nazev:'Šalvěj lékařská', lat:'Salvia officinalis', emoji:'🪻', kat:'Bylinka', celed:'Hluchavkovité', jednotka:'kg',
+    sow:[4, 5], plant:[5], harvest:[5, 6, 7, 8, 9], hustota:6,
+    rozestup:'35 × 40 cm', hloubka:'1 cm', slunce:'Plné slunce, sucho',
+    pozor:'Starší keřík dřevnatí a vypadává ze středu. Na jaře zmladit řezem do poloviny.',
+    rady:'Vytrvalá, přezimuje venku. Listy sbírat před květem.',
+    zaliv:'Málo, snese sucho.',
+    sousedi:'Dobře: zelí, mrkev — odpuzuje bělásky. Špatně: okurky.' },
+  { id:'medunka', nazev:'Meduňka', lat:'Melissa officinalis', emoji:'🌼', kat:'Bylinka', celed:'Hluchavkovité', jednotka:'kg',
+    sow:[4, 5], plant:[5], harvest:[6, 7, 8, 9], hustota:6,
+    rozestup:'35 × 40 cm', hloubka:'povrchově', slunce:'Slunce i polostín',
+    pozor:'Vysemeňuje se a šíří. Odkvetlé stonky stříhat.',
+    rady:'Vytrvalá. Po seříznutí v červenci naroste druhá, voňavější sklizeň.',
+    zaliv:'Pravidelně, nemá ráda úplné vyschnutí.',
+    sousedi:'Dobře: skoro vše, láká opylovače. Špatně: nic zásadního.' },
+  { id:'libecek', nazev:'Libeček', lat:'Levisticum officinale', emoji:'🪴', kat:'Bylinka', celed:'Miříkovité', jednotka:'kg',
+    sow:[4], plant:[4, 9], harvest:[5, 6, 7, 8, 9], hustota:1,
+    rozestup:'80 × 80 cm', hloubka:'1 cm', slunce:'Slunce i polostín',
+    pozor:'Vyroste do dvou metrů a vydrží desítky let. Nesázet doprostřed záhonu, zastíní okolí.',
+    rady:'Jedna rostlina stačí celé rodině. Chuť je výrazná, do polévky stačí list.',
+    zaliv:'Snese vlhčí místo.',
+    sousedi:'Dobře: okraj zahrady u kompostu. Špatně: drobná zelenina v jeho stínu.' },
+  { id:'koriandr', nazev:'Koriandr', lat:'Coriandrum sativum', emoji:'🌸', kat:'Bylinka', celed:'Miříkovité', jednotka:'kg',
+    sow:[4, 5, 8], plant:[], harvest:[6, 7, 9, 10], hustota:40,
+    rozestup:'8 × 25 cm', hloubka:'1,5 cm', slunce:'Slunce, v létě polostín',
+    pozor:'V horku okamžitě vybíhá do květu a nať zmizí.',
+    rady:'Na nať sít brzy zjara nebo koncem srpna. Na semeno nechat dozrát okolíky.',
+    zaliv:'Pravidelně, aby nevybíhal.',
+    sousedi:'Dobře: okurky, fazole. Špatně: fenykl.' },
+  { id:'levandule', nazev:'Levandule', lat:'Lavandula angustifolia', emoji:'💐', kat:'Bylinka', celed:'Hluchavkovité', jednotka:'kg',
+    sow:[], plant:[5], harvest:[6, 7, 8], hustota:4,
+    rozestup:'40 × 50 cm', hloubka:'—', slunce:'Plné slunce, sucho',
+    pozor:'Hnije v těžké mokré půdě. Pod kořeny patří štěrk nebo písek.',
+    rady:'Každé jaro sestřihnout o třetinu, jinak zdřevnatí a rozpadne se. Sklízet, když se otvírají první květy.',
+    zaliv:'Minimálně. Zalévat jen první rok po výsadbě.',
+    sousedi:'Dobře: růže, jahody, zelí — odpuzuje mšice. Špatně: nic zásadního.' },
 ];
 
-const KATEGORIE = ['Vše','Plodová','Kořenová','Listová','Cibulová','Luskovina','Ovoce'];
+const KATEGORIE = ['Vše','Plodová','Kořenová','Listová','Cibulová','Luskovina','Ovoce','Bylinka'];
 const MESICE = ['leden','únor','březen','duben','květen','červen','červenec','srpen','září','říjen','listopad','prosinec'];
 const MESICE_KR = ['L','Ú','B','D','K','Č','Č','S','Z','Ř','L','P'];
 const TYP_LABEL = { soil:'Příprava půdy', sow:'Výsev', plant:'Výsadba', care:'Péče', harvest:'Sklizeň' };
@@ -3279,6 +3498,7 @@ function kresliMapu() {
   const prazdno = !state.outline.length && !items().length;
   const nacitam = katStav.stav === 'hledam';
   const rezim = state.tool !== 'pan' ? RADY[state.tool] : null;
+  const rozdel = (rezim && state.rozdelano && state.items[state.rozdelano]) ? state.items[state.rozdelano] : null;
   const vyberParcel = katStav.stav === 'vyber' && state.katParcely;
   /* Adresu nabízíme jen dokud není zahrada. Potom už jen malým tlačítkem v liště. */
   const nabidniAdresu = !state.panel && !rezim && !state.outline.length && !items().length;
@@ -3297,8 +3517,10 @@ function kresliMapu() {
 
       ${rezim ? `<div class="m-mode">
         <span class="mi">${state.tool === 'outline' ? ik('obrys') : (state.tool === 'erase' ? ik('guma') : ik('p_' + state.tool))}</span>
-        <span class="mt"><b>${esc(rezim.t)}</b><span>${esc(rezim.s)}</span></span>
-        <button id="m-hotovo">Hotovo</button>
+        <span class="mt"><b>${rozdel ? esc(rozdel.nazev) : esc(rezim.t)}</b>
+          <span>${rozdel ? fmtA(itArea(rozdel)) + ' · dokresluj dál, nebo tvar potvrď' : esc(rezim.s)}</span></span>
+        ${rozdel ? `<button id="m-potvrdit">Potvrdit</button>` : ''}
+        <button id="m-hotovo">${rozdel ? '✕' : 'Hotovo'}</button>
       </div>` : ''}
 
       ${nabidniAdresu ? `<button class="m-search plain" id="otevri-adresu">
@@ -3337,11 +3559,15 @@ function kresliMapu() {
           </div>
           ${kartaZahonu(vyb, new Date().getMonth()+1)}
         ` : vybranyPrvek(vyb)) : ''}
-        ${state.tool === 'outline' && state.outline.length ? `<div class="dacts" style="margin-top:${vyberParcel||vyb?'12px':'0'}">
-          ${!state.outlineDone && state.outline.length >= 3 ? `<button class="btn sm" id="o-close">Uzavřít obrys</button>` : ''}
-          ${state.selVert != null && state.outline.length > 3 ? `<button class="btn sm sec" id="o-del">Smazat vrchol</button>` : ''}
-          <button class="btn sm sec" id="o-undo">Zpět</button>
-        </div>` : ''}
+        ${state.tool === 'outline' && state.outline.length ? `
+          <p class="note" style="margin:${vyberParcel||vyb?'12px':'0'} 0 10px">
+            ${state.outlineDone ? 'Vrcholy se dají tahat, tažením uvnitř posuneš celý obrys.' : 'Klepej po obvodu. Až budeš mít objeto, obrys uzavři.'}</p>
+          <div class="dacts">
+            ${!state.outlineDone && state.outline.length >= 3 ? `<button class="btn sm" id="o-close">Uzavřít obrys</button>` : ''}
+            ${state.selVert != null && state.outline.length > 3 ? `<button class="btn sm sec" id="o-del">Smazat vrchol</button>` : ''}
+            <button class="btn sm sec" id="o-undo">Zpět</button>
+            <button class="btn sm sec" id="o-smaz" style="color:var(--danger)">Smazat obrys</button>
+          </div>` : ''}
       </div>` : ''}
 
       ${state.panelSkryt || (vyb && roste(vyb)) ? `
@@ -3371,6 +3597,7 @@ function kresliMapu() {
   const nastav = (t) => {
     if (state.zamek && t !== 'pan') { dialogZamek(); return; }
     if (state.tool === t && t !== 'pan') t = 'pan';
+    if (t !== state.tool) state.rozdelano = null;
     state.tool = t;
     if (t !== 'outline') state.selVert = null;
     if (t !== 'pan') state.sel = null;
@@ -3392,7 +3619,13 @@ function kresliMapu() {
   };
   const ta = el('t-adresa');
   if (ta) ta.onclick = () => { state.panel = true; state.tool = 'pan'; save(); kresliMapu(); };
-  const mh = el('m-hotovo'); if (mh) mh.onclick = () => nastav('pan');
+  const mh = el('m-hotovo'); if (mh) mh.onclick = () => { state.rozdelano = null; nastav('pan'); };
+  const mp = el('m-potvrdit');
+  if (mp) mp.onclick = () => {
+    const t = state.items[state.rozdelano];
+    state.rozdelano = null; save(); kresliMapu();
+    toast((t ? t.nazev : 'Tvar') + ' potvrzen — další kreslení začne nový');
+  };
 
   s.querySelectorAll('[data-parcela]').forEach(b => b.onclick = () => prepniParcelu(Number(b.dataset.parcela)));
   const ko = el('kat-ok');
@@ -3412,6 +3645,14 @@ function kresliMapu() {
   }
   const oc = el('o-close'); if (oc) oc.onclick = () => { state.outlineDone = true; save(); kresliMapu(); toast('Obrys uzavřen'); };
   const od = el('o-del'); if (od) od.onclick = () => { state.outline.splice(state.selVert,1); state.selVert = null; save(); kresliMapu(); };
+  const os = el('o-smaz');
+  if (os) os.onclick = () => potvrd('Smazat obrys zahrady?',
+    'Záhonky, dům ani cesty to nesmaže, zmizí jen hranice pozemku.', () => {
+      state.outline = []; state.outlineDone = false; state.vedlejsi = [];
+      state.selVert = null; state.katParcely = null; state.katKontrola = null;
+      katStav = { stav:'idle', text:'' };
+      save(); kresliMapu(); toast('Obrys smazán');
+    });
   const ou = el('o-undo'); if (ou) ou.onclick = () => {
     state.outline.pop(); state.selVert = null;
     if (state.outline.length < 3) state.outlineDone = false;
@@ -3898,9 +4139,26 @@ function kresliPlatno() {
    se sousedem stejného druhu, malé se kladou jeden vedle druhého, takže
    se jich do jednoho metru vejde několik. */
 function namaluj(g, wx, wy) {
+  /* Prst se mezi dvěma událostmi posune klidně o metr. Bez dokreslení
+     mezikroků by zůstal děravý záhon, do kterého se pak nedá klepnout. */
+  let zmena = false;
+  const a = g.posledni;
+  if (a) {
+    const dx = wx - a.x, dy = wy - a.y;
+    const kroku = Math.ceil(Math.hypot(dx, dy) / 0.3);
+    for (let i = 1; i < kroku && i < 400; i++) {
+      if (malujBod(g, a.x + dx*i/kroku, a.y + dy*i/kroku)) zmena = true;
+    }
+  }
+  if (malujBod(g, wx, wy)) zmena = true;
+  g.posledni = { x:wx, y:wy };
+  return zmena;
+}
+function malujBod(g, wx, wy) {
   const typ = g.prvek, d = PRVKY[typ];
   if (d.maly) {
     const rz = d.rozmer;
+    state.rozdelano = null;
     // razítkujeme po půlce rozměru, ať se při tažení nenaskládají na sebe
     const krok = Math.max(0.2, Math.min(rz.w, rz.h) * 0.9);
     const kl = Math.round(wx/krok) + ',' + Math.round(wy/krok);
@@ -3920,30 +4178,39 @@ function namaluj(g, wx, wy) {
   if (stary && stary.typ === typ) return false;
   // slepit se sousedem stejného druhu, ať záhon zůstane jeden celek
   let cil = g.cil ? state.items[g.cil] : null;
-  if (!cil) {
-    const sous = new Set();
-    [[1,0],[-1,0],[0,1],[0,-1]].forEach(dd => {
-      const o = ownerAt(ck(kx+dd[0], ky+dd[1]));
-      if (o && o.typ === typ && !o.zamek) sous.add(o.id);
-    });
-    const ids = [...sous];
-    if (ids.length) {
-      cil = state.items[ids[0]];
-      ids.slice(1).forEach(id => { const o = state.items[id]; if (o) addCells(cil, o.cells.slice()); });
-    }
+  if (!cil && state.rozdelano && state.items[state.rozdelano]
+      && state.items[state.rozdelano].typ === typ) {
+    // rozdělaný tvar se dokresluje dál; hotový už se nespojí
+    cil = state.items[state.rozdelano];
   }
   if (!cil) {
     // rovnou s prvním čtverečkem — prázdný prvek by se hned zahodil
     cil = novyPrvek(typ, [k]);
     g.cil = cil.id;
+    state.rozdelano = cil.id;
     return true;
   }
   g.cil = cil.id;
+  state.rozdelano = cil.id;
   addCells(cil, [k]);
   return true;
 }
-/* Guma: malý prvek zmizí celý, velkému ubude čtvereček */
+/* Guma maže také po celé dráze prstu */
 function smazNaBode(g, wx, wy) {
+  let zmena = false;
+  const a = g.posledni;
+  if (a) {
+    const dx = wx - a.x, dy = wy - a.y;
+    const kroku = Math.ceil(Math.hypot(dx, dy) / 0.3);
+    for (let i = 1; i < kroku && i < 400; i++) {
+      if (smazBod(g, a.x + dx*i/kroku, a.y + dy*i/kroku)) zmena = true;
+    }
+  }
+  if (smazBod(g, wx, wy)) zmena = true;
+  g.posledni = { x:wx, y:wy };
+  return zmena;
+}
+function smazBod(g, wx, wy) {
   const male = items().filter(jeMaly).reverse();
   for (const i of male) {
     const r = rectOf(i);
@@ -4002,6 +4269,16 @@ function napojPlatno() {
           if (Math.hypot(pa[0]-pb[0], pa[1]-pb[1]) < 46) continue;
           const mx = (pa[0]+pb[0])/2, my = (pa[1]+pb[1])/2;
           if (Math.hypot(mx-p.x, my-p.y) <= 15) { gest = { type:'insert', i, start:p, moved:false }; return; }
+        }
+      }
+      // uzavřeným obrysem se dá hýbat celým: chytne se zevnitř a táhne
+      if (state.outlineDone && state.outline.length >= 3) {
+        const w = s2w(p.x, p.y);
+        if (pointInPoly(w[0], w[1], state.outline)) {
+          gest = { type:'obrysPosun', start:p, moved:false, last:{dx:0,dy:0},
+                   zaloha: state.outline.map(q => q.slice()),
+                   zalohaV: (state.vedlejsi||[]).map(v => v.map(q => q.slice())) };
+          return;
         }
       }
       gest = { type:'tapAdd', start:p, moved:false }; return;
@@ -4068,6 +4345,12 @@ function napojPlatno() {
       if (namaluj(gest, w[0], w[1])) scheduleRender();
       return;
     }
+    if (gest.type === 'obrysPosun' && gest.moved) {
+      const dx = (p.x - gest.start.x)/view.scale, dy = (p.y - gest.start.y)/view.scale;
+      state.outline = gest.zaloha.map(q => snapW(q[0]+dx, q[1]+dy));
+      state.vedlejsi = gest.zalohaV.map(v => v.map(q => snapW(q[0]+dx, q[1]+dy)));
+      scheduleRender(); return;
+    }
     if (gest.type === 'vertex' && gest.moved) {
       state.outline[gest.i] = snapW(...s2w(p.x, p.y));
       scheduleRender(); return;
@@ -4127,6 +4410,11 @@ function napojPlatno() {
     if (g.type === 'vertex') {
       if (g.moved) { save(); kresliMapu(); }
       else { state.selVert = (state.selVert === g.i) ? null : g.i; save(); kresliMapu(); }
+      return;
+    }
+    if (g.type === 'obrysPosun') {
+      if (g.moved) { save(); kresliMapu(); toast('Obrys posunut'); }
+      else { state.selVert = null; save(); kresliMapu(); }
       return;
     }
     if (g.type === 'erase') {
