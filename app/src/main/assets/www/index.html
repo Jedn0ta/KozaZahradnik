@@ -820,10 +820,10 @@ body { font-size: 17px; }
 
 /* ---------- nástroje na plán: svislá lišta u kraje, jen ikony ---------- */
 .mrail {
-  position: absolute; left: 12px; z-index: 6;
-  display: flex; flex-direction: column; gap: 8px; align-items: center;
+  position: absolute; left: 6px; z-index: 6;
+  display: flex; flex-direction: column; gap: 9px; align-items: center;
   max-height: calc(100% - 20px); overflow-y: auto; overscroll-behavior: contain;
-  scrollbar-width: none; padding: 2px 0;
+  scrollbar-width: none; padding: 7px 8px;
 }
 .mrail::-webkit-scrollbar { display: none; }
 .mrail button {
@@ -889,7 +889,7 @@ body { font-size: 17px; }
 
 <script>
 
-const VERZE = 'v3.0 · 25. 10. 2026';
+const VERZE = 'v3.1 · 25. 10. 2026';
 const LOGO_KOZEL = `<svg viewBox="0 0 32 32" aria-hidden="true">
   <path d="M11.2 9.4C9.6 6.6 7.4 4.6 4.6 3.9c-.5-.1-.9.3-.8.8.5 2.9 1.9 5.4 4.1 7.2.7.6 1.5 1 2.4 1.3z" fill="#fff" opacity=".95"/>
   <path d="M20.8 9.4c1.6-2.8 3.8-4.8 6.6-5.5.5-.1.9.3.8.8-.5 2.9-1.9 5.4-4.1 7.2-.7.6-1.5 1-2.4 1.3z" fill="#fff" opacity=".95"/>
@@ -1632,83 +1632,100 @@ const PIX = {
   ] },
 };
 /* ============ DLAŽDICE ZAHRADY ============
-   Pixelartové textury po vzoru hospodářských her: jeden metr je mřížka
-   16 × 16 pixelů, takže se s plánem posouvají i přibližují. */
+   Pixelartové textury: jeden metr je mřížka 16 × 16 pixelů, takže se
+   s plánem posouvají i přibližují. */
 const DLAZDICE = {
-  trava: { p:{'a':'#6cb04a','b':'#5e9e3e','c':'#81c25c','d':'#4e8a34'}, d:[
-    'abbabcaaabaaacbb',
-    'abaaabaabaaaaada',
-    'aaacaaaaacaaaddd',
-    'aaaadaaacaaaaaac',
-    'aaadddaaaaaacaaa',
-    'aaabbbacaaabaaaa',
-    'aaaaaaaabbaaabac',
-    'aaacaaabaaaaaaaa',
-    'aaaaacaaaaadaaaa',
-    'aaaaaaaaaadddaaa',
-    'abaaaaaaaaabaaaa',
-    'aaaaaaaaaabaaaaa',
-    'aabbaaadaaaaaaaa',
-    'caaaaadddcaaabaa',
-    'aaaaabaaaaaaaaaa',
-    'aaaaaaaaaaaaabaa'
+  trava: { p:{'a':'#6aae46','b':'#71b74c','c':'#4f8c33','d':'#8ccb62'}, d:[
+    'dbbbdaaadbbbdaaa',
+    'cbbbcaaacbbbcaaa',
+    'bbbbaaaabbbbacaa',
+    'bbbbaaaabbbbcaca',
+    'aadabbdbaadabcdb',
+    'aacabbcbaacabbcb',
+    'aaaabbbbaaaabbbb',
+    'aaaabbbbaaaabbbb',
+    'dbbbdacadbbbdaaa',
+    'cbbbccaccbbbcaaa',
+    'bbbbaacabbbbaaaa',
+    'bbbbaaaabbbbaaaa',
+    'aacabbdbaadabbdb',
+    'acccbbcbaacabbcb',
+    'aacabbbbaaaabbbb',
+    'aaaabbbbaaaabbbb'
   ] },
-  hlina: { p:{'e':'#7a5230','f':'#8c6038','g':'#613f23','h':'#4d3119','i':'#9c7146'}, d:[
-    'ffffffffffffffff',
-    'eeeeeeeeeeeeeeee',
-    'gggggggggggggggg',
-    'hhhhhhhihihhhhhh',
-    'ffffffffffffffff',
-    'eeeeeeeeeeeeeeee',
-    'ggiggggggggggggg',
-    'hhhhhihhhhhhhhhh',
-    'ffffifffffffffff',
-    'eeeeeeeeeeeeeeee',
-    'gggggggggggggggg',
-    'hhhhihhhhhhhhhhh',
-    'ffffffffffffffff',
-    'eeeeeieieeeeeeee',
-    'ggggiggggggggggg',
-    'hhhhhhhhhhhhihhh'
+  hlina: { p:{'e':'#7b5330','f':'#916539','g':'#5f3d22','h':'#4b2f18','i':'#a07749'}, d:[
+    'fffffeeeeefffffe',
+    'eieeegggggeeeeeg',
+    'igggihhhhhgggggh',
+    'hhhhhiffffhhhhhf',
+    'fffffeeeeefffffe',
+    'eeeeegggggeeeeig',
+    'ggggghhhhhggggih',
+    'hhhhhfifffhhhhhf',
+    'fffffeeeeefffffe',
+    'eeeeegggggeeeeig',
+    'ggggghhhhhgggggh',
+    'hhhhhfffffhhhhhf',
+    'fifffeeeeefffffe',
+    'eeeeegggggeeeeeg',
+    'igggghhhhhigggih',
+    'hhhhhiffffhhhhhf'
   ] },
-  dlazba: { p:{'j':'#b5ac9a','k':'#9a9080','l':'#6f6758'}, d:[
-    'kjjjjkklkjjjjkkl',
-    'jjjjkjkljjjjkjkl',
-    'jjjkjjkljjjkjjkl',
-    'jjkjjjkljjkjjjkl',
-    'jkjjjjkljkjjjjkl',
-    'kjjjjkklkjjjjkkl',
-    'jjjjkjkljjjjkjkl',
+  dlazba: { p:{'j':'#b7ae9c','k':'#968c7c','l':'#6b6354'}, d:[
+    'kkkkkkklkkkkkkkl',
+    'kjjjjjjlkjjjjjjl',
+    'kjjjjjjlkjjjjjjl',
+    'kjjjjjjlkjjjjjjl',
+    'kjjjjjjlkjjjjjjl',
     'llllllllllllllll',
-    'kjjjjkklkjjjjkkl',
-    'jjjjkjkljjjjkjkl',
-    'jjjkjjkljjjkjjkl',
-    'jjkjjjkljjkjjjkl',
-    'jkjjjjkljkjjjjkl',
-    'kjjjjkklkjjjjkkl',
-    'jjjjkjkljjjjkjkl',
+    'kkkkklkkkkkkkkkl',
+    'kjjjjlkjjjjjjjjl',
+    'kjjjjlkjjjjjjjjl',
+    'kjjjjlkjjjjjjjjl',
+    'llllllllllllllll',
+    'kkkkkkkkklkkkkkl',
+    'kjjjjjjjjlkjjjjl',
+    'kjjjjjjjjlkjjjjl',
+    'kjjjjjjjjlkjjjjl',
     'llllllllllllllll'
   ] },
-  drevo: { p:{'m':'#a9763f','n':'#bd8c51','o':'#7a5126'}, d:[
+  drevo: { p:{'m':'#a9763f','n':'#c0904f','o':'#7a5126'}, d:[
     'nnnnnnnnnnnnnnnn',
     'mmmmmmmmmmmmmmmm',
-    'mmmmmmmmmmmmmmmm',
+    'mmmmoommmmmmmmmm',
     'mmmmmmmmmmmmmmmm',
     'oooooooooooooooo',
     'nnnnnnnnnnnnnnnn',
-    'mmmmmmmmmmmmmnmm',
     'mmmmmmmmmmmmmmmm',
+    'mmmmmmmmmmmoommm',
     'mmmmmmmmmmmmmmmm',
     'oooooooooooooooo',
     'nnnnnnnnnnnnnnnn',
-    'mmnmmmmmmmmmmmmm',
     'mmmmmmmmmmmmmmmm',
+    'mmmmmmmoommmmmmm',
     'mmmmmmmmmmmmmmmm',
     'oooooooooooooooo',
     'nnnnnnnnnnnnnnnn'
   ] },
+  strecha: { p:{'p':'#b04a38','q':'#8e3b2c','r':'#742f22','s':'#c75b46'}, d:[
+    'qsssqsssqsssqsss',
+    'qpppqpppqpppqppp',
+    'qpppqpppqpppqppp',
+    'rrrrrrrrrrrrrrrr',
+    'ssqsssqsssqsssqs',
+    'ppqpppqpppqpppqp',
+    'ppqpppqpppqpppqp',
+    'rrrrrrrrrrrrrrrr',
+    'qsssqsssqsssqsss',
+    'qpppqpppqpppqppp',
+    'qpppqpppqpppqppp',
+    'rrrrrrrrrrrrrrrr',
+    'ssqsssqsssqsssqs',
+    'ppqpppqpppqpppqp',
+    'ppqpppqpppqpppqp',
+    'rrrrrrrrrrrrrrrr'
+  ] },
 };
-
 /* Z dlaždice udělá SVG vzor ukotvený ke světu: metr = 16 pixelů. */
 function vzorDlazdice(id, nazev, s, ox, oy) {
   const t = DLAZDICE[id];
@@ -3607,8 +3624,8 @@ const RADY = {
   erase:    { t:'Mažeš', s:'Táhni prstem přes to, co má zmizet.' },
   bed:      { t:'Maluješ záhon', s:'Táhni prstem po zahradě, maluje se po čtverečcích.' },
   raised:   { t:'Maluješ vyvýšený záhon', s:'Táhni prstem, kudy má vést dřevěný rám.' },
-  trough:   { t:'Kladeš truhlíky', s:'Klepni nebo táhni. Do jednoho metru se jich vejde víc.' },
-  pot:      { t:'Kladeš květináče', s:'Klepni nebo táhni. Do jednoho metru se jich vejde víc.' },
+  trough:   { t:'Truhlík', s:'Klepni, kam ho postavíš. Pak ho posuň, zvětši nebo otoč a potvrď.' },
+  pot:      { t:'Květináč', s:'Klepni, kam ho postavíš. Pak ho posuň, zvětši nebo otoč a potvrď.' },
   house:    { t:'Maluješ dům', s:'Táhni prstem půdorys domu, garáže nebo skleníku.' },
   paved:    { t:'Maluješ cestu', s:'Táhni prstem, kudy cesta vede.' },
 };
@@ -3959,6 +3976,8 @@ function handlesOf(it) {
 /* --- kresleni --- */
 let preview = null;
 let potvrdBod = null;      // kde na plátně sedí potvrzovací fajfka
+let otocBod = null;        // tlačítko na otočení rozdělaného kusu
+let malyUchyt = null;      // úchyt na zvětšení truhlíku či květináče
 let rafId = null;
 function scheduleRender() { if (rafId) return; rafId = requestAnimationFrame(() => { rafId = null; kresliPlatno(); }); }
 
@@ -4000,6 +4019,7 @@ function kresliPlatno() {
       + vzorDlazdice('hlina', 'vz-hlina', T, ox, oy)
       + vzorDlazdice('dlazba', 'vz-dlazba', T, ox, oy)
       + vzorDlazdice('drevo', 'vz-drevo', T, ox, oy)
+      + vzorDlazdice('strecha', 'vz-strecha', T, ox, oy)
       + `</defs>`);
   }
   // dalsi vybrane parcely pod hlavnim obrysem
@@ -4052,8 +4072,9 @@ function kresliPlatno() {
 
     const vypln = !hezky ? d.fill
       : (it.typ === 'paved' ? 'url(#vz-dlazba)'
+      : (it.typ === 'house' ? 'url(#vz-strecha)'
       : (it.typ === 'raised' || it.typ === 'trough' ? 'url(#vz-drevo)'
-      : (roste(it) ? 'url(#vz-hlina)' : d.fill)));
+      : (roste(it) ? 'url(#vz-hlina)' : d.fill))));
     parts.push(telo(vypln, 1));
     // hlína v záhonu: jemné řádky, ne šachovnice
     if (roste(it) && s >= 7 && jednoduchy && !hezky) {
@@ -4066,6 +4087,11 @@ function kresliPlatno() {
     }
     // osázený záhon má zelený nádech
     if (roste(it) && c) parts.push(telo('#3f8c3f', hezky ? 0.22 : 0.3));
+    if (hezky && jednoduchy && it.typ === 'house' && bw > 20 && bh > 20) {
+      // hřeben střechy po delší straně
+      if (bw >= bh) parts.push(`<path d="M${(sp0[0]+3).toFixed(1)} ${(sp0[1]+bh/2).toFixed(1)}h${(bw-6).toFixed(1)}" stroke="#6d2b1f" stroke-width="3"/>`);
+      else parts.push(`<path d="M${(sp0[0]+bw/2).toFixed(1)} ${(sp0[1]+3).toFixed(1)}v${(bh-6).toFixed(1)}" stroke="#6d2b1f" stroke-width="3"/>`);
+    }
     if (hezky && jednoduchy && (it.typ === 'raised' || it.typ === 'trough') && bw > 16 && bh > 16) {
       const ram = Math.max(2.5, Math.min(bw, bh) * 0.13);
       parts.push(`<rect x="${(sp0[0]+ram).toFixed(1)}" y="${(sp0[1]+ram).toFixed(1)}" width="${(bw-ram*2).toFixed(1)}" height="${(bh-ram*2).toFixed(1)}" rx="${Math.max(1,r-2).toFixed(1)}" fill="url(#vz-hlina)"/>`);
@@ -4137,7 +4163,7 @@ function kresliPlatno() {
     const cel = (maIkonu ? velI : 0) + mezera + sirkaTxt;
     let bx = sp0[0] + bw/2 - cel/2;
     const by = sp0[1] + bh/2;
-    const svetly = roste(it);
+    const svetly = roste(it) || (hezky && it.typ === 'house');
     const barva = svetly ? '#ffffff' : 'var(--ink)';
     const halo = svetly ? 'rgba(40,26,14,.42)' : 'rgba(255,255,255,.7)';
 
@@ -4179,8 +4205,21 @@ function kresliPlatno() {
       parts.push(`<g color="var(--ink2)">` + artInto('zamek', sp0[0] + bw - 20, sp0[1] + 4, 16) + `</g>`);
     }
   });
+  // rozdělaný truhlík nebo květináč se dá posunout, zvětšit i otočit
+  malyUchyt = null;
+  if (state.rozdelano && state.items[state.rozdelano] && jeMaly(state.items[state.rozdelano]) && !state.zamek) {
+    const mi = state.items[state.rozdelano], mr = rectOf(mi);
+    const a = w2s(mr.x0, mr.y0), b2 = w2s(mr.x1, mr.y1);
+    parts.push(`<rect x="${(a[0]-4).toFixed(1)}" y="${(a[1]-4).toFixed(1)}" width="${(b2[0]-a[0]+8).toFixed(1)}" height="${(b2[1]-a[1]+8).toFixed(1)}" fill="none" stroke="var(--acc-dark)" stroke-width="2" stroke-dasharray="5 4" rx="4"/>`);
+    // úchyt na zvětšení v pravém dolním rohu
+    const ux = b2[0], uy = b2[1];
+    malyUchyt = { x:ux, y:uy, r:22, id:mi.id };
+    parts.push(`<circle cx="${ux.toFixed(1)}" cy="${uy.toFixed(1)}" r="13" fill="#ffffff" stroke="var(--acc-dark)" stroke-width="2.5"/>`);
+    parts.push(`<path d="M${(ux-5).toFixed(1)} ${(uy+5).toFixed(1)}l10 -10M${(ux+1).toFixed(1)} ${(uy-5).toFixed(1)}h4v4" fill="none" stroke="var(--acc-dark)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`);
+  }
+
   // potvrzovací fajfka visí rovnou u rozdělaného tvaru
-  potvrdBod = null;
+  potvrdBod = null; otocBod = null;
   if (state.rozdelano && state.items[state.rozdelano] && state.tool !== 'pan') {
     const it2 = state.items[state.rozdelano];
     const rb = rectOf(it2);
@@ -4192,6 +4231,13 @@ function kresliPlatno() {
     parts.push(`<circle cx="${cx.toFixed(1)}" cy="${(cy+2).toFixed(1)}" r="${rr}" fill="rgba(21,96,48,.28)"/>`);
     parts.push(`<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${rr}" fill="#1e7a3c" stroke="#ffffff" stroke-width="3"/>`);
     parts.push(`<path d="M${(cx-10).toFixed(1)} ${cy.toFixed(1)}l${7} ${7.5} ${13} -${14}" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`);
+    if (jeMaly(it2)) {
+      const oy2 = cy + rr*2 + 8;
+      otocBod = { x:cx, y:oy2, r:rr + 6, id:it2.id };
+      parts.push(`<circle cx="${cx.toFixed(1)}" cy="${oy2.toFixed(1)}" r="${(rr-2)}" fill="#ffffff" stroke="var(--acc-dark)" stroke-width="2.5"/>`);
+      parts.push(`<path d="M${(cx-8).toFixed(1)} ${(oy2-2).toFixed(1)}a8 8 0 1 1 2.5 6" fill="none" stroke="var(--acc-dark)" stroke-width="2.6" stroke-linecap="round"/>`);
+      parts.push(`<path d="M${(cx-11.5).toFixed(1)} ${(oy2-6).toFixed(1)}l3.5 4 4 -3.2" fill="none" stroke="var(--acc-dark)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`);
+    }
   }
 
   // vybrany prvek: ramec a uchyty
@@ -4264,7 +4310,10 @@ function namaluj(g, wx, wy) {
 function malujBod(g, wx, wy) {
   const typ = g.prvek, d = PRVKY[typ];
   if (d.maly) {
-    const rz = d.rozmer;
+    // jeden kus po druhém: dokud není potvrzený, další se nepokládá
+    const minuly = state.rozdelano ? state.items[state.rozdelano] : null;
+    if (minuly && jeMaly(minuly)) { g.cekaPotvrzeni = true; return false; }
+    const rz = { w: d.rozmer.w, h: d.rozmer.h };
     // razítkuje se po celém rozměru, aby šly klást těsně vedle sebe
     const krok = Math.max(rz.w, rz.h);
     const kl = Math.round(wx/krok) + ',' + Math.round(wy/krok);
@@ -4370,6 +4419,26 @@ function napojPlatno() {
     cv.setPointerCapture(e.pointerId);
     const p = local(e);
     ptrs.set(e.pointerId, p);
+    // otočení a zvětšení rozdělaného kusu mají přednost
+    if (ptrs.size === 1 && otocBod && Math.hypot(p.x - otocBod.x, p.y - otocBod.y) <= otocBod.r) {
+      const it3 = state.items[otocBod.id];
+      if (it3) {
+        const rz3 = it3.rozmer || PRVKY[it3.typ].rozmer;
+        const nove = { w: rz3.h, h: rz3.w };
+        if (volnoProMaly(it3.m.x, it3.m.y, nove.w, nove.h, it3.id)) {
+          it3.rozmer = nove; save(); kresliMapu(); toast('Otočeno');
+        } else toast('Otočený se sem nevejde');
+      }
+      gest = null; ptrs.clear(); return;
+    }
+    if (ptrs.size === 1 && malyUchyt && Math.hypot(p.x - malyUchyt.x, p.y - malyUchyt.y) <= malyUchyt.r) {
+      const it4 = state.items[malyUchyt.id];
+      if (it4) {
+        const rz4 = it4.rozmer || PRVKY[it4.typ].rozmer;
+        gest = { type:'zvetsitMaly', id:it4.id, start:p, w0:rz4.w, h0:rz4.h, moved:false };
+        return;
+      }
+    }
     // fajfka má přednost před kreslením, ať se jí dá trefit
     if (ptrs.size === 1 && potvrdBod && Math.hypot(p.x - potvrdBod.x, p.y - potvrdBod.y) <= potvrdBod.r) {
       const t = state.items[state.rozdelano];
@@ -4428,6 +4497,14 @@ function napojPlatno() {
     }
 
     if (PRVKY[state.tool]) {
+      const roz = state.rozdelano ? state.items[state.rozdelano] : null;
+      if (roz && jeMaly(roz)) {
+        const w6 = s2w(p.x, p.y), r6 = rectOf(roz);
+        if (w6[0] >= r6.x0 && w6[0] <= r6.x1 && w6[1] >= r6.y0 && w6[1] <= r6.y1) {
+          gest = { type:'move', id:roz.id, start:p, last:{dx:0,dy:0}, moved:false };
+          return;
+        }
+      }
       gest = { type:'stetec', prvek: state.tool, start:p, moved:false, done:new Set() };
       const w = s2w(p.x, p.y);
       namaluj(gest, w[0], w[1]);
@@ -4474,6 +4551,18 @@ function napojPlatno() {
     if (gest.type === 'erase') {
       const w = s2w(p.x, p.y);
       if (smazNaBode(gest, w[0], w[1])) scheduleRender();
+      return;
+    }
+    if (gest.type === 'zvetsitMaly') {
+      const it5 = state.items[gest.id]; if (!it5) return;
+      const dw = (p.x - gest.start.x)/view.scale, dh = (p.y - gest.start.y)/view.scale;
+      const w2 = clamp(Math.round((gest.w0 + dw) * 20) / 20, 0.1, 3);
+      const h2 = clamp(Math.round((gest.h0 + dh) * 20) / 20, 0.1, 3);
+      if (volnoProMaly(it5.m.x, it5.m.y, w2, h2, it5.id)) {
+        it5.rozmer = { w:w2, h:h2 };
+        it5.cells = [ck(Math.floor(it5.m.x), Math.floor(it5.m.y))];
+        scheduleRender();
+      }
       return;
     }
     if (gest.type === 'stetec') {
@@ -4558,8 +4647,10 @@ function napojPlatno() {
       save(); kresliMapu(); return;
     }
 
+    if (g.type === 'zvetsitMaly') { save(); kresliMapu(); return; }
     if (g.type === 'stetec') {
       if (g.zamceno) toast('Tahle část je zamčená');
+      else if (g.cekaPotvrzeni) toast('Nejdřív tenhle kus potvrď fajfkou');
       else if (g.naPrvku) toast('Na dům ani do záhonu se nedá postavit');
       else if (g.obsazeno) toast('Tady už něco stojí, zkus to vedle');
       state.sel = null;
