@@ -1,3 +1,4 @@
+<!-- KOZA_APP · Koza Zahradník · aktualizace: https://github.com/Jedn0ta/koza_update -->
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="claude:viewport-fit-sides" content="cover">
 <title>Koza Zahradník</title>
@@ -729,12 +730,13 @@ body { font-size: 17px; }
 .plodinka .pv .go { width: 16px; height: 16px; margin-left: auto; }
 
 /* ---------- nastavení ---------- */
-.rada .rh { display: flex; align-items: center; gap: 10px; width: 100%; padding: 13px; text-align: left; }
-.rada.vyp { opacity: .55; }
-.rada .rm { display: block; flex: 1; min-width: 0; }
-.rada .rm b { display: block; font-size: 16px; font-weight: 800; }
-.rada .rm span { display: block; font-size: 13px; font-weight: 600; color: var(--ink3); margin-top: 2px; }
-.rada .go { width: 18px; height: 18px; flex: none; color: var(--ink3); }
+.rh { display: flex; align-items: center; gap: 10px; width: 100%; padding: 13px; text-align: left; }
+.rh:active { background: var(--bg2); }
+.vyp { opacity: .55; }
+.rm { display: block; flex: 1; min-width: 0; }
+.rm b { display: block; font-size: 16px; font-weight: 800; }
+.rm span { display: block; font-size: 13px; font-weight: 600; color: var(--ink3); margin-top: 2px; }
+.rh .go { width: 18px; height: 18px; flex: none; color: var(--ink3); }
 .ikony { display: flex; flex-wrap: wrap; gap: 8px; }
 .ikony button {
   width: 52px; height: 52px; border-radius: 14px; border: 1.5px solid var(--line);
@@ -910,7 +912,10 @@ body { font-size: 17px; }
 
 <script>
 
-const VERZE = 'v4.1 · 25. 10. 2026';
+/* Cislo verze je cele cislo: major*10 + minor. Musi souhlasit se
+   ZABUDOVANA_VERZE v MainActivity.java a s polem cislo ve verze.json. */
+const CISLO_VERZE = 42;
+const VERZE = 'v4.2 · 28. 10. 2026';
 const LOGO_KOZEL = `<svg viewBox="0 0 32 32" aria-hidden="true">
   <path d="M11.2 9.4C9.6 6.6 7.4 4.6 4.6 3.9c-.5-.1-.9.3-.8.8.5 2.9 1.9 5.4 4.1 7.2.7.6 1.5 1 2.4 1.3z" fill="#fff" opacity=".95"/>
   <path d="M20.8 9.4c1.6-2.8 3.8-4.8 6.6-5.5.5-.1.9.3.8.8-.5 2.9-1.9 5.4-4.1 7.2-.7.6-1.5 1-2.4 1.3z" fill="#fff" opacity=".95"/>
@@ -3060,6 +3065,86 @@ async function httpGet(url, accept) {
   return res.text();
 }
 
+/* ============ AKTUALIZACE ============
+
+   Aplikace si stahuje novou verzi sama sebe z veřejného repozitáře
+   https://github.com/Jedn0ta/koza_update — v Nastavení tlačítkem Aktualizovat.
+
+   V repozitáři jsou dva soubory:
+     verze.json  {"cislo":43,"verze":"v4.3 · …","popis":"co je nového"}
+     index.html  celá aplikace, jeden soubor
+
+   Stažené HTML uloží nativní část do interního úložiště aplikace a při dalším
+   startu ho pustí místo verze zabudované v APK — ze stejné adresy, takže
+   uložená zahrada zůstane nedotčená. Když se nová verze třikrát po sobě
+   nerozjede, aplikace se sama vrátí k té z APK.
+
+   Pozor: kdo může psát do toho repozitáře, může změnit aplikaci na telefonu. */
+
+const AKT_REPO  = 'Jedn0ta/koza_update';
+const AKT_VETEV = 'main';
+const AKT_ZDROJ = 'https://raw.githubusercontent.com/' + AKT_REPO + '/' + AKT_VETEV + '/';
+
+/* Nativní most — bez něj (tj. v prohlížeči) se dá verze jen zkontrolovat. */
+function most() {
+  return (window.KozaNative && typeof window.KozaNative.ulozAktualizaci === 'function')
+    ? window.KozaNative : null;
+}
+
+function verzeZCisla(c) { return 'v' + Math.floor(c / 10) + '.' + (c % 10); }
+
+/** Co právě běží: zabudovaná verze z APK, nebo stažená aktualizace. */
+function coBezi() {
+  const m = most();
+  if (!m) return { most: false };
+  let zab = CISLO_VERZE, info = null;
+  try { zab = m.zabudovanaVerze(); } catch (e) {}
+  try { const r = m.aktualizaceInfo(); if (r) info = JSON.parse(r); } catch (e) {}
+  return { most: true, zabudovana: zab, info: info, stazena: !!(info && (info.cislo | 0) > zab) };
+}
+
+async function zjistiAktualizaci() {
+  const t = await httpGet(AKT_ZDROJ + 'verze.json?t=' + Date.now(), 'application/json');
+  let j = null;
+  try { j = JSON.parse(t); } catch (e) { throw new Error('verze.json se nedá přečíst'); }
+  if (!j || typeof j.cislo !== 'number') throw new Error('verze.json nemá číslo verze');
+  return j;
+}
+
+async function stahniAktualizaci(j) {
+  const soubor = (typeof j.soubor === 'string' && /^[\w.\-]+$/.test(j.soubor)) ? j.soubor : 'index.html';
+  const html = await httpGet(AKT_ZDROJ + soubor + '?t=' + Date.now(), 'text/html');
+  if (!html || html.length < 20000) throw new Error('stažený soubor je podezřele malý');
+  if (html.indexOf('KOZA_APP') < 0) throw new Error('stažený soubor není Koza Zahradník');
+  const m = most();
+  if (!m) throw new Error('instalace jde jen v aplikaci na telefonu');
+  const meta = JSON.stringify({
+    cislo: j.cislo | 0,
+    verze: String(j.verze || verzeZCisla(j.cislo | 0)),
+    popis: String(j.popis || ''),
+    kdy: new Date().toISOString().slice(0, 10)
+  });
+  const r = m.ulozAktualizaci(meta, html);
+  if (r !== 'OK') throw new Error(String(r).replace(/^KOZA_ERR:/, ''));
+  return html.length;
+}
+
+/** Hlášky z fetche jsou anglické, na zahradě to nikomu nepomůže. */
+function chybaCesky(e) {
+  const m = (e && e.message) ? String(e.message) : 'neznámá chyba';
+  if (/failed to fetch|networkerror|network request failed|load failed|unknownhost|ERR_/i.test(m))
+    return 'nepodařilo se spojit s GitHubem';
+  if (/HTTP 404/i.test(m)) return 'v repozitáři zatím žádná verze není';
+  if (/timeout|timed out/i.test(m)) return 'spojení vypršelo';
+  return m;
+}
+
+function restartAplikace() {
+  const m = most();
+  if (m && typeof m.restart === 'function') { try { m.restart(); return; } catch (e) {} }
+  location.reload();
+}
+
 async function geokoduj(dotaz) {
   const u = 'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=cz&q='
     + encodeURIComponent(dotaz);
@@ -3441,6 +3526,56 @@ function otevriNastaveni() {
   el('bar-title').textContent = 'Nastavení';
   kresliNastaveni();
 }
+/* ============ NASTAVENÍ ============
+   Jedna dlouhá obrazovka, ale rozdělená na sekce s odkazy nahoře, aby se
+   senior nemusel prorolovat čtyřiceti radami, když chce jen tmavý režim.   */
+
+let radyOtevrene = {};        /* rozbalené skupiny rad */
+let aktualizaceStav = null;   /* {faze:'hledam|aktualni|nove|stahuji|hotovo|chyba', …} */
+
+function kartaAktualizace() {
+  const b = coBezi();
+  const a = aktualizaceStav;
+
+  const jakaVerze = !b.most
+    ? 'Běží v prohlížeči. Aktualizovat se dá jen aplikace na telefonu.'
+    : (b.stazena
+        ? 'Stažená aktualizace. V aplikaci je zabudovaná ' + verzeZCisla(b.zabudovana) + '.'
+        : 'Verze zabudovaná v aplikaci.');
+
+  let stav = '';
+  if (a) {
+    const barva = a.faze === 'chyba' ? 'var(--danger)'
+      : (a.faze === 'nove' || a.faze === 'hotovo') ? 'var(--acc)' : 'var(--line2)';
+    stav = `<div class="card" style="padding:12px 14px;margin-top:10px;border-left:3px solid ${barva}">
+      <b style="display:block;font-size:15.5px">${esc(a.nadpis)}</b>
+      ${a.text ? `<span class="note" style="margin:5px 0 0;display:block">${esc(a.text)}</span>` : ''}
+    </div>`;
+  }
+
+  let tlacitka = '';
+  if (a && a.faze === 'nove') {
+    tlacitka = `<button class="btn sm wide" id="n-akt-inst" style="margin-top:10px">Nainstalovat ${esc(a.info.verze || verzeZCisla(a.info.cislo))}</button>
+      <button class="btn sm sec wide" id="n-akt-zrus" style="margin-top:8px">Teď ne</button>`;
+  } else if (a && a.faze === 'hotovo') {
+    tlacitka = `<button class="btn sm wide" id="n-akt-restart" style="margin-top:10px">Restartovat aplikaci</button>`;
+  } else {
+    tlacitka = `<button class="btn sm wide" id="n-akt" style="margin-top:10px"${a && a.faze === 'hledam' || a && a.faze === 'stahuji' ? ' disabled' : ''}>Aktualizovat</button>`;
+  }
+
+  return `<div id="nsek-akt" class="card" style="padding:16px 15px 15px">
+    <div class="row" style="gap:12px;align-items:center">
+      <span class="thumb" style="width:46px;height:46px;padding:9px;background:var(--acc);color:var(--acc-ink)">${ik('listek')}</span>
+      <span class="mid"><b style="font-size:17px">Koza Zahradník</b><span>${esc(VERZE)}</span></span>
+    </div>
+    <p class="note" style="margin:11px 0 0">${esc(jakaVerze)}</p>
+    ${stav}
+    ${tlacitka}
+    ${b.stazena ? `<button class="btn sm sec wide" id="n-akt-zpet" style="margin-top:8px">Vrátit se k verzi z aplikace</button>` : ''}
+    <p class="note" style="margin-bottom:0">Nová verze se stahuje z veřejného repozitáře <b>${esc(AKT_REPO)}</b> na GitHubu. Kdo do něj může psát, může změnit i aplikaci v telefonu — proto ho nikomu dalšímu nepouštěj.</p>
+  </div>`;
+}
+
 function kresliNastaveni() {
   const s = el('s-nast');
   const motiv = state.theme || 'auto';
@@ -3449,11 +3584,22 @@ function kresliNastaveni() {
   rady.forEach(r => { if (!skupiny.includes(r.skupina)) skupiny.push(r.skupina); });
   const ak = akceSeznam();
 
+  const odkazy = [
+    ['nsek-akt', 'Verze'], ['nsek-vzhled', 'Vzhled'], ['nsek-zahrady', 'Zahrady'],
+    ['nsek-akce', 'Rychlé akce'], ['nsek-rady', 'Rady'], ['nsek-data', 'Data']
+  ];
+
   s.innerHTML = `<div class="scroll">
     <div class="sec" style="margin-top:14px">
-      <button class="btn sm sec" id="n-zpet" style="margin-bottom:18px">← Zpět</button>
+      <button class="btn sm sec" id="n-zpet" style="margin-bottom:16px">← Zpět</button>
 
-      <div class="sec-h"><h2>Vzhled</h2></div>
+      <div class="chips" style="margin-bottom:16px">
+        ${odkazy.map(o => `<button class="chip" data-skok="${o[0]}">${o[1]}</button>`).join('')}
+      </div>
+
+      ${kartaAktualizace()}
+
+      <div class="sec-h" id="nsek-vzhled" style="margin-top:26px"><h2>Vzhled</h2></div>
       <div class="seg" style="margin-bottom:8px">
         <button class="${motiv==='light'?'on':''}" data-motiv="light">Světlý</button>
         <button class="${motiv==='dark'?'on':''}" data-motiv="dark">Tmavý</button>
@@ -3461,34 +3607,7 @@ function kresliNastaveni() {
       </div>
       <p class="note" style="margin-top:0">Tmavý režim šetří oči večer na zahradě i baterii.</p>
 
-      <div class="sec-h" style="margin-top:24px"><h2>Rychlé akce u záhonku</h2><span class="n">${ak.length}</span></div>
-      <div class="list">
-        ${ak.map(a=>`<div class="card row" style="padding:11px 13px">
-          <span class="thumb" style="width:44px;height:44px;padding:9px">${ik(a.ikona)}</span>
-          <span class="mid"><b>${esc(a.nazev)}</b><span>${a.vlastni ? 'vlastní akce' : 'vestavěná'}</span></span>
-          ${a.vlastni ? `<button class="tag" data-aedit="${a.id}">Upravit</button>
-            <button class="tag" data-adel="${a.id}">×</button>` : ''}
-        </div>`).join('')}
-      </div>
-      <button class="btn sm sec wide" id="n-akce" style="margin-top:10px">+ Přidat vlastní akci</button>
-      <p class="note">Třeba Postřik, Okopat, Přivázat, Protrhat. Objeví se jako tlačítko u každého záhonku a zapíše se do kalendáře.</p>
-
-      <div class="sec-h" style="margin-top:24px"><h2>Rady a pravidla</h2><span class="n">${rady.length}</span></div>
-      <p class="note" style="margin-top:0">Tohle appka radí na obrazovce Dnes. Každou radu můžeš přepsat podle své zahrady, vypnout, nebo si přidat vlastní.</p>
-      ${skupiny.map(g=>`
-        <div class="sec-h" style="margin-top:16px"><h2 style="text-transform:none;letter-spacing:0;font-size:15px;color:var(--ink)">${esc(g)}</h2></div>
-        <div class="list">
-          ${rady.filter(r=>r.skupina===g).map(r=>`<div class="card rada ${r.zap===false?'vyp':''}">
-            <button class="rh" data-radu="${esc(r.id)}">
-              <span class="rm"><b>${esc(r.nadpis)}</b>
-                <span>${r.mesice && r.mesice.length ? r.mesice.map(m=>MESICE_KR2[m-1]).join(', ') : 'celoročně'}${r.vlastni?' · moje':''}${r.zap===false?' · vypnuto':''}</span></span>
-              <svg class="go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
-            </button>
-          </div>`).join('')}
-        </div>`).join('')}
-      <button class="btn sm sec wide" id="n-rada" style="margin-top:12px">+ Přidat vlastní radu</button>
-
-      <div class="sec-h" style="margin-top:26px"><h2>Moje zahrady</h2><span class="n">${zahrady.length}</span></div>
+      <div class="sec-h" id="nsek-zahrady" style="margin-top:26px"><h2>Moje zahrady</h2><span class="n">${zahrady.length}</span></div>
       <div class="list">
         ${zahrady.map(z=>`<div class="card row" style="padding:12px 13px">
           <span class="thumb" style="width:40px;height:40px;padding:8px">${ik(z.id===aktivniZahrada?'mapa':'zahon')}</span>
@@ -3501,7 +3620,7 @@ function kresliNastaveni() {
       <button class="btn sm sec wide" id="n-nova" style="margin-top:10px">+ Založit novou zahradu</button>
       <p class="note">Hodí se na chatu, předzahrádku nebo zahradu u rodičů. Každá má vlastní plán i zápisy.</p>
 
-      <div class="sec-h" style="margin-top:26px"><h2>Tahle zahrada</h2></div>
+      <div class="sec-h" style="margin-top:22px"><h2>Otevřená zahrada</h2></div>
       <div class="list">
         <div class="card row" style="padding:12px 13px">
           <span class="mid"><b>${esc(state.adresa || 'Adresa nezadaná')}</b>
@@ -3515,12 +3634,51 @@ function kresliNastaveni() {
         </div>
       </div>
 
-      <div class="sec-h" style="margin-top:24px"><h2>Data</h2></div>
+      <div class="sec-h" id="nsek-akce" style="margin-top:26px"><h2>Rychlé akce u záhonku</h2><span class="n">${ak.length}</span></div>
+      <div class="list">
+        ${ak.map(a=>`<div class="card row" style="padding:11px 13px">
+          <span class="thumb" style="width:44px;height:44px;padding:9px">${ik(a.ikona)}</span>
+          <span class="mid"><b>${esc(a.nazev)}</b><span>${a.vlastni ? 'vlastní akce' : 'vestavěná'}</span></span>
+          ${a.vlastni ? `<button class="tag" data-aedit="${a.id}">Upravit</button>
+            <button class="tag" data-adel="${a.id}">×</button>` : ''}
+        </div>`).join('')}
+      </div>
+      <button class="btn sm sec wide" id="n-akce" style="margin-top:10px">+ Přidat vlastní akci</button>
+      <p class="note">Třeba Postřik, Okopat, Přivázat, Protrhat. Objeví se jako tlačítko u každého záhonku a zapíše se do kalendáře.</p>
+
+      <div class="sec-h" id="nsek-rady" style="margin-top:26px"><h2>Rady a pravidla</h2><span class="n">${rady.length}</span></div>
+      <p class="note" style="margin-top:0">Tohle appka radí na obrazovce Dnes. Každou radu můžeš přepsat podle své zahrady, vypnout, nebo si přidat vlastní. Klepni na skupinu a rozbalí se.</p>
+      <div class="list">
+        ${skupiny.map(g=>{
+          const vg = rady.filter(r=>r.skupina===g);
+          const otev = !!radyOtevrene[g];
+          const vyp = vg.filter(r=>r.zap===false).length;
+          return `<div class="card" style="padding:0;overflow:hidden">
+            <button class="rh" data-skupina="${esc(g)}" style="width:100%">
+              <span class="rm"><b>${esc(g)}</b>
+                <span>${vg.length} ${vg.length===1?'rada':(vg.length<5?'rady':'rad')}${vyp?' · '+vyp+' vypnuto':''}</span></span>
+              <svg class="go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+                style="transform:rotate(${otev?90:0}deg);transition:transform .15s"><path d="M9 6l6 6-6 6"/></svg>
+            </button>
+            ${otev ? `<div style="border-top:1px solid var(--line);padding:4px 0">
+              ${vg.map(r=>`<button class="rh ${r.zap===false?'vyp':''}" data-radu="${esc(r.id)}" style="width:100%">
+                <span class="rm"><b style="font-weight:600">${esc(r.nadpis)}</b>
+                  <span>${r.mesice && r.mesice.length ? r.mesice.map(m=>MESICE_KR2[m-1]).join(', ') : 'celoročně'}${r.vlastni?' · moje':''}${r.zap===false?' · vypnuto':''}</span></span>
+                <svg class="go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
+              </button>`).join('')}
+            </div>` : ''}
+          </div>`;
+        }).join('')}
+      </div>
+      <button class="btn sm sec wide" id="n-rada" style="margin-top:12px">+ Přidat vlastní radu</button>
+
+      <div class="sec-h" id="nsek-data" style="margin-top:26px"><h2>Data</h2></div>
       <button class="btn sm sec wide" id="n-export" style="margin-bottom:10px">Uložit zálohu zahrady</button>
       <button class="btn sm sec wide" id="n-import" style="margin-bottom:10px">Načíst zálohu</button>
       <button class="btn sm sec wide" id="n-reset" style="color:var(--danger)">Smazat všechno a začít znovu</button>
-      <p class="note">Záloha je jeden soubor se vším — plánem, fotkami i zápisy. Hodí se před výměnou telefonu.</p>
-      <div class="sec-h" style="margin-top:24px"><h2>Zdroje</h2></div>
+      <p class="note">Záloha je jeden soubor se vším — plánem, fotkami i zápisy. Hodí se před výměnou telefonu. Aktualizace zahradu nemaže, ale záloha před ní nic nezkazí.</p>
+
+      <div class="sec-h" style="margin-top:26px"><h2>Zdroje</h2></div>
       <p class="note" style="margin-top:0">Ikony: <b>Material Symbols</b> od Googlu, licence Apache 2.0, ve dvou řezech — obtaženém a plném. Emoji dodává tvůj telefon.
       Počasí: <b>Open-Meteo</b>, data CC BY 4.0. Parcely: <b>ČÚZK</b>, INSPIRE. Adresy: <b>Nominatim</b> nad OpenStreetMap.</p>
       <p class="note" style="text-align:center;margin-top:18px">Koza Zahradník ${esc(VERZE)}</p>
@@ -3528,12 +3686,22 @@ function kresliNastaveni() {
   </div>`;
 
   el('n-zpet').onclick = () => prepni(state.tab || 'dnes');
+  s.querySelectorAll('[data-skok]').forEach(b => b.onclick = () => {
+    const c = el(b.dataset.skok);
+    if (c) c.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
   s.querySelectorAll('[data-motiv]').forEach(b => b.onclick = () => {
     const v = b.dataset.motiv;
     state.theme = v === 'auto' ? null : v;
     if (v === 'auto') document.documentElement.removeAttribute('data-theme');
     else document.documentElement.setAttribute('data-theme', v);
     save(); kresliNastaveni();
+  });
+  s.querySelectorAll('[data-skupina]').forEach(b => b.onclick = () => {
+    const g = b.dataset.skupina;
+    radyOtevrene[g] = !radyOtevrene[g];
+    kresliNastaveni();
+    const c = el('nsek-rady'); if (c) c.scrollIntoView({ block: 'start' });
   });
   s.querySelectorAll('[data-radu]').forEach(b => b.onclick = () => dialogRady(b.dataset.radu));
   s.querySelectorAll('[data-uhot]').forEach(b => b.onclick = () => { prepniUkol(b.dataset.uhot); kresliDnes(); });
@@ -3557,6 +3725,64 @@ function kresliNastaveni() {
     try { localStorage.removeItem(klicZahrady(aktivniZahrada)); } catch (e) {}
     location.reload();
   });
+
+  /* --- aktualizace --- */
+  const bAkt = el('n-akt');
+  if (bAkt) bAkt.onclick = async () => {
+    aktualizaceStav = { faze: 'hledam', nadpis: 'Hledám novou verzi…', text: 'Chvilku to trvá.' };
+    kresliNastaveni();
+    try {
+      const j = await zjistiAktualizaci();
+      const zab = coBezi();
+      const mam = zab.most ? Math.max(zab.zabudovana, zab.info ? (zab.info.cislo | 0) : 0) : CISLO_VERZE;
+      if ((j.cislo | 0) <= mam) {
+        aktualizaceStav = { faze: 'aktualni', nadpis: 'Máš nejnovější verzi',
+          text: 'V repozitáři je ' + (j.verze || verzeZCisla(j.cislo)) + ', což už v telefonu běží.' };
+      } else if (!most()) {
+        aktualizaceStav = { faze: 'nove', info: j, nadpis: 'K dispozici je ' + (j.verze || verzeZCisla(j.cislo)),
+          text: (j.popis || '') + ' Nainstalovat ji jde ale jen v aplikaci na telefonu, ne tady v prohlížeči.' };
+        aktualizaceStav.faze = 'aktualni';
+      } else {
+        aktualizaceStav = { faze: 'nove', info: j,
+          nadpis: 'K dispozici je ' + (j.verze || verzeZCisla(j.cislo)),
+          text: j.popis || 'Popis změn chybí.' };
+      }
+    } catch (e) {
+      aktualizaceStav = { faze: 'chyba', nadpis: 'Nepovedlo se',
+        text: chybaCesky(e) + '. Zkontroluj připojení a zkus to znovu.' };
+    }
+    kresliNastaveni();
+  };
+
+  const bZrus = el('n-akt-zrus');
+  if (bZrus) bZrus.onclick = () => { aktualizaceStav = null; kresliNastaveni(); };
+
+  const bInst = el('n-akt-inst');
+  if (bInst) bInst.onclick = async () => {
+    const j = aktualizaceStav.info;
+    aktualizaceStav = { faze: 'stahuji', nadpis: 'Stahuji a instaluji…', text: 'Nevypínej teď aplikaci.' };
+    kresliNastaveni();
+    try {
+      const kb = Math.round(await stahniAktualizaci(j) / 1024);
+      aktualizaceStav = { faze: 'hotovo', nadpis: 'Nainstalováno (' + kb + ' kB)',
+        text: 'Nová verze se spustí po restartu aplikace. Zahrada i zápisy zůstávají.' };
+    } catch (e) {
+      aktualizaceStav = { faze: 'chyba', nadpis: 'Instalace se nepovedla',
+        text: chybaCesky(e) + '. Aplikace běží dál ve staré verzi.' };
+    }
+    kresliNastaveni();
+  };
+
+  const bRest = el('n-akt-restart');
+  if (bRest) bRest.onclick = () => restartAplikace();
+
+  const bZpet = el('n-akt-zpet');
+  if (bZpet) bZpet.onclick = () => potvrd('Vrátit se k verzi z aplikace?',
+    'Stažená aktualizace se smaže a pustí se verze zabudovaná v APK. Zahrada ani zápisy se nemažou.', () => {
+      const m = most();
+      try { if (m) m.smazAktualizaci(); } catch (e) {}
+      restartAplikace();
+    });
 }
 const MESICE_KR2 = ['led','úno','bře','dub','kvě','čvn','čvc','srp','zář','říj','lis','pro'];
 
@@ -6264,5 +6490,13 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') zavri(); });
 window.addEventListener('resize', () => { if (state.tab === 'map') { posadPanel(); scheduleRender(); } });
 prepni(state.tab || 'dnes');
 if (!state.view) requestAnimationFrame(() => requestAnimationFrame(() => fitView()));
+
+/* Ohlásíme nativní části, že se stránka rozjela. Dokud tohle nepřijde,
+   počítá si neúspěšné starty a po třech se vrátí k verzi z APK. */
+try {
+  if (window.KozaNative && typeof window.KozaNative.aktualizaceOk === 'function') {
+    window.KozaNative.aktualizaceOk();
+  }
+} catch (e) {}
 
 </script>
